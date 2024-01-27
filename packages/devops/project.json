@@ -1,0 +1,20 @@
+{
+  "name": "devops",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/devops/",
+  "targets": {
+    "local:database:up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f ./packages/devops/local/docker-compose.yaml up -d postgres"
+      }
+    },
+    "local:database:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f ./packages/devops/local/docker-compose.yaml down postgres"
+      }
+    }
+  },
+  "tags": []
+}
