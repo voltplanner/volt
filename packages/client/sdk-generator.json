@@ -1,7 +1,0 @@
-{
-    "verbose": true,
-    "apiInputPath": "../server",
-    "sdkOutput": "src/sdk/types",
-    "sdkInterfacePath": "src/sdk/sdk-interface.ts",
-    "tsconfigFile": "tsconfig.app.json"
-  }

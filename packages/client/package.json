@@ -17,8 +17,5 @@
     "react-router-dom": "6.11.2",
     "tslib": "^2.3.0",
     "zustand": "^4.5.0"
-  },
-  "devDependencies": {
-    "nest-sdk-generator": "^1.1.3"
   }
 }

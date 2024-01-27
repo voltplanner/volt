@@ -7,7 +7,7 @@ import {
     AuthConfigurableModuleClass,
     patchAuthConfig,
 } from './auth.config'
-import { AuthController } from './auth.controller'
+import { AuthController } from './controllers/auth.controller'
 import { AuthTokensService } from './services/auth-tokens.service'
 import { AuthUserService } from './services/auth-user.service'
 import { OwnerStrategy } from './strategies/owner.strategy'
