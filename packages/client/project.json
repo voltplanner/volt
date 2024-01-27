@@ -5,6 +5,7 @@
   "projectType": "application",
   "targets": {
     "build": {
+      "dependsOn": ["sdk:generate"],
       "executor": "@nx/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
@@ -79,6 +80,12 @@
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "packages/client/jest.config.ts"
+      }
+    },
+    "sdk:generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nest-sdk-generator ./packages/client/sdk-generator.json"
       }
     }
   },

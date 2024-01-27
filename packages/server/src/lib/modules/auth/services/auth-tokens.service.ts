@@ -4,7 +4,7 @@ import { SignOptions, TokenExpiredError } from 'jsonwebtoken'
 
 import { PrismaService, RoleEnum } from '../../shared/prisma'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
-import { RefreshTokenPayload } from './auth.interfaces'
+import { RefreshTokenPayload } from '../interfaces/auth.interfaces'
 
 @Injectable()
 export class AuthTokensService {

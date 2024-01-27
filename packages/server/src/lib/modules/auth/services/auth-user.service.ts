@@ -10,7 +10,7 @@ import {
     SignInResponse,
     UpdateUser,
     User,
-} from './auth.interfaces'
+} from '../interfaces/auth.interfaces'
 import { AuthTokensService } from './auth-tokens.service'
 
 @Injectable()
