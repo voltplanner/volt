@@ -1,6 +1,5 @@
 import AppRouter from './routes/AppRouter'
 import { Stack, ThemeProvider, createTheme } from '@mui/material'
-import { ResponsiveAppBar } from 'widgets'
 
 export function App() {
     const theme = createTheme({
