@@ -20,7 +20,17 @@
       },
       "configurations": {
         "development": {},
-        "production": {}
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "watch": false,
+          "fileReplacements": [
+            {
+              "replace": "packages/server/src/environments/environment.ts",
+              "with": "packages/server/src/environments/environment.prod.ts"
+            }
+          ]
+        }
       }
     },
     "serve": {
