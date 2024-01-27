@@ -7,6 +7,7 @@
       "dependsOn": ["^build"]
     },
     "lint": {
+      "dependsOn": ["prisma:generate"],
       "cache": true,
       "inputs": [
         "default",
@@ -14,6 +15,10 @@
         "{workspaceRoot}/.eslintignore",
         "{workspaceRoot}/eslint.config.js"
       ]
+    },
+    "prisma:generate": {
+      "inputs": ["{projectRoot}/**/schema.prisma"],
+      "cache": true
     },
     "@nx/jest:jest": {
       "cache": true,
