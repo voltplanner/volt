@@ -1,0 +1,15 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../../../../node_modules/@prisma/server"
+  binaryTargets   = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SampleUser {
+  id   String  @id(map: "PK_SAMPLE_USERS") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name String? @db.VarChar(64)
+}

@@ -6,13 +6,14 @@
   "targets": {
     "build": {
       "executor": "@nx/webpack:webpack",
+      "dependsOn": ["prisma:generate"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "target": "node",
         "compiler": "tsc",
         "outputPath": "dist/packages/server",
-        "main": "packages/server/src/main.ts",
+        "main": "packages/server/src/lib/main.ts",
         "tsConfig": "packages/server/tsconfig.app.json",
         "assets": ["packages/server/src/assets"],
         "webpackConfig": "packages/server/webpack.config.js"
@@ -47,6 +48,22 @@
       "options": {
         "jestConfig": "packages/server/jest.config.ts"
       }
+    },
+    "prisma:generate": {
+      "executor": "@tinybudgie/schematics:prisma-generate",
+      "outputs": ["{workspaceRoot}/node_modules/@prisma/server"]
+    },
+    "prisma:pull": {
+      "executor": "@tinybudgie/schematics:prisma-pull"
+    },
+    "prisma:migrate:dev": {
+      "executor": "@tinybudgie/schematics:prisma-migrate-dev"
+    },
+    "prisma:migrate:deploy": {
+      "executor": "@tinybudgie/schematics:prisma-migrate-deploy"
+    },
+    "prisma:studio": {
+      "executor": "@tinybudgie/schematics:prisma-studio"
     }
   },
   "tags": []
