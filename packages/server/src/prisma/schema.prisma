@@ -1,7 +1,7 @@
 generator client {
-  provider        = "prisma-client-js"
-  output          = "../../../../node_modules/@prisma/server"
-  binaryTargets   = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  output        = "../../../../node_modules/@prisma/server"
+  binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -9,7 +9,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model SampleUser {
-  id   String  @id(map: "PK_SAMPLE_USERS") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name String? @db.VarChar(64)
+model AuthUser {
+  id        String             @id @default(uuid())
+  email     String             @unique
+  firstname String
+  lastname  String
+  password  String
+  role      RoleEnum           @default(MEMBER)
+  createdAt DateTime           @default(now())
+  deletedAt DateTime?
+  tokens    AuthRefreshToken[]
+}
+
+model AuthRefreshToken {
+  id        String   @id @default(uuid())
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  user      AuthUser @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+enum RoleEnum {
+  MEMBER
+  ADMIN
+  OWNER
 }
