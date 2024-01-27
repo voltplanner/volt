@@ -1,19 +1,18 @@
-import { Suspense, memo, useMemo } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { CircularProgress } from '@mui/material';
-import { routeConfig } from 'shared';
-
+import { Suspense, memo, useMemo } from 'react'
+import { Route, Routes } from 'react-router-dom'
+import { CircularProgress, Container } from '@mui/material'
+import { routeConfig } from 'shared'
 
 const AppRouter = () => {
-    const isAuth = true;
+    const isAuth = true
     const routes = useMemo(() => {
         return Object.values(routeConfig).filter((route) => {
             if (route.authOnly && !isAuth) {
-                return false;
+                return false
             }
-            return true;
-        });
-    }, [isAuth]);
+            return true
+        })
+    }, [isAuth])
 
     return (
         <Routes>
@@ -21,15 +20,17 @@ const AppRouter = () => {
                 <Route
                     key={path}
                     path={path}
-                    element={(
+                    element={
                         <Suspense fallback={<CircularProgress />}>
-                            <div className="page-wrapper">{element}</div>
+                            <Container sx={{ minHeight: '100%' }}>
+                                {element}
+                            </Container>
                         </Suspense>
-                    )}
+                    }
                 />
             ))}
         </Routes>
-    );
-};
+    )
+}
 
-export default memo(AppRouter);
+export default memo(AppRouter)

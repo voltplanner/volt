@@ -16,17 +16,22 @@ export function App() {
             },
         },
         typography: {
-            allVariants:{
+            allVariants: {
                 color: '#e3e3e3',
-            }
+            },
+            h4: {
+                fontSize: '26px',
+            },
         },
     })
     return (
         <ThemeProvider theme={theme}>
-            <ResponsiveAppBar />
+            {/* <ResponsiveAppBar /> */}
             <Stack
-                height={'100vh'}
-                sx={{ backgroundColor: 'background.default', padding: '20px' }}
+                sx={{
+                    backgroundColor: 'background.default',
+                    height: '100%',
+                }}
             >
                 <AppRouter />
             </Stack>
