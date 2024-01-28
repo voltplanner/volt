@@ -16,10 +16,6 @@
         "{workspaceRoot}/eslint.config.js"
       ]
     },
-    "prisma:generate": {
-      "inputs": ["{projectRoot}/**/schema.prisma"],
-      "cache": true
-    },
     "@nx/jest:jest": {
       "cache": true,
       "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],

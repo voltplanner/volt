@@ -61,8 +61,7 @@
       }
     },
     "prisma:generate": {
-      "executor": "@tinybudgie/schematics:prisma-generate",
-      "outputs": ["{workspaceRoot}/node_modules/@prisma/server"]
+      "executor": "@tinybudgie/schematics:prisma-generate"
     },
     "prisma:pull": {
       "executor": "@tinybudgie/schematics:prisma-pull"
@@ -75,6 +74,26 @@
     },
     "prisma:studio": {
       "executor": "@tinybudgie/schematics:prisma-studio"
+    },
+    "graphql:prepare": {
+      "executor": "@nx/webpack:webpack",
+      "dependsOn": ["prisma:generate"],
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/packages/graphql-generate",
+        "main": "packages/server/src/lib/generate-graphql.ts",
+        "tsConfig": "packages/server/tsconfig.app.json",
+        "webpackConfig": "packages/server/webpack.config.js"
+      }
+    },
+    "graphql:generate": {
+      "executor": "@nx/js:node",
+      "options": {
+        "watch": false,
+        "buildTarget": "server:graphql:prepare"
+      }
     }
   },
   "tags": []

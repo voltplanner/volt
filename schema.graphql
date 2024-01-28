@@ -1,0 +1,19 @@
+type AuthorizationResponse {
+  refreshToken: String!
+  accessToken: String!
+  adminId: String!
+  expiresAt: Float!
+}
+
+type Query {
+  hi: String!
+}
+
+type Mutation {
+  signIn(input: SignInInput!): AuthorizationResponse!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}

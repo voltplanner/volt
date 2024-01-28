@@ -7,7 +7,7 @@ import {
     AuthConfigurableModuleClass,
     patchAuthConfig,
 } from './auth.config'
-import { AuthController } from './controllers/auth.controller'
+import { AuthResolver } from './resolvers/auth.resolver'
 import { AuthTokensService } from './services/auth-tokens.service'
 import { AuthUserService } from './services/auth-user.service'
 import { OwnerStrategy } from './strategies/owner.strategy'
@@ -16,7 +16,7 @@ import { OwnerStrategy } from './strategies/owner.strategy'
 export class AuthModule extends AuthConfigurableModuleClass {
     static forRoot(options: typeof AUTH_OPTIONS_TYPE): DynamicModule {
         const imports: any[] = [JwtModule]
-        const controllers: Type<any>[] = [AuthController]
+        const controllers: Type<any>[] = []
         const exports: any[] = [AUTH_CONFIG]
         const providers: Provider[] = [
             {
@@ -26,6 +26,7 @@ export class AuthModule extends AuthConfigurableModuleClass {
             AuthUserService,
             AuthTokensService,
             OwnerStrategy,
+            AuthResolver,
         ]
 
         return {

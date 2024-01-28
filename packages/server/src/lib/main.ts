@@ -15,17 +15,12 @@ logger.configure({
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, { logger })
 
-    const globalPrefix = 'api'
-
-    app.setGlobalPrefix(globalPrefix)
     app.useGlobalPipes(new ValidationPipe())
 
     const port = get('SERVER_PORT').default(3000).asPortNumber()
     await app.listen(port)
 
-    logger.log(
-        `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
-    )
+    logger.log(`🚀 Application is running on: http://localhost:${port}/graphql`)
 }
 
 bootstrap()
