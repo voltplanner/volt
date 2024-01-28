@@ -1,9 +1,9 @@
-import { Typography } from '@mui/material'
+
 
 const AboutPage = () => {
     return (
         <div>
-            <Typography>AboutPage</Typography>
+            AboutPage
         </div>
     )
 }

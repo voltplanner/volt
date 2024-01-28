@@ -1,6 +1,6 @@
-import { Typography } from '@mui/material'
+
 
 const MainPage = () => {
-    return <Typography>MainPage</Typography>
+    return <>MainPage</>
 }
 export default MainPage

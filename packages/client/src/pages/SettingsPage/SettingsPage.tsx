@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material'
 
 const SettingsPage = () => {
-    return <Typography>SettingsPage</Typography>
+    return <>SettingsPage</>
 }
 export default SettingsPage

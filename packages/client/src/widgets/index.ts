@@ -1,2 +1,1 @@
-import ResponsiveAppBar from './ResponsiveAppBar/ResponsiveAppBar'
-export { ResponsiveAppBar }
+export const test = 1;

@@ -1,7 +1,7 @@
 import { Suspense, memo, useMemo } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { CircularProgress, Container } from '@mui/material'
 import { routeConfig } from 'shared'
+import styled from 'styled-components'
 
 const AppRouter = () => {
     const isAuth = true
@@ -21,10 +21,8 @@ const AppRouter = () => {
                     key={path}
                     path={path}
                     element={
-                        <Suspense fallback={<CircularProgress />}>
-                            <Container sx={{ minHeight: '100%' }}>
-                                {element}
-                            </Container>
+                        <Suspense fallback={''}>
+                            <PageWrapperStyled>{element}</PageWrapperStyled>
                         </Suspense>
                     }
                 />
@@ -34,3 +32,10 @@ const AppRouter = () => {
 }
 
 export default memo(AppRouter)
+const PageWrapperStyled = styled.div`
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+`
