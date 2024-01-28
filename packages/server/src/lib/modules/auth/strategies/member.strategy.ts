@@ -7,7 +7,7 @@ import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import { AccessTokenPayload } from '../interfaces/auth.interfaces'
 
 @Injectable()
-export class OwnerStrategy extends PassportStrategy(Strategy, 'owner') {
+export class MemberStrategy extends PassportStrategy(Strategy, 'member') {
     constructor(
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
@@ -25,8 +25,8 @@ export class OwnerStrategy extends PassportStrategy(Strategy, 'owner') {
     async validate(payload: AccessTokenPayload): Promise<boolean> {
         const { role } = payload
 
-        if (role !== AuthUserRoleEnum.OWNER) {
-            throw new ForbiddenException('Not an owner')
+        if (role !== AuthUserRoleEnum.MEMBER) {
+            throw new ForbiddenException('Not an member')
         }
 
         return true

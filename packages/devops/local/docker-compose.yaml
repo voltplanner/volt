@@ -2,11 +2,22 @@ version: '3.9'
 
 services:
   postgres:
-    container_name: postgres
     image: postgres:15.5
+    container_name: postgres
     environment:
       POSTGRES_DB: 'postgres'
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'postgres'
     ports:
       - '5432:5432'
+
+  maildev:
+    image: soulteary/maildev:latest
+    container_name: maildev
+    environment:
+      - MAILDEV_WEB_USER=maildev
+      - MAILDEV_WEB_PASS=maildev
+    ports:
+      - 1080:1080
+      - 1025:1025
+    tty: true

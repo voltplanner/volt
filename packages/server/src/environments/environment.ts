@@ -1,7 +1,10 @@
 import { get } from 'env-var'
 
+import { parseSmtpConnectionUrl } from '../lib/modules/shared/utils'
+
 export const environment = {
     production: false,
+    rootUrl: get('ROOT_URL').required().asUrlString(),
     databaseUrl: get('DATABASE_URL').required().asUrlString(),
     adminEmail: get('ADMIN_EMAIL').default('admin@volt.com').asEmailString(),
     adminPassword: get('ADMIN_PASSWORD').default('admin').asString(),
@@ -15,5 +18,13 @@ export const environment = {
             .default(60 * 60)
             .asInt(),
         secret: get('JWT_SECRET').required().asString(),
+    },
+    mailer: {
+        transport: parseSmtpConnectionUrl(
+            get('SMTP_URL').required().asUrlString(),
+        ),
+        defaults: {
+            from: get('SMTP_NO_REPLY_EMAIL'),
+        },
     },
 }

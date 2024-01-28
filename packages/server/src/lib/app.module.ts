@@ -5,7 +5,9 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { join } from 'path'
 
 import { environment } from '../environments/environment'
+import { AuthIntegration } from './integrations/auth.integration'
 import { AuthModule } from './modules/auth/auth.module'
+import { NotificationsModule } from './modules/notifications/notifications.module'
 import { PrismaModule } from './modules/shared/prisma'
 
 @Module({
@@ -15,6 +17,7 @@ import { PrismaModule } from './modules/shared/prisma'
         }),
         GraphQLModule.forRoot<ApolloFederationDriverConfig>({
             driver: ApolloDriver,
+            fieldResolverEnhancers: ['interceptors'],
             autoSchemaFile: join(process.cwd(), 'schema.graphql'),
             playground: false,
             introspection: true,
@@ -25,8 +28,11 @@ import { PrismaModule } from './modules/shared/prisma'
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
         }),
+        NotificationsModule.forRoot({
+            ...environment.mailer,
+        }),
     ],
     controllers: [],
-    providers: [],
+    providers: [AuthIntegration],
 })
 export class AppModule {}

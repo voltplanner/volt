@@ -1,7 +1,12 @@
-import { RoleEnum } from '../../shared/prisma'
+import { AuthUserRoleEnum } from '../../shared/prisma'
 
 export interface RefreshTokenPayload {
     jti: string
+    sub: string
+}
+
+export interface AccessTokenPayload {
+    role: AuthUserRoleEnum
     sub: string
 }
 
@@ -10,17 +15,34 @@ export interface User {
     email: string
     firstname: string
     lastname: string
-    role: RoleEnum
+    role: AuthUserRoleEnum
     createdAt: Date
     deletedAt: Date
+}
+
+export type CreateUserWithPassword = {
+    email: string
+    firstname: string
+    lastname: string
+    password: string
+    role: AuthUserRoleEnum
 }
 
 export type CreateUser = {
     email: string
     firstname: string
     lastname: string
+    role: AuthUserRoleEnum
+}
+
+export interface CompleteSignIn {
+    userId: string
+    code: string
     password: string
-    role: RoleEnum
+}
+
+export type DeleteUser = {
+    userId: string
 }
 
 export type UpdateUser = {
@@ -28,7 +50,7 @@ export type UpdateUser = {
     firstname: string
     lastname: string
     password: string
-    role: RoleEnum
+    role: AuthUserRoleEnum
 }
 
 export interface FindFilter {
@@ -38,7 +60,7 @@ export interface FindFilter {
         email?: string
         firstname?: string
         lastname?: string
-        role?: RoleEnum
+        role?: AuthUserRoleEnum
     }
 }
 
@@ -50,6 +72,6 @@ export interface SignInPayload {
 export interface SignInResponse {
     refreshToken: string
     accessToken: string
-    adminId: string
+    userId: string
     expiresAt: number
 }

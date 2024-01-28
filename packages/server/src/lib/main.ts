@@ -17,6 +17,8 @@ async function bootstrap() {
 
     app.useGlobalPipes(new ValidationPipe())
 
+    // app.useGlobalFilters(new GraphQLExceptionFilter());
+
     const port = get('SERVER_PORT').default(3000).asPortNumber()
     await app.listen(port)
 

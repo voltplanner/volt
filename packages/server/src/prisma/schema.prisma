@@ -10,15 +10,18 @@ datasource db {
 }
 
 model AuthUser {
-  id        String             @id @default(uuid())
-  email     String             @unique
-  firstname String
-  lastname  String
-  password  String
-  role      RoleEnum           @default(MEMBER)
-  createdAt DateTime           @default(now())
-  deletedAt DateTime?
-  tokens    AuthRefreshToken[]
+  id            String             @id @default(uuid())
+  email         String             @unique
+  firstname     String
+  lastname      String
+  password      String?
+  completeCode String?
+  role          AuthUserRoleEnum   @default(MEMBER)
+  status        AuthUserStatusEnum @default(WAITING_COMPLETE)
+  createdAt     DateTime           @default(now())
+  deletedAt     DateTime?
+  tokens        AuthRefreshToken[]
+  notifications Notification[]
 }
 
 model AuthRefreshToken {
@@ -29,8 +32,32 @@ model AuthRefreshToken {
   userId    String
 }
 
-enum RoleEnum {
+enum AuthUserRoleEnum {
   MEMBER
   ADMIN
   OWNER
+}
+
+enum AuthUserStatusEnum {
+  WAITING_COMPLETE
+  ACTIVE
+  BLOCKED
+}
+
+model Notification {
+  id      String               @id @default(uuid())
+  topic   String
+  message String
+  link    String?
+  type    NotificationTypeEnum
+  sent    Boolean              @default(false)
+  sentAt  DateTime?
+  error   String?
+  user    AuthUser             @relation(fields: [userId], references: [id])
+  userId  String
+}
+
+enum NotificationTypeEnum {
+  EMAIL
+  WEB
 }

@@ -8,8 +8,12 @@ import {
     patchAuthConfig,
 } from './auth.config'
 import { AuthResolver } from './resolvers/auth.resolver'
+import { AuthAdminService } from './services/auth-admin.service'
+import { AuthEventsService } from './services/auth-events.service'
 import { AuthTokensService } from './services/auth-tokens.service'
 import { AuthUserService } from './services/auth-user.service'
+import { AdminStrategy } from './strategies/admin.strategy'
+import { MemberStrategy } from './strategies/member.strategy'
 import { OwnerStrategy } from './strategies/owner.strategy'
 
 @Module({})
@@ -17,7 +21,7 @@ export class AuthModule extends AuthConfigurableModuleClass {
     static forRoot(options: typeof AUTH_OPTIONS_TYPE): DynamicModule {
         const imports: any[] = [JwtModule]
         const controllers: Type<any>[] = []
-        const exports: any[] = [AUTH_CONFIG]
+        const exports: any[] = [AUTH_CONFIG, AuthEventsService]
         const providers: Provider[] = [
             {
                 provide: AUTH_CONFIG,
@@ -26,7 +30,11 @@ export class AuthModule extends AuthConfigurableModuleClass {
             AuthUserService,
             AuthTokensService,
             OwnerStrategy,
+            AdminStrategy,
+            MemberStrategy,
             AuthResolver,
+            AuthEventsService,
+            AuthAdminService,
         ]
 
         return {

@@ -1,8 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common'
+import {
+    Inject,
+    Injectable,
+    UnprocessableEntityException,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken'
 
-import { PrismaService, RoleEnum } from '../../shared/prisma'
+import { AuthUserRoleEnum, PrismaService } from '../../shared/prisma'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import { RefreshTokenPayload } from '../interfaces/auth.interfaces'
 
@@ -17,7 +21,7 @@ export class AuthTokensService {
 
     async generateAccessToken(
         adminId: string,
-        role: RoleEnum = RoleEnum.ADMIN,
+        role: AuthUserRoleEnum = AuthUserRoleEnum.MEMBER,
     ): Promise<string> {
         const signOptions: SignOptions = {
             issuer: this.config.jwt.issuerUrl,
@@ -39,7 +43,7 @@ export class AuthTokensService {
 
     async generateRefreshToken(
         userId: string,
-        role: RoleEnum = RoleEnum.MEMBER,
+        role: AuthUserRoleEnum = AuthUserRoleEnum.MEMBER,
     ): Promise<string> {
         const refreshToken = await this.prisma.authRefreshToken.create({
             data: {
@@ -80,11 +84,12 @@ export class AuthTokensService {
             })
         } catch (error) {
             if (error instanceof TokenExpiredError) {
-                // TODO: error handling
-                throw new Error('Refresh token expired')
+                throw new UnprocessableEntityException('Refresh token expired')
             }
 
-            throw new Error('Token is not valid configuration')
+            throw new UnprocessableEntityException(
+                'Token is not valid configuration',
+            )
         }
     }
 
