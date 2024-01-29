@@ -6,6 +6,8 @@ import {
     AuthorizationResponse,
     CompleteSignInInput,
     CreateUserInput,
+    GetUsersInput,
+    PaginatedUsers,
     SignInInput,
     User,
 } from '../interfaces/auth.graphql'
@@ -19,9 +21,11 @@ export class AuthResolver {
         private readonly adminService: AuthAdminService,
     ) {}
 
-    @Query(() => String)
-    async hi() {
-        return 'string'
+    @Query(() => PaginatedUsers)
+    async getUsers(
+        @Args('input') input: GetUsersInput,
+    ): Promise<PaginatedUsers> {
+        return await this.adminService.getUsers(input)
     }
 
     @Mutation(() => AuthorizationResponse)

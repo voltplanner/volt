@@ -1,4 +1,5 @@
-import { AuthUserRoleEnum } from '../../shared/prisma'
+import { OrderEnum } from '../../shared/interfaces/shared.interfaces'
+import { AuthUserRoleEnum, AuthUserStatusEnum } from '../../shared/prisma'
 
 export interface RefreshTokenPayload {
     jti: string
@@ -16,8 +17,25 @@ export interface User {
     firstname: string
     lastname: string
     role: AuthUserRoleEnum
+    status: AuthUserStatusEnum
     createdAt: Date
     deletedAt: Date
+}
+
+export interface GetUsers {
+    curPage?: number
+    perPage?: number
+    orderBy?: {
+        field: string
+        order: OrderEnum
+    }
+    filter?: {
+        email?: string
+        firstname?: string
+        lastname?: string
+        role?: AuthUserRoleEnum
+        status?: AuthUserStatusEnum
+    }
 }
 
 export type CreateUserWithPassword = {

@@ -1,7 +1,19 @@
 import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 import { IsEmail } from 'class-validator'
 
-import { AuthUserRoleEnum } from '../../shared/prisma'
+import {
+    OrderByInput,
+    PaginatedResponseType,
+} from '../../shared/graphql/shared.graphql'
+import { AuthUserRoleEnum, AuthUserStatusEnum } from '../../shared/prisma'
+
+registerEnumType(AuthUserRoleEnum, {
+    name: 'AuthUserRoleEnum',
+})
+
+registerEnumType(AuthUserStatusEnum, {
+    name: 'AuthUserStatusEnum',
+})
 
 @InputType()
 export class SignInInput {
@@ -40,7 +52,40 @@ export class AuthorizationResponse {
     expiresAt: number
 }
 
-@ObjectType()
+@InputType()
+export class GetUsersFilterInput {
+    @Field({ nullable: true })
+    email?: string
+
+    @Field({ nullable: true })
+    firstname?: string
+
+    @Field({ nullable: true })
+    lastname?: string
+
+    @Field(() => AuthUserRoleEnum, { nullable: true })
+    role?: AuthUserRoleEnum
+
+    @Field(() => AuthUserStatusEnum, { nullable: true })
+    status?: AuthUserStatusEnum
+}
+
+@InputType()
+export class GetUsersInput {
+    @Field({ nullable: true })
+    curPage?: number
+
+    @Field({ nullable: true })
+    perPage?: number
+
+    @Field(() => OrderByInput, { nullable: true })
+    orderBy?: OrderByInput
+
+    @Field(() => GetUsersFilterInput, { nullable: true })
+    filter?: GetUsersFilterInput
+}
+
+@ObjectType({ isAbstract: true })
 export class User {
     @Field()
     id: string
@@ -50,7 +95,25 @@ export class User {
 
     @Field()
     lastname: string
+
+    @Field()
+    email: string
+
+    @Field(() => AuthUserRoleEnum)
+    role: AuthUserRoleEnum
+
+    @Field(() => AuthUserStatusEnum)
+    status: AuthUserStatusEnum
+
+    @Field()
+    createdAt: Date
+
+    @Field({ nullable: true })
+    deletedAt?: Date
 }
+
+@ObjectType()
+export class PaginatedUsers extends PaginatedResponseType(User) {}
 
 @InputType()
 export class CreateUserInput {
@@ -66,7 +129,3 @@ export class CreateUserInput {
     @Field(() => AuthUserRoleEnum)
     role: AuthUserRoleEnum
 }
-
-registerEnumType(AuthUserRoleEnum, {
-    name: 'AuthUserRoleEnum',
-})
