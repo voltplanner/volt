@@ -1,4 +1,3 @@
-
 const NotFoundPage = () => {
     return <>NotFoundPage</>
 }

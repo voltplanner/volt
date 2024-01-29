@@ -1,5 +1,3 @@
-
-
 const MainPage = () => {
     return <>MainPage</>
 }

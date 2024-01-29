@@ -8,10 +8,6 @@ const AuthPage = () => {
         setIsOwn(false)
     }
 
-    return (
-        <>
-            <LoginForm title="Login to Volt" />
-        </>
-    )
+    return <LoginForm title="Login to Volt" />
 }
 export default AuthPage

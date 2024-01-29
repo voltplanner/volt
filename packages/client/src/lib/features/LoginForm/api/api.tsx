@@ -1,5 +1,5 @@
-import { gql, useMutation } from "@apollo/client"
-import { generateMutationOp } from "../../../sdk"
+import { gql, useMutation } from '@apollo/client'
+import { generateMutationOp } from '../../../sdk'
 
 export interface SignInPayload {
     email: string
@@ -11,22 +11,25 @@ export const ApiSignIn = (payload: SignInPayload) => {
         signIn: {
             __args: {
                 input: {
-                    ...payload
-                }
+                    ...payload,
+                },
             },
             accessToken: true,
             expiresAt: true,
             refreshToken: true,
-            userId: true
-        }
+            userId: true,
+        },
     })
 
-    const [signIn, { data, loading, error }] = useMutation(gql(query), variables)
+    const [signIn, { data, loading, error }] = useMutation(
+        gql(query),
+        variables,
+    )
 
     return {
         signIn,
         data,
         loading,
-        error
+        error,
     }
 }

@@ -2,5 +2,5 @@ console.log(process.env)
 
 export const environment = {
     production: false,
-    serverPort: 3000
+    serverPort: 3000,
 }
