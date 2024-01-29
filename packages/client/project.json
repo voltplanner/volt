@@ -82,8 +82,9 @@
       }
     },
     "sdk:generate": {
-      "dependsOn": ["server:graphql:generate"],
       "executor": "nx:run-commands",
+      "dependsOn": ["server:graphql:generate"],
+      "outputs": ["{projectRoot}/src/lib/sdk"],
       "options": {
         "command": "genql --schema ./schema.graphql --output {projectRoot}/src/lib/sdk"
       }

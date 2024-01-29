@@ -61,7 +61,8 @@
       }
     },
     "prisma:generate": {
-      "executor": "@tinybudgie/schematics:prisma-generate"
+      "executor": "@tinybudgie/schematics:prisma-generate",
+      "outputs": ["{workspaceRoot}/node_modules/generatedprisma"]
     },
     "prisma:pull": {
       "executor": "@tinybudgie/schematics:prisma-pull"

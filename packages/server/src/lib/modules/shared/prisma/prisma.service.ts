@@ -5,7 +5,7 @@ import {
     OnModuleDestroy,
     OnModuleInit,
 } from '@nestjs/common'
-import { PrismaClient } from '@prisma/server'
+import { PrismaClient } from 'generatedprisma'
 
 import { PRISMA_CONFIG, PrismaConfig } from './prisma.config'
 
