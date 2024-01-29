@@ -1,49 +1,46 @@
 import { HiddenForm } from 'entities'
 import { useState } from 'react'
 import { Button, ReactIcon } from 'shared'
-import { gql, useMutation, useQuery } from '@apollo/client'
-import { graphql } from '../../sdk'
 import styled from 'styled-components'
+import { ApiSignIn } from './api/api'
 
 type LoginFormProps = {
     title: string
 }
-const signInMutation = graphql(`
-    mutation SignIn($input: SignInInput!) {
-        signIn(input: $input) {
-            refreshToken
-            accessToken
-            userId
-            expiresAt
-        }
-    }
-`)
+
 export const LoginForm = (props: LoginFormProps) => {
     const { title } = props
-    const [text, setText] = useState('')
-    const [password, setPassword] = useState('admin')
-    // const [signIn, { data, loading, error }] = useMutation(signInMutation)
-    const [signIn, { data, loading, error }] = useMutation(signInMutation, {
-        variables: {
-            input: {
-                email: text,
-                password: password,
-            },
-        },
+    const [email, setEmail] = useState('')
+
+    // TODO: comment to disable eslint warning
+    // const [password, setPassword] = useState('admin')
+    const [password] = useState('admin')
+
+
+    // const { signIn, data, loading, error } = ApiSignIn({
+    //     email,
+    //     password,
+    // })
+
+    const { signIn, data } = ApiSignIn({
+        email,
+        password,
     })
-    console.log(data)
+
     const onChange = (value: string) => {
-        setText(value)
+        setEmail(value)
     }
+
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
             e.preventDefault()
             signIn()
-            console.log('email', text)
+            console.log('signIn', data)
         } catch (e) {
             console.log(e)
         }
     }
+
     return (
         <ContainerStyled>
             <HeaderStyled>
@@ -57,6 +54,7 @@ export const LoginForm = (props: LoginFormProps) => {
         </ContainerStyled>
     )
 }
+
 const ContainerStyled = styled.div`
     display: flex;
     user-select: none;

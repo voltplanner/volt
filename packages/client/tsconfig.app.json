@@ -9,7 +9,6 @@
     ]
   },
   "exclude": [
-    "src/sdk/*",
     "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
@@ -20,5 +19,5 @@
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx", "src/shared/api/apollo-client.ts"]
 }

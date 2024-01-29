@@ -12,15 +12,15 @@
       "options": {
         "compiler": "babel",
         "outputPath": "dist/packages/client",
-        "index": "packages/client/src/index.html",
+        "index": "packages/client/src/lib/index.html",
         "baseHref": "/",
-        "main": "packages/client/src/main.tsx",
+        "main": "packages/client/src/lib/main.tsx",
         "tsConfig": "packages/client/tsconfig.app.json",
         "assets": [
-          "packages/client/src/favicon.ico",
-          "packages/client/src/assets"
+          "packages/client/src/lib/favicon.ico",
+          "packages/client/src/lib/assets"
         ],
-        "styles": ["packages/client/src/styles.scss"],
+        "styles": ["packages/client/src/lib/styles.scss"],
         "scripts": [],
         "webpackConfig": "packages/client/webpack.config.js"
       },
@@ -52,8 +52,7 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "client:build",
-        "hmr": true,
-        "proxyConfig": "packages/client/proxy.conf.json"
+        "hmr": true
       },
       "configurations": {
         "development": {
@@ -86,7 +85,7 @@
       "dependsOn": ["server:graphql:generate"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "graphql-codegen -c ./packages/client/codegen.ts"
+        "command": "genql --schema ./schema.graphql --output {projectRoot}/src/lib/sdk"
       }
     }
   },

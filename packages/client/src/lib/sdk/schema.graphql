@@ -1,0 +1,46 @@
+type AuthorizationResponse {
+  refreshToken: String!
+  accessToken: String!
+  userId: String!
+  expiresAt: Float!
+}
+
+type User {
+  id: String!
+  firstname: String!
+  lastname: String!
+}
+
+type Query {
+  hi: String!
+}
+
+type Mutation {
+  signIn(input: SignInInput!): AuthorizationResponse!
+  createUser(input: CreateUserInput!): User!
+  completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+input CreateUserInput {
+  email: String!
+  firstname: String!
+  lastname: String!
+  role: AuthUserRoleEnum!
+}
+
+enum AuthUserRoleEnum {
+  MEMBER
+  ADMIN
+  OWNER
+}
+
+input CompleteSignInInput {
+  userId: String!
+  code: String!
+  password: String!
+}
