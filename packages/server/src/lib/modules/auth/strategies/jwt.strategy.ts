@@ -1,13 +1,12 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 
-import { AuthUserRoleEnum } from '../../shared/prisma'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import { AccessTokenPayload } from '../interfaces/auth.interfaces'
 
 @Injectable()
-export class MemberStrategy extends PassportStrategy(Strategy, 'member') {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor(
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
@@ -23,12 +22,7 @@ export class MemberStrategy extends PassportStrategy(Strategy, 'member') {
     }
 
     async validate(payload: AccessTokenPayload): Promise<boolean> {
-        const { role } = payload
-
-        if (role !== AuthUserRoleEnum.MEMBER) {
-            throw new ForbiddenException('Not an member')
-        }
-
+        console.log(payload)
         return true
     }
 }

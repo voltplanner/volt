@@ -11,6 +11,13 @@ export interface AuthConfig {
         accessTokenTTL: number
         refreshTokenTTL: number
     }
+    acl: {
+        defaultPermissions: {
+            methodName: string
+            roleName: string
+            allow: boolean
+        }[]
+    }
     temp?: boolean
 }
 

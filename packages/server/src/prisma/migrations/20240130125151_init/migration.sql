@@ -1,8 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- CreateEnum
-CREATE TYPE "AuthUserRoleEnum" AS ENUM ('MEMBER', 'ADMIN', 'OWNER');
-
 -- CreateEnum
 CREATE TYPE "AuthUserStatusEnum" AS ENUM ('WAITING_COMPLETE', 'ACTIVE', 'BLOCKED');
 
@@ -17,7 +12,7 @@ CREATE TABLE "AuthUser" (
     "lastname" TEXT NOT NULL,
     "password" TEXT,
     "completeCode" TEXT,
-    "role" "AuthUserRoleEnum" NOT NULL DEFAULT 'MEMBER',
+    "roleId" TEXT NOT NULL,
     "status" "AuthUserStatusEnum" NOT NULL DEFAULT 'WAITING_COMPLETE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
@@ -33,6 +28,35 @@ CREATE TABLE "AuthRefreshToken" (
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "AuthRefreshToken_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AuthRole" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "superuser" BOOLEAN NOT NULL,
+    "editable" BOOLEAN NOT NULL,
+
+    CONSTRAINT "AuthRole_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AuthRolePermission" (
+    "roleId" TEXT NOT NULL,
+    "methodId" TEXT NOT NULL,
+    "allowed" BOOLEAN NOT NULL,
+
+    CONSTRAINT "AuthRolePermission_pkey" PRIMARY KEY ("roleId","methodId")
+);
+
+-- CreateTable
+CREATE TABLE "AuthMethod" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "group" TEXT NOT NULL,
+
+    CONSTRAINT "AuthMethod_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -53,8 +77,23 @@ CREATE TABLE "Notification" (
 -- CreateIndex
 CREATE UNIQUE INDEX "AuthUser_email_key" ON "AuthUser"("email");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "AuthRole_name_key" ON "AuthRole"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AuthMethod_name_key" ON "AuthMethod"("name");
+
+-- AddForeignKey
+ALTER TABLE "AuthUser" ADD CONSTRAINT "AuthUser_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "AuthRole"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "AuthRefreshToken" ADD CONSTRAINT "AuthRefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AuthRolePermission" ADD CONSTRAINT "AuthRolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "AuthRole"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AuthRolePermission" ADD CONSTRAINT "AuthRolePermission_methodId_fkey" FOREIGN KEY ("methodId") REFERENCES "AuthMethod"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

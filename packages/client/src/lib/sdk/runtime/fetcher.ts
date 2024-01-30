@@ -92,8 +92,7 @@ export const createFetcher = ({
             return json.data
         }
         throw new Error(
-            'Genql batch fetcher returned unexpected result ' +
-                JSON.stringify(json),
+            'Genql batch fetcher returned unexpected result ' + JSON.stringify(json),
         )
     }
 }

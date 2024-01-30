@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken'
 
-import { AuthUserRoleEnum, PrismaService } from '../../shared/prisma'
+import { PrismaService } from '../../shared/prisma'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import { RefreshTokenPayload } from '../interfaces/auth.interfaces'
 
@@ -19,10 +19,7 @@ export class AuthTokensService {
         private readonly prisma: PrismaService,
     ) {}
 
-    async generateAccessToken(
-        adminId: string,
-        role: AuthUserRoleEnum = AuthUserRoleEnum.MEMBER,
-    ): Promise<string> {
+    async generateAccessToken(adminId: string, role: string): Promise<string> {
         const signOptions: SignOptions = {
             issuer: this.config.jwt.issuerUrl,
             audience: this.config.jwt.issuerUrl,
@@ -41,10 +38,7 @@ export class AuthTokensService {
         )
     }
 
-    async generateRefreshToken(
-        userId: string,
-        role: AuthUserRoleEnum = AuthUserRoleEnum.MEMBER,
-    ): Promise<string> {
+    async generateRefreshToken(userId: string, role: string): Promise<string> {
         const refreshToken = await this.prisma.authRefreshToken.create({
             data: {
                 user: {

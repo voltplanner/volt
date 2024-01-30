@@ -1,5 +1,5 @@
 import { OrderEnum } from '../../shared/interfaces/shared.interfaces'
-import { AuthUserRoleEnum, AuthUserStatusEnum } from '../../shared/prisma'
+import { AuthUserStatusEnum } from '../../shared/prisma'
 
 export interface RefreshTokenPayload {
     jti: string
@@ -7,19 +7,8 @@ export interface RefreshTokenPayload {
 }
 
 export interface AccessTokenPayload {
-    role: AuthUserRoleEnum
+    role: string
     sub: string
-}
-
-export interface User {
-    id: string
-    email: string
-    firstname: string
-    lastname: string
-    role: AuthUserRoleEnum
-    status: AuthUserStatusEnum
-    createdAt: Date
-    deletedAt: Date
 }
 
 export interface GetUsers {
@@ -33,7 +22,7 @@ export interface GetUsers {
         email?: string
         firstname?: string
         lastname?: string
-        role?: AuthUserRoleEnum
+        role?: string
         status?: AuthUserStatusEnum
     }
 }
@@ -43,14 +32,23 @@ export type CreateUserWithPassword = {
     firstname: string
     lastname: string
     password: string
-    role: AuthUserRoleEnum
+    role: string
 }
 
-export type CreateUser = {
+export interface CreateUser {
     email: string
     firstname: string
     lastname: string
-    role: AuthUserRoleEnum
+    roleName: string
+}
+
+export interface GetAvailableMethods {
+    name: string
+    groups?: string[]
+}
+
+export interface GetRoles {
+    name?: string
 }
 
 export interface CompleteSignIn {
@@ -64,11 +62,13 @@ export type DeleteUser = {
 }
 
 export type UpdateUser = {
-    email: string
-    firstname: string
-    lastname: string
-    password: string
-    role: AuthUserRoleEnum
+    userId: string
+    email?: string
+    firstname?: string
+    lastname?: string
+    password?: string
+    role?: string
+    status?: AuthUserStatusEnum
 }
 
 export interface FindFilter {
@@ -78,7 +78,7 @@ export interface FindFilter {
         email?: string
         firstname?: string
         lastname?: string
-        role?: AuthUserRoleEnum
+        role?: string
     }
 }
 
@@ -92,4 +92,23 @@ export interface SignInResponse {
     accessToken: string
     userId: string
     expiresAt: number
+}
+
+export interface CreateRole {
+    name: string
+}
+
+export interface UpdateRole {
+    roleId: string
+    name?: string
+    superuser?: boolean
+    editable?: boolean
+}
+
+export interface ChangePermissionPayload {
+    roleId: string
+    permissions: {
+        methodId: string
+        allow: boolean
+    }[]
 }

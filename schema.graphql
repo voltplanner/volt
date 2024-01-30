@@ -1,7 +1,3 @@
-# ------------------------------------------------------
-# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
-# ------------------------------------------------------
-
 type PaginatedMetaType {
   curPage: Float!
   perPage: Float!
@@ -15,26 +11,38 @@ type AuthorizationResponse {
   expiresAt: Float!
 }
 
-type PaginatedUsers {
-  data: [User!]!
-  meta: PaginatedMetaType!
+type RoleType {
+  id: ID!
+  name: String!
+  editable: Boolean!
+  superuser: Boolean!
 }
 
-type User {
+type MethodsType {
+  id: ID!
+  name: String!
+  group: String!
+  description: String!
+  allowed: Boolean!
+}
+
+type AvailableMethodsType {
+  id: ID!
+  name: String!
+  editable: Boolean!
+  superuser: Boolean!
+  methods: [MethodsType!]!
+}
+
+type UserType {
   id: String!
   firstname: String!
   lastname: String!
   email: String!
-  role: AuthUserRoleEnum!
+  role: RoleType!
   status: AuthUserStatusEnum!
   createdAt: DateTime!
   deletedAt: DateTime
-}
-
-enum AuthUserRoleEnum {
-  MEMBER
-  ADMIN
-  OWNER
 }
 
 enum AuthUserStatusEnum {
@@ -48,8 +56,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type PaginatedUsers {
+  data: [UserType!]!
+  meta: PaginatedMetaType!
+}
+
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
+  getAvailableMethods(input: GetAvailableMethodsInput!): AvailableMethodsType!
+  getRoles(input: GetRolesInput!): [RoleType!]!
 }
 
 input GetUsersInput {
@@ -73,14 +88,45 @@ input GetUsersFilterInput {
   email: String
   firstname: String
   lastname: String
-  role: AuthUserRoleEnum
+  role: String
   status: AuthUserStatusEnum
 }
 
+input GetAvailableMethodsInput {
+  name: String!
+  groups: [String!]
+}
+
+input GetRolesInput {
+  name: String
+}
+
 type Mutation {
+  changePermissions(input: ChangePermissionsInput!): Boolean!
+  updateUser(input: UpdateUserInput!): UserType!
   signIn(input: SignInInput!): AuthorizationResponse!
-  createUser(input: CreateUserInput!): User!
+  createUser(input: CreateUserInput!): UserType!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+}
+
+input ChangePermissionsInput {
+  roleId: String!
+  permissions: [PermissionInput!]!
+}
+
+input PermissionInput {
+  methodId: String!
+  allow: Boolean!
+}
+
+input UpdateUserInput {
+  userId: ID!
+  email: String
+  firstname: String
+  lastname: String
+  password: String
+  role: String
+  status: AuthUserStatusEnum
 }
 
 input SignInInput {
@@ -92,7 +138,7 @@ input CreateUserInput {
   email: String!
   firstname: String!
   lastname: String!
-  role: AuthUserRoleEnum!
+  roleName: String!
 }
 
 input CompleteSignInInput {

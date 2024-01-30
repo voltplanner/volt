@@ -2,9 +2,12 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
+import { JwtModule } from '@nestjs/jwt'
+import { PassportModule } from '@nestjs/passport'
 import { join } from 'path'
 
 import { environment } from '../environments/environment'
+import { defaultPermissions } from '../environments/permissions'
 import { AuthIntegration } from './integrations/auth.integration'
 import { AuthModule } from './modules/auth/auth.module'
 import { NotificationsModule } from './modules/notifications/notifications.module'
@@ -14,6 +17,10 @@ import { PrismaModule } from './modules/shared/prisma'
     imports: [
         PrismaModule.forRoot({
             url: environment.databaseUrl,
+        }),
+        PassportModule,
+        JwtModule.register({
+            global: true,
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
@@ -27,6 +34,9 @@ import { PrismaModule } from './modules/shared/prisma'
             adminEmail: environment.adminEmail,
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
+            acl: {
+                defaultPermissions,
+            },
         }),
         NotificationsModule.forRoot({
             ...environment.mailer,

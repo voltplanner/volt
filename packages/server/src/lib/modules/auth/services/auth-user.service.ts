@@ -28,7 +28,11 @@ export class AuthUserService {
             select: {
                 id: true,
                 password: true,
-                role: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
         })
 
@@ -44,12 +48,12 @@ export class AuthUserService {
 
         const refreshToken = await this.tokens.generateRefreshToken(
             user.id,
-            user.role,
+            user.role.name,
         )
 
         const accessToken = await this.tokens.generateAccessToken(
             user.id,
-            user.role,
+            user.role.name,
         )
 
         return {
@@ -71,7 +75,11 @@ export class AuthUserService {
             select: {
                 id: true,
                 completeCode: true,
-                role: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
         })
 
@@ -100,12 +108,12 @@ export class AuthUserService {
 
         const refreshToken = await this.tokens.generateRefreshToken(
             user.id,
-            user.role,
+            user.role.name,
         )
 
         const accessToken = await this.tokens.generateAccessToken(
             user.id,
-            user.role,
+            user.role.name,
         )
 
         return {

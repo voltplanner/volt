@@ -1,17 +1,17 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import {
+    BadRequestException,
+    Inject,
+    Injectable,
+    Logger,
+    NotFoundException,
+} from '@nestjs/common'
 import { genSalt, hash } from 'bcrypt'
 import { randomBytes } from 'crypto'
 
-import { PaginatedResponse } from '../../shared/interfaces/shared.interfaces'
-import {
-    AuthUserRoleEnum,
-    AuthUserStatusEnum,
-    Prisma,
-    PrismaService,
-} from '../../shared/prisma'
+import { AuthUserStatusEnum, Prisma, PrismaService } from '../../shared/prisma'
 import { parseMetaArgs } from '../../shared/utils'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
-import { CreateUser, GetUsers, User } from '../interfaces/auth.interfaces'
+import { CreateUser, GetUsers, UpdateUser } from '../interfaces/auth.interfaces'
 import { AuthEventPattern, AuthEventsService } from './auth-events.service'
 
 @Injectable()
@@ -25,39 +25,7 @@ export class AuthAdminService {
         private readonly events: AuthEventsService,
     ) {}
 
-    async onApplicationBootstrap() {
-        await this.createOwnerIfNotExists()
-    }
-
-    async createOwnerIfNotExists() {
-        const isOwnerExist = await this.prisma.authUser.findUnique({
-            where: {
-                email: this.config.adminEmail,
-            },
-        })
-
-        if (!isOwnerExist) {
-            const salt = await genSalt()
-            const hashedPassword = await hash(this.config.adminPassword, salt)
-
-            await this.prisma.authUser.create({
-                data: {
-                    email: this.config.adminEmail,
-                    role: AuthUserRoleEnum.OWNER,
-                    firstname: 'Volt',
-                    lastname: 'Owner',
-                    password: hashedPassword,
-                    status: AuthUserStatusEnum.ACTIVE,
-                },
-            })
-
-            this.logger.log(`Owner created: ${this.config.adminEmail}`, {
-                label: 'auth',
-            })
-        }
-    }
-
-    async getUsers(data: GetUsers): Promise<PaginatedResponse<User>> {
+    async getUsers(data: GetUsers) {
         const { filter, orderBy } = data
 
         const { skip, take, curPage, perPage } = parseMetaArgs({
@@ -105,7 +73,9 @@ export class AuthAdminService {
         }
 
         if (filter?.role) {
-            queryOptions.where.role = filter.role
+            queryOptions.where.role = {
+                name: filter.role,
+            }
         }
 
         if (filter?.status) {
@@ -118,25 +88,17 @@ export class AuthAdminService {
             }
         }
 
-        console.log(queryOptions)
-
         const users = await this.prisma.authUser.findMany({
             ...queryOptions,
             skip,
             take,
+            include: {
+                role: true,
+            },
         })
 
         const total = await this.prisma.authUser.count({
             ...queryOptions,
-        })
-
-        console.log({
-            meta: {
-                curPage,
-                perPage,
-                total,
-            },
-            data: users,
         })
 
         return {
@@ -149,8 +111,90 @@ export class AuthAdminService {
         }
     }
 
-    async createUser(data: CreateUser): Promise<User> {
-        const { email, firstname, lastname, role } = data
+    async updateUser(data: UpdateUser) {
+        const { userId, password, status, role, ...updateFields } = data
+
+        const isUserExist = await this.prisma.authUser.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                status: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        })
+
+        if (!isUserExist) {
+            throw new NotFoundException('User not found')
+        }
+
+        const updateData: Prisma.AuthUserUpdateInput = {
+            ...updateFields,
+            password: undefined,
+            status: undefined,
+            role: undefined,
+        }
+
+        if (password) {
+            const salt = await genSalt()
+            const hashedPassword = await hash(password, salt)
+
+            updateData.password = hashedPassword
+        }
+
+        if (role) {
+            if (isUserExist.role.name === 'owner') {
+                throw new BadRequestException(`Can't change owner role`)
+            }
+
+            if (isUserExist.role.name === 'owner') {
+                throw new BadRequestException(
+                    `Can't change user role to this type`,
+                )
+            }
+
+            updateData.role = {
+                update: {
+                    name: role,
+                },
+            }
+        }
+
+        if (status) {
+            if (status === AuthUserStatusEnum.WAITING_COMPLETE) {
+                throw new BadRequestException(
+                    `Can't change user status to this type`,
+                )
+            }
+
+            if (isUserExist.status === AuthUserStatusEnum.WAITING_COMPLETE) {
+                throw new BadRequestException(
+                    `Can't change user status. Need to complete sign in`,
+                )
+            }
+
+            updateData.status = status
+        }
+
+        const user = await this.prisma.authUser.update({
+            where: {
+                id: userId,
+            },
+            data: updateData,
+            include: {
+                role: true,
+            },
+        })
+
+        return user
+    }
+
+    async createUser(data: CreateUser) {
+        const { email, firstname, lastname, roleName } = data
 
         const code = randomBytes(32).toString('hex')
 
@@ -162,9 +206,16 @@ export class AuthAdminService {
                 email,
                 firstname,
                 lastname,
-                role,
+                role: {
+                    connect: {
+                        name: roleName,
+                    },
+                },
                 completeCode: hashedCode,
                 status: AuthUserStatusEnum.WAITING_COMPLETE,
+            },
+            include: {
+                role: true,
             },
         })
 
@@ -179,7 +230,7 @@ export class AuthAdminService {
         return user
     }
 
-    async deleteUser(userId: string): Promise<User> {
+    async deleteUser(userId: string) {
         const user = await this.prisma.authUser.update({
             where: {
                 id: userId,
@@ -191,8 +242,47 @@ export class AuthAdminService {
                 status: AuthUserStatusEnum.BLOCKED,
                 deletedAt: new Date(),
             },
+            include: {
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
         })
 
         return user
+    }
+
+    async _createOwnerIfNotExists() {
+        const isOwnerExist = await this.prisma.authUser.findUnique({
+            where: {
+                email: this.config.adminEmail,
+            },
+        })
+
+        if (!isOwnerExist) {
+            const salt = await genSalt()
+            const hashedPassword = await hash(this.config.adminPassword, salt)
+
+            await this.prisma.authUser.create({
+                data: {
+                    email: this.config.adminEmail,
+                    role: {
+                        connect: {
+                            name: 'owner',
+                        },
+                    },
+                    firstname: 'Volt',
+                    lastname: 'Owner',
+                    password: hashedPassword,
+                    status: AuthUserStatusEnum.ACTIVE,
+                },
+            })
+
+            this.logger.log(`Owner created: ${this.config.adminEmail}`, {
+                label: 'auth',
+            })
+        }
     }
 }

@@ -10,13 +10,16 @@ datasource db {
 }
 
 model AuthUser {
-  id            String             @id @default(uuid())
-  email         String             @unique
-  firstname     String
-  lastname      String
-  password      String?
+  id           String  @id @default(uuid())
+  email        String  @unique
+  firstname    String
+  lastname     String
+  password     String?
   completeCode String?
-  role          AuthUserRoleEnum   @default(MEMBER)
+
+  role   AuthRole @relation(fields: [roleId], references: [id])
+  roleId String
+
   status        AuthUserStatusEnum @default(WAITING_COMPLETE)
   createdAt     DateTime           @default(now())
   deletedAt     DateTime?
@@ -32,16 +35,47 @@ model AuthRefreshToken {
   userId    String
 }
 
-enum AuthUserRoleEnum {
-  MEMBER
-  ADMIN
-  OWNER
+model AuthRole {
+  id          String               @id @default(uuid())
+  name        String               @unique
+  superuser   Boolean
+  editable    Boolean
+  user        AuthUser[]
+  permissions AuthRolePermission[]
+}
+
+model AuthRolePermission {
+  role     AuthRole   @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roleId   String
+  method   AuthMethod @relation(fields: [methodId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  methodId String
+  allowed  Boolean
+
+  @@id([roleId, methodId])
+}
+
+model AuthMethod {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  group       String
+
+  permissions AuthRolePermission[]
 }
 
 enum AuthUserStatusEnum {
   WAITING_COMPLETE
   ACTIVE
   BLOCKED
+}
+
+model AuthSettings {
+  id                      Int     @id
+  defaultRolesInitialized Boolean @default(false)
+}
+
+model SystemSettings {
+  id String @id @default(uuid())
 }
 
 model Notification {

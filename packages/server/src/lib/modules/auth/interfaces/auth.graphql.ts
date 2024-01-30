@@ -1,15 +1,17 @@
-import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
+import {
+    Field,
+    ID,
+    InputType,
+    ObjectType,
+    registerEnumType,
+} from '@nestjs/graphql'
 import { IsEmail } from 'class-validator'
 
 import {
     OrderByInput,
     PaginatedResponseType,
 } from '../../shared/graphql/shared.graphql'
-import { AuthUserRoleEnum, AuthUserStatusEnum } from '../../shared/prisma'
-
-registerEnumType(AuthUserRoleEnum, {
-    name: 'AuthUserRoleEnum',
-})
+import { AuthUserStatusEnum } from '../../shared/prisma'
 
 registerEnumType(AuthUserStatusEnum, {
     name: 'AuthUserStatusEnum',
@@ -63,8 +65,32 @@ export class GetUsersFilterInput {
     @Field({ nullable: true })
     lastname?: string
 
-    @Field(() => AuthUserRoleEnum, { nullable: true })
-    role?: AuthUserRoleEnum
+    @Field({ nullable: true })
+    role?: string
+
+    @Field(() => AuthUserStatusEnum, { nullable: true })
+    status?: AuthUserStatusEnum
+}
+
+@InputType()
+export class UpdateUserInput {
+    @Field(() => ID)
+    userId: string
+
+    @Field({ nullable: true })
+    email?: string
+
+    @Field({ nullable: true })
+    firstname?: string
+
+    @Field({ nullable: true })
+    lastname?: string
+
+    @Field({ nullable: true })
+    password?: string
+
+    @Field({ nullable: true })
+    role?: string
 
     @Field(() => AuthUserStatusEnum, { nullable: true })
     status?: AuthUserStatusEnum
@@ -85,8 +111,92 @@ export class GetUsersInput {
     filter?: GetUsersFilterInput
 }
 
-@ObjectType({ isAbstract: true })
-export class User {
+@InputType()
+export class GetRolesInput {
+    @Field({ nullable: true })
+    name?: string
+}
+
+@InputType()
+export class PermissionInput {
+    @Field()
+    methodId: string
+
+    @Field()
+    allow: boolean
+}
+
+@InputType()
+export class ChangePermissionsInput {
+    @Field()
+    roleId: string
+
+    @Field(() => [PermissionInput])
+    permissions: PermissionInput[]
+}
+
+@InputType()
+export class GetAvailableMethodsInput {
+    @Field()
+    name: string
+
+    @Field(() => [String], { nullable: true })
+    groups?: string[]
+}
+
+@ObjectType()
+export class RoleType {
+    @Field(() => ID)
+    id: string
+
+    @Field()
+    name: string
+
+    @Field()
+    editable: boolean
+
+    @Field()
+    superuser: boolean
+}
+
+@ObjectType()
+export class MethodsType {
+    @Field(() => ID)
+    id: string
+
+    @Field()
+    name: string
+
+    @Field()
+    group: string
+
+    @Field()
+    description: string
+
+    @Field()
+    allowed: boolean
+}
+
+@ObjectType()
+export class AvailableMethodsType {
+    @Field(() => ID)
+    id: string
+
+    @Field()
+    name: string
+
+    @Field()
+    editable: boolean
+
+    @Field()
+    superuser: boolean
+
+    @Field(() => [MethodsType])
+    methods: MethodsType[]
+}
+
+@ObjectType()
+export class UserType {
     @Field()
     id: string
 
@@ -99,8 +209,8 @@ export class User {
     @Field()
     email: string
 
-    @Field(() => AuthUserRoleEnum)
-    role: AuthUserRoleEnum
+    @Field(() => RoleType)
+    role: RoleType
 
     @Field(() => AuthUserStatusEnum)
     status: AuthUserStatusEnum
@@ -113,7 +223,7 @@ export class User {
 }
 
 @ObjectType()
-export class PaginatedUsers extends PaginatedResponseType(User) {}
+export class PaginatedUsers extends PaginatedResponseType(UserType) {}
 
 @InputType()
 export class CreateUserInput {
@@ -126,6 +236,6 @@ export class CreateUserInput {
     @Field()
     lastname: string
 
-    @Field(() => AuthUserRoleEnum)
-    role: AuthUserRoleEnum
+    @Field()
+    roleName: string
 }
