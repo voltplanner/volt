@@ -22,6 +22,11 @@ export const defaultPermissions = [
         allow: true,
     },
     {
+        methodName: AuthResolver.prototype.getRoleAvailableMethods.name,
+        roleName: 'admin',
+        allow: true,
+    },
+    {
         methodName: AuthResolver.prototype.changePermissions.name,
         roleName: 'admin',
         allow: true,

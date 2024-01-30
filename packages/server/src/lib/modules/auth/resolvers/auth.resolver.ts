@@ -42,10 +42,10 @@ export class AuthResolver {
     @UseGuards(ACLGuard)
     @Query(() => AvailableMethodsType)
     @AccessControl({ group: 'roles', description: 'View permissions' })
-    async getAvailableMethods(
+    async getRoleAvailableMethods(
         @Args('input') input: GetAvailableMethodsInput,
     ): Promise<AvailableMethodsType> {
-        return await this.aclService.getAvailableMethods(input)
+        return await this.aclService.getRoleAvailableMethods(input)
     }
 
     @UseGuards(ACLGuard)

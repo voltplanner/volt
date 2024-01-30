@@ -76,7 +76,7 @@ export class AuthACLService {
         return roles
     }
 
-    async getAvailableMethods(data: GetAvailableMethods) {
+    async getRoleAvailableMethods(data: GetAvailableMethods) {
         const { name, groups } = data
 
         const role = await this.prisma.authRole.findUnique({
