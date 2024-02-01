@@ -91,7 +91,6 @@ export interface SignInResponse {
     accessToken: string
     userId: string
     expiresAt: number
-    role: Role
 }
 
 export interface Role {

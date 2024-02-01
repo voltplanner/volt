@@ -54,13 +54,8 @@ export class AuthAuthService {
             user.role.name,
         )
 
-        const role = await this.role.getMyRole({
-            userId: user.id,
-        })
-
         return {
             userId: user.id,
-            role,
             accessToken,
             refreshToken,
             expiresAt:
@@ -130,15 +125,10 @@ export class AuthAuthService {
             },
         })
 
-        const role = await this.role.getMyRole({
-            userId: user.id,
-        })
-
         return {
             userId: id,
             accessToken,
             refreshToken: newRefreshToken,
-            role,
             expiresAt:
                 Math.floor(Date.now() / 1000) + this.tokens.accessTokenTTL,
         }
@@ -195,13 +185,8 @@ export class AuthAuthService {
             user.role.name,
         )
 
-        const role = await this.role.getMyRole({
-            userId: user.id,
-        })
-
         return {
             userId: user.id,
-            role,
             accessToken,
             refreshToken,
             expiresAt:

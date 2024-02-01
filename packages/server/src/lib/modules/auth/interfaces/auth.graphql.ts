@@ -256,7 +256,4 @@ export class AuthorizationResponse {
 
     @Field()
     expiresAt: number
-
-    @Field(() => RoleType)
-    role: RoleType
 }

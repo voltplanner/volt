@@ -50,7 +50,6 @@ export default {
             accessToken: [4],
             userId: [4],
             expiresAt: [1],
-            role: [6],
             __typename: [4],
         },
         Query: {

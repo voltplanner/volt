@@ -61,7 +61,6 @@ export interface AuthorizationResponse {
     accessToken: Scalars['String']
     userId: Scalars['String']
     expiresAt: Scalars['Float']
-    role: RoleType
     __typename: 'AuthorizationResponse'
 }
 
@@ -140,7 +139,6 @@ export interface AuthorizationResponseGenqlSelection {
     accessToken?: boolean | number
     userId?: boolean | number
     expiresAt?: boolean | number
-    role?: RoleTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }

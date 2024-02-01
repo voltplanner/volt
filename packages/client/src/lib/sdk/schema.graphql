@@ -52,7 +52,6 @@ type AuthorizationResponse {
   accessToken: String!
   userId: String!
   expiresAt: Float!
-  role: RoleType!
 }
 
 type Query {
