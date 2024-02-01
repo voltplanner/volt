@@ -3,11 +3,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
 import { JwtModule } from '@nestjs/jwt'
-import { PassportModule } from '@nestjs/passport'
 import { join } from 'path'
 
 import { environment } from '../environments/environment'
-import { defaultPermissions } from '../environments/permissions'
+import { defaultAllowPermissions } from '../environments/permissions'
 import { AuthIntegration } from './integrations/auth.integration'
 import { AuthModule } from './modules/auth/auth.module'
 import { NotificationsModule } from './modules/notifications/notifications.module'
@@ -18,7 +17,6 @@ import { PrismaModule } from './modules/shared/prisma'
         PrismaModule.forRoot({
             url: environment.databaseUrl,
         }),
-        PassportModule,
         JwtModule.register({
             global: true,
         }),
@@ -35,7 +33,7 @@ import { PrismaModule } from './modules/shared/prisma'
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
             acl: {
-                defaultPermissions,
+                defaultAllowPermissions,
             },
         }),
         NotificationsModule.forRoot({

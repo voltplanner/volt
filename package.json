@@ -5,7 +5,7 @@
   "scripts": {
     "nx": "nx",
     "lint": "npm run nx -- run-many --t lint",
-    "lint:fix": "nx run-many --t lint --fix && nx format:write --all",
+    "lint:fix": "npm run postinstall && nx run-many --t lint --fix && nx format:write --all",
     "postinstall": "nx run server:prisma:generate && nx run client:sdk:generate"
   },
   "private": true,

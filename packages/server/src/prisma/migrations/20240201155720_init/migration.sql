@@ -60,6 +60,21 @@ CREATE TABLE "AuthMethod" (
 );
 
 -- CreateTable
+CREATE TABLE "AuthSettings" (
+    "id" INTEGER NOT NULL,
+    "defaultRolesInitialized" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "AuthSettings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SystemSettings" (
+    "id" TEXT NOT NULL,
+
+    CONSTRAINT "SystemSettings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Notification" (
     "id" TEXT NOT NULL,
     "topic" TEXT NOT NULL,
@@ -90,10 +105,10 @@ ALTER TABLE "AuthUser" ADD CONSTRAINT "AuthUser_roleId_fkey" FOREIGN KEY ("roleI
 ALTER TABLE "AuthRefreshToken" ADD CONSTRAINT "AuthRefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AuthRolePermission" ADD CONSTRAINT "AuthRolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "AuthRole"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AuthRolePermission" ADD CONSTRAINT "AuthRolePermission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "AuthRole"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AuthRolePermission" ADD CONSTRAINT "AuthRolePermission_methodId_fkey" FOREIGN KEY ("methodId") REFERENCES "AuthMethod"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AuthRolePermission" ADD CONSTRAINT "AuthRolePermission_methodId_fkey" FOREIGN KEY ("methodId") REFERENCES "AuthMethod"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AuthUser"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

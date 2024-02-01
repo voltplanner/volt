@@ -1,6 +1,5 @@
 import { DiscoveryService } from '@golevelup/nestjs-discovery'
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
-import _ from 'lodash'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 
 import {
     ACCESS_CONTROL_METAKEY,
@@ -11,13 +10,15 @@ import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import {
     ChangePermissionPayload,
     CreateRole,
-    GetAvailableMethods,
+    GetMyRole,
     GetRoles,
     UpdateRole,
 } from '../interfaces/auth.interfaces'
 
 @Injectable()
-export class AuthACLService {
+export class AuthRoleService {
+    private logger = new Logger()
+
     constructor(
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
@@ -64,6 +65,39 @@ export class AuthACLService {
         return role
     }
 
+    async getMyRole(data: GetMyRole) {
+        const role = await this.prisma.authRole.findFirst({
+            where: {
+                user: {
+                    some: {
+                        id: data.userId,
+                    },
+                },
+            },
+            include: {
+                permissions: {
+                    include: {
+                        method: true,
+                    },
+                },
+            },
+        })
+
+        return {
+            id: role.id,
+            name: role.name,
+            superuser: role.superuser,
+            editable: role.editable,
+            methods: role.permissions.map((u) => ({
+                id: u.method.id,
+                name: u.method.name,
+                description: u.method.description,
+                group: u.method.group,
+                allowed: u.allowed,
+            })),
+        }
+    }
+
     async getRoles(data: GetRoles) {
         const roles = await this.prisma.authRole.findMany({
             where: {
@@ -71,80 +105,28 @@ export class AuthACLService {
                     contains: data.name,
                 },
             },
-        })
-
-        return roles
-    }
-
-    async getRoleAvailableMethods(data: GetAvailableMethods) {
-        const { name, groups } = data
-
-        const role = await this.prisma.authRole.findUnique({
-            where: {
-                name,
-            },
-        })
-
-        if (!role) {
-            throw new NotFoundException('Role not found')
-        }
-
-        const allMethods = await this.prisma.authMethod.findMany({})
-
-        const methods = await this.prisma.authMethod.findMany({
-            where: {
-                group: groups
-                    ? {
-                          in: groups,
-                      }
-                    : undefined,
-                permissions: {
-                    some: {
-                        role: {
-                            name,
-                        },
-                    },
-                },
-            },
             include: {
                 permissions: {
-                    select: {
-                        allowed: true,
+                    include: {
+                        method: true,
                     },
                 },
             },
         })
 
-        const parsedAllMethods = allMethods.map((v) => ({
-            ...v,
-            permissions: [],
+        return roles.map((v) => ({
+            id: v.id,
+            name: v.name,
+            superuser: v.superuser,
+            editable: v.editable,
+            methods: v.permissions.map((u) => ({
+                id: u.method.id,
+                name: u.method.name,
+                description: u.method.description,
+                group: u.method.group,
+                allowed: u.allowed,
+            })),
         }))
-
-        return {
-            id: role.id,
-            name: role.name,
-            superuser: role.superuser,
-            editable: role.editable,
-            methods: _.merge(parsedAllMethods, methods).map((v) => {
-                let allowed = false
-
-                if (v.permissions.length > 0) {
-                    allowed = v.permissions[0].allowed
-                }
-
-                if (role.superuser) {
-                    allowed = true
-                }
-
-                return {
-                    id: v.id,
-                    name: v.name,
-                    group: v.group,
-                    description: v.description,
-                    allowed,
-                }
-            }),
-        }
     }
 
     async changePermissions(data: ChangePermissionPayload) {
@@ -237,70 +219,95 @@ export class AuthACLService {
                 ACCESS_CONTROL_METAKEY,
             )
 
-        await this.prisma.authMethod.createMany({
-            data: graphqlMethods.map((v) => {
-                return {
-                    name: v.discoveredMethod.methodName,
-                    description: v.meta.description,
-                    group: v.meta.group,
-                }
-            }),
+        const parsedGraphqlMethods = graphqlMethods.map((v) => {
+            return {
+                name: v.discoveredMethod.methodName,
+                description: v.meta.description,
+                group: v.meta.group,
+            }
+        })
+
+        const methodsCreated = await this.prisma.authMethod.createMany({
+            data: parsedGraphqlMethods,
             skipDuplicates: true,
         })
-    }
 
-    async _createDefaultPermissions() {
-        const permissions = this.config.acl.defaultPermissions
+        if (methodsCreated.count) {
+            this.logger.log(`Auth methods created: ${methodsCreated.count}`)
+        }
 
-        for (const permission of permissions) {
-            const { allow, methodName, roleName } = permission
+        const defaultAllowPermissions = this.config.acl.defaultAllowPermissions
 
-            const method = await this.prisma.authMethod.findUnique({
-                where: {
-                    name: methodName,
-                },
-                select: {
-                    id: true,
-                },
-            })
+        const roles = await this.prisma.authRole.findMany({
+            select: {
+                id: true,
+                name: true,
+                superuser: true,
+            },
+        })
 
-            const role = await this.prisma.authRole.findUnique({
-                where: {
-                    name: methodName,
-                },
-                select: {
-                    id: true,
-                },
-            })
+        const methods = await this.prisma.authMethod.findMany({
+            select: {
+                id: true,
+                name: true,
+            },
+        })
 
-            if (!role) {
-                continue
-            }
+        const permissionsToCreateForRole: {
+            roleId: string
+            methodId: string
+            allowed: boolean
+        }[] = []
 
-            const data = {
-                method: {
-                    connect: {
-                        name: methodName,
-                    },
-                },
-                role: {
-                    connect: {
-                        name: roleName,
-                    },
-                },
-                allowed: allow,
-            }
+        for (const role of roles) {
+            const rolePermissions = defaultAllowPermissions.filter(
+                (v) => v.roleName === role.name,
+            )
 
-            await this.prisma.authRolePermission.upsert({
-                where: {
-                    roleId_methodId: {
+            for (const method of parsedGraphqlMethods) {
+                const { id: methodId } = methods.find(
+                    (v) => v.name === method.name,
+                )
+
+                if (role.superuser) {
+                    permissionsToCreateForRole.push({
                         roleId: role.id,
-                        methodId: method.id,
-                    },
-                },
-                create: data,
-                update: data,
+                        methodId: methodId,
+                        allowed: true,
+                    })
+                    continue
+                }
+
+                if (
+                    rolePermissions.find(
+                        (v) => v.methodName === method.name,
+                    ) !== undefined
+                ) {
+                    permissionsToCreateForRole.push({
+                        roleId: role.id,
+                        methodId: methodId,
+                        allowed: true,
+                    })
+                } else {
+                    permissionsToCreateForRole.push({
+                        roleId: role.id,
+                        methodId: methodId,
+                        allowed: false,
+                    })
+                }
+            }
+        }
+
+        const permissionsCreated =
+            await this.prisma.authRolePermission.createMany({
+                data: permissionsToCreateForRole,
+                skipDuplicates: true,
             })
+
+        if (permissionsCreated.count) {
+            this.logger.log(
+                `Auth permissions created: ${permissionsCreated.count}`,
+            )
         }
     }
 }

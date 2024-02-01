@@ -42,9 +42,8 @@ export interface CreateUser {
     roleName: string
 }
 
-export interface GetAvailableMethods {
-    name: string
-    groups?: string[]
+export interface GetMyRole {
+    userId: string
 }
 
 export interface GetRoles {
@@ -92,6 +91,21 @@ export interface SignInResponse {
     accessToken: string
     userId: string
     expiresAt: number
+    role: Role
+}
+
+export interface Role {
+    id: string
+    name: string
+    superuser: boolean
+    editable: boolean
+    methods: {
+        id: string
+        name: string
+        description: string
+        group: string
+        allowed: boolean
+    }[]
 }
 
 export interface CreateRole {

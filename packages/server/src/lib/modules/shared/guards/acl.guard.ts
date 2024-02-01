@@ -1,15 +1,17 @@
 import {
+    BadRequestException,
     ExecutionContext,
     ForbiddenException,
     Injectable,
     Logger,
     UnauthorizedException,
-    UnprocessableEntityException,
 } from '@nestjs/common'
 import { GqlExecutionContext } from '@nestjs/graphql'
 import { JwtService } from '@nestjs/jwt'
 import { AuthGuard } from '@nestjs/passport'
 
+import { environment } from '../../../../environments/environment'
+import { CurrentUserPayload } from '../interfaces/shared.interfaces'
 import { PrismaService } from '../prisma'
 
 @Injectable()
@@ -26,20 +28,29 @@ export class ACLGuard extends AuthGuard('jwt') {
     async canActivate(context: ExecutionContext) {
         try {
             const ctx = GqlExecutionContext.create(context)
-            const graphqlOperationName = ctx.getContext().req.body.operationName
+            const req = ctx.getContext().req
+            const graphqlOperationName = req.body.operationName
 
             if (!graphqlOperationName) {
-                throw new UnprocessableEntityException(
+                throw new UnauthorizedException(
                     `GraphQL operation name not found. Try to 'query operationName { ... }'`,
                 )
             }
 
-            const authorizationToken =
-                ctx.getContext().req.headers['authorization']
+            const authorizationToken = this.extractTokenFromHeader(req)
 
-            const decodedToken = this.jwt.decode(
-                authorizationToken.split(' ')[1],
-            )
+            let decodedToken = undefined
+
+            try {
+                decodedToken = await this.jwt.verifyAsync<{
+                    sub: string
+                    role: string
+                }>(authorizationToken, {
+                    secret: environment.jwt.secret,
+                })
+            } catch (error) {
+                throw new UnauthorizedException()
+            }
 
             if (!decodedToken || !decodedToken?.role) {
                 throw new UnauthorizedException('Role not found')
@@ -60,8 +71,13 @@ export class ACLGuard extends AuthGuard('jwt') {
                 },
             })
 
+            req['user'] = {
+                role: decodedToken.role,
+                userId: decodedToken.sub,
+            } as CurrentUserPayload
+
             if (role.superuser) {
-                return ctx.getContext().req
+                return req
             }
 
             const method = await this.prisma.authMethod.findUnique({
@@ -74,7 +90,7 @@ export class ACLGuard extends AuthGuard('jwt') {
             })
 
             if (!method) {
-                throw new UnprocessableEntityException(
+                throw new BadRequestException(
                     `This graphql method not found in method list. Try to 'query operationName { ... }'`,
                 )
             }
@@ -95,11 +111,32 @@ export class ACLGuard extends AuthGuard('jwt') {
                 throw new ForbiddenException('Forbidden')
             }
 
-            return ctx.getContext().req
+            return req
         } catch (error) {
-            // TODO: add 401 error skip
+            if (error instanceof UnauthorizedException) {
+                throw error
+            }
+
+            if (error instanceof ForbiddenException) {
+                throw error
+            }
+
+            if (error instanceof BadRequestException) {
+                throw error
+            }
+
             this.logger.error(error)
             throw error
         }
+    }
+
+    private extractTokenFromHeader(request: Request): string | undefined {
+        const [type, token] = request.headers['authorization'].split(' ') ?? []
+
+        if (!token) {
+            throw new UnauthorizedException()
+        }
+
+        return type.toLowerCase() === 'bearer' ? token : undefined
     }
 }

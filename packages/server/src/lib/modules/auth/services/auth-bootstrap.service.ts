@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common'
 
-import { AuthACLService } from './auth-acl.service'
 import { AuthAdminService } from './auth-admin.service'
+import { AuthRoleService } from './auth-role.service'
 
 @Injectable()
 export class AuthBootstrapService {
     constructor(
         private readonly admin: AuthAdminService,
-        private readonly acl: AuthACLService,
+        private readonly role: AuthRoleService,
     ) {}
 
     async onApplicationBootstrap() {
-        await this.acl._createDefaultRole()
-        await this.acl._updateMethods()
-        await this.acl._createDefaultPermissions()
+        await this.role._createDefaultRole()
+        await this.role._updateMethods()
         await this.admin._createOwnerIfNotExists()
     }
 }

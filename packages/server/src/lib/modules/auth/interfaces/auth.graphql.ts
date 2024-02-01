@@ -28,6 +28,12 @@ export class SignInInput {
 }
 
 @InputType()
+export class RefreshTokenInput {
+    @Field()
+    refreshToken: string
+}
+
+@InputType()
 export class CompleteSignInInput {
     @Field()
     userId: string
@@ -37,21 +43,6 @@ export class CompleteSignInInput {
 
     @Field()
     password: string
-}
-
-@ObjectType()
-export class AuthorizationResponse {
-    @Field()
-    refreshToken: string
-
-    @Field()
-    accessToken: string
-
-    @Field()
-    userId: string
-
-    @Field()
-    expiresAt: number
 }
 
 @InputType()
@@ -145,21 +136,6 @@ export class GetAvailableMethodsInput {
 }
 
 @ObjectType()
-export class RoleType {
-    @Field(() => ID)
-    id: string
-
-    @Field()
-    name: string
-
-    @Field()
-    editable: boolean
-
-    @Field()
-    superuser: boolean
-}
-
-@ObjectType()
 export class MethodsType {
     @Field(() => ID)
     id: string
@@ -178,7 +154,7 @@ export class MethodsType {
 }
 
 @ObjectType()
-export class AvailableMethodsType {
+export class RoleType {
     @Field(() => ID)
     id: string
 
@@ -238,4 +214,22 @@ export class CreateUserInput {
 
     @Field()
     roleName: string
+}
+
+@ObjectType()
+export class AuthorizationResponse {
+    @Field()
+    refreshToken: string
+
+    @Field()
+    accessToken: string
+
+    @Field()
+    userId: string
+
+    @Field()
+    expiresAt: number
+
+    @Field(() => RoleType)
+    role: RoleType
 }

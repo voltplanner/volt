@@ -93,7 +93,15 @@ export class AuthAdminService {
             skip,
             take,
             include: {
-                role: true,
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                method: true,
+                            },
+                        },
+                    },
+                },
             },
         })
 
@@ -107,7 +115,22 @@ export class AuthAdminService {
                 perPage,
                 total,
             },
-            data: users,
+            data: users.map((user) => ({
+                ...user,
+                role: {
+                    id: user.role.id,
+                    name: user.role.name,
+                    superuser: user.role.superuser,
+                    editable: user.role.editable,
+                    methods: user.role.permissions.map((u) => ({
+                        id: u.method.id,
+                        name: u.method.name,
+                        description: u.method.description,
+                        group: u.method.group,
+                        allowed: u.allowed,
+                    })),
+                },
+            })),
         }
     }
 
@@ -215,7 +238,15 @@ export class AuthAdminService {
                 status: AuthUserStatusEnum.WAITING_COMPLETE,
             },
             include: {
-                role: true,
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                method: true,
+                            },
+                        },
+                    },
+                },
             },
         })
 
@@ -227,7 +258,22 @@ export class AuthAdminService {
             },
         })
 
-        return user
+        return {
+            ...user,
+            role: {
+                id: user.role.id,
+                name: user.role.name,
+                superuser: user.role.superuser,
+                editable: user.role.editable,
+                methods: user.role.permissions.map((u) => ({
+                    id: u.method.id,
+                    name: u.method.name,
+                    description: u.method.description,
+                    group: u.method.group,
+                    allowed: u.allowed,
+                })),
+            },
+        }
     }
 
     async deleteUser(userId: string) {

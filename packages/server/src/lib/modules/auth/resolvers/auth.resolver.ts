@@ -2,24 +2,25 @@ import { UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
 import { AccessControl } from '../../shared/decorators'
+import { CurrentUser } from '../../shared/decorators/current-user.decorator'
 import { ACLGuard } from '../../shared/guards/acl.guard'
+import { CurrentUserPayload } from '../../shared/interfaces/shared.interfaces'
 import {
     AuthorizationResponse,
-    AvailableMethodsType,
     ChangePermissionsInput,
     CompleteSignInInput,
     CreateUserInput,
-    GetAvailableMethodsInput,
     GetRolesInput,
     GetUsersInput,
     PaginatedUsers,
+    RefreshTokenInput,
     RoleType,
     SignInInput,
     UpdateUserInput,
     UserType,
 } from '../interfaces/auth.graphql'
-import { AuthACLService } from '../services/auth-acl.service'
 import { AuthAdminService } from '../services/auth-admin.service'
+import { AuthRoleService } from '../services/auth-role.service'
 import { AuthUserService } from '../services/auth-user.service'
 
 @Resolver()
@@ -27,7 +28,7 @@ export class AuthResolver {
     constructor(
         private readonly userService: AuthUserService,
         private readonly adminService: AuthAdminService,
-        private readonly aclService: AuthACLService,
+        private readonly aclService: AuthRoleService,
     ) {}
 
     @UseGuards(ACLGuard)
@@ -40,19 +41,23 @@ export class AuthResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Query(() => AvailableMethodsType)
-    @AccessControl({ group: 'roles', description: 'View permissions' })
-    async getRoleAvailableMethods(
-        @Args('input') input: GetAvailableMethodsInput,
-    ): Promise<AvailableMethodsType> {
-        return await this.aclService.getRoleAvailableMethods(input)
-    }
-
-    @UseGuards(ACLGuard)
     @Query(() => [RoleType])
     @AccessControl({ group: 'roles', description: 'View roles' })
     async getRoles(@Args('input') input: GetRolesInput): Promise<RoleType[]> {
         return await this.aclService.getRoles(input)
+    }
+
+    @UseGuards(ACLGuard)
+    @Query(() => RoleType)
+    @AccessControl({ group: 'roles', description: 'View user role' })
+    async getMyRole(
+        @Args('input') input: GetRolesInput,
+        @CurrentUser() user: CurrentUserPayload,
+    ): Promise<RoleType> {
+        return await this.aclService.getMyRole({
+            ...input,
+            userId: user.userId,
+        })
     }
 
     @UseGuards(ACLGuard)
@@ -67,10 +72,12 @@ export class AuthResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Mutation(() => UserType)
+    @Mutation(() => Boolean)
     @AccessControl({ group: 'users', description: 'Update users' })
-    async updateUser(@Args('input') input: UpdateUserInput): Promise<UserType> {
-        return await this.adminService.updateUser(input)
+    async updateUser(@Args('input') input: UpdateUserInput): Promise<boolean> {
+        await this.adminService.updateUser(input)
+
+        return true
     }
 
     @Mutation(() => AuthorizationResponse)
@@ -78,6 +85,13 @@ export class AuthResolver {
         @Args('input') input: SignInInput,
     ): Promise<AuthorizationResponse> {
         return await this.userService.signIn(input)
+    }
+
+    @Mutation(() => AuthorizationResponse)
+    async refreshToken(
+        @Args('input') input: RefreshTokenInput,
+    ): Promise<AuthorizationResponse> {
+        return await this.userService.refreshToken(input.refreshToken)
     }
 
     @UseGuards(ACLGuard)
