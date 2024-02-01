@@ -8,7 +8,7 @@ import {
     patchAuthConfig,
 } from './auth.config'
 import { AuthResolver } from './resolvers/auth.resolver'
-import { AuthAdminService } from './services/auth-admin.service'
+import { AuthAuthService } from './services/auth-auth.service'
 import { AuthBootstrapService } from './services/auth-bootstrap.service'
 import { AuthEventsService } from './services/auth-events.service'
 import { AuthRoleService } from './services/auth-role.service'
@@ -26,11 +26,11 @@ export class AuthModule extends AuthConfigurableModuleClass {
                 provide: AUTH_CONFIG,
                 useValue: patchAuthConfig(options),
             },
-            AuthUserService,
+            AuthAuthService,
             AuthTokensService,
             AuthResolver,
             AuthEventsService,
-            AuthAdminService,
+            AuthUserService,
             AuthRoleService,
             AuthBootstrapService,
         ]

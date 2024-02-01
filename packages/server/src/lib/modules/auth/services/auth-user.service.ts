@@ -1,101 +1,292 @@
 import {
     BadRequestException,
+    Inject,
     Injectable,
+    Logger,
     NotFoundException,
-    UnprocessableEntityException,
 } from '@nestjs/common'
-import { compare, genSalt, hash } from 'bcrypt'
+import { genSalt, hash } from 'bcrypt'
+import { randomBytes } from 'crypto'
 
-import { AuthUserStatusEnum, PrismaService } from '../../shared/prisma'
-import { AuthorizationResponse } from '../interfaces/auth.graphql'
-import {
-    CompleteSignIn,
-    SignInPayload,
-    SignInResponse,
-} from '../interfaces/auth.interfaces'
-import { AuthRoleService } from './auth-role.service'
-import { AuthTokensService } from './auth-tokens.service'
+import { AuthUserStatusEnum, Prisma, PrismaService } from '../../shared/prisma'
+import { parseMetaArgs } from '../../shared/utils'
+import { AUTH_CONFIG, AuthConfig } from '../auth.config'
+import { CreateUser, GetUsers, UpdateUser } from '../interfaces/auth.interfaces'
+import { AuthEventPattern, AuthEventsService } from './auth-events.service'
 
 @Injectable()
 export class AuthUserService {
+    private logger = new Logger()
+
     constructor(
-        private readonly tokens: AuthTokensService,
+        @Inject(AUTH_CONFIG)
+        private readonly config: AuthConfig,
         private readonly prisma: PrismaService,
-        private readonly role: AuthRoleService,
+        private readonly events: AuthEventsService,
     ) {}
 
-    async signIn(data: SignInPayload): Promise<SignInResponse> {
-        const { email } = data
+    async getUsers(data: GetUsers) {
+        const { filter, orderBy } = data
 
-        const user = await this.prisma.authUser.findUnique({
-            where: { email, status: AuthUserStatusEnum.ACTIVE },
+        const { skip, take, curPage, perPage } = parseMetaArgs({
+            curPage: data.curPage,
+            perPage: data.perPage,
+            defaults: {
+                curPage: 1,
+                perPage: 20,
+            },
+        })
+
+        const queryOptions: {
+            where?: Prisma.AuthUserWhereInput
+            orderBy?: Prisma.AuthUserOrderByWithRelationInput
+        } = {
+            where: {
+                email: undefined,
+                OR: undefined,
+                role: undefined,
+                status: undefined,
+            },
+            orderBy: undefined,
+        }
+
+        if (filter?.email) {
+            queryOptions.where['email'] = { contains: filter.email }
+        }
+
+        if (filter?.firstname) {
+            queryOptions.where.OR = [
+                {
+                    firstname: { contains: filter.firstname },
+                },
+                { lastname: { contains: filter.firstname } },
+            ]
+        }
+
+        if (filter?.lastname) {
+            queryOptions.where.OR = [
+                {
+                    firstname: { contains: filter.lastname },
+                },
+                { lastname: { contains: filter.lastname } },
+            ]
+        }
+
+        if (filter?.role) {
+            queryOptions.where.role = {
+                name: filter.role,
+            }
+        }
+
+        if (filter?.status) {
+            queryOptions.where.status = filter.status
+        }
+
+        if (orderBy) {
+            queryOptions.orderBy = {
+                [orderBy.field]: orderBy.order,
+            }
+        }
+
+        const users = await this.prisma.authUser.findMany({
+            ...queryOptions,
+            skip,
+            take,
+            include: {
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                method: true,
+                            },
+                        },
+                    },
+                },
+            },
+        })
+
+        const total = await this.prisma.authUser.count({
+            ...queryOptions,
+        })
+
+        return {
+            meta: {
+                curPage,
+                perPage,
+                total,
+            },
+            data: users.map((user) => ({
+                ...user,
+                role: {
+                    id: user.role.id,
+                    name: user.role.name,
+                    superuser: user.role.superuser,
+                    editable: user.role.editable,
+                    methods: user.role.permissions.map((u) => ({
+                        id: u.method.id,
+                        name: u.method.name,
+                        description: u.method.description,
+                        group: u.method.group,
+                        allowed: u.allowed,
+                    })),
+                },
+            })),
+        }
+    }
+
+    async updateUser(data: UpdateUser) {
+        const { userId, password, status, role, ...updateFields } = data
+
+        const isUserExist = await this.prisma.authUser.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                status: true,
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        })
+
+        if (!isUserExist) {
+            throw new NotFoundException('User not found')
+        }
+
+        const updateData: Prisma.AuthUserUpdateInput = {
+            ...updateFields,
+            password: undefined,
+            status: undefined,
+            role: undefined,
+        }
+
+        if (password) {
+            const salt = await genSalt()
+            const hashedPassword = await hash(password, salt)
+
+            updateData.password = hashedPassword
+        }
+
+        if (role) {
+            if (isUserExist.role.name === 'owner') {
+                throw new BadRequestException(`Can't change owner role`)
+            }
+
+            if (isUserExist.role.name === 'owner') {
+                throw new BadRequestException(
+                    `Can't change user role to this type`,
+                )
+            }
+
+            updateData.role = {
+                update: {
+                    name: role,
+                },
+            }
+        }
+
+        if (status) {
+            if (status === AuthUserStatusEnum.WAITING_COMPLETE) {
+                throw new BadRequestException(
+                    `Can't change user status to this type`,
+                )
+            }
+
+            if (isUserExist.status === AuthUserStatusEnum.WAITING_COMPLETE) {
+                throw new BadRequestException(
+                    `Can't change user status. Need to complete sign in`,
+                )
+            }
+
+            updateData.status = status
+        }
+
+        const user = await this.prisma.authUser.update({
+            where: {
+                id: userId,
+            },
+            data: updateData,
             include: {
                 role: true,
             },
         })
 
-        if (!user) {
-            throw new BadRequestException('Invalid login or password')
-        }
-
-        const isValid = await compare(data.password, user.password)
-
-        if (!isValid) {
-            throw new BadRequestException('Invalid login or password')
-        }
-
-        const refreshToken = await this.tokens.generateRefreshToken(
-            user.id,
-            user.role.name,
-        )
-
-        const accessToken = await this.tokens.generateAccessToken(
-            user.id,
-            user.role.name,
-        )
-
-        const role = await this.role.getMyRole({
-            userId: user.id,
-        })
-
-        return {
-            userId: user.id,
-            role,
-            accessToken,
-            refreshToken,
-            expiresAt:
-                Math.floor(Date.now() / 1000) + this.tokens.accessTokenTTL,
-        }
+        return user
     }
 
-    async refreshToken(refreshToken: string): Promise<AuthorizationResponse> {
-        const refreshTokenPayload = await this.tokens.decodeRefreshToken(
-            refreshToken,
-        )
+    async createUser(data: CreateUser) {
+        const { email, firstname, lastname, roleName } = data
 
-        const token = await this.prisma.authRefreshToken.findUnique({
-            where: {
-                id: refreshTokenPayload.jti,
+        const code = randomBytes(32).toString('hex')
+
+        const salt = await genSalt()
+        const hashedCode = await hash(code, salt)
+
+        const user = await this.prisma.authUser.create({
+            data: {
+                email,
+                firstname,
+                lastname,
+                role: {
+                    connect: {
+                        name: roleName,
+                    },
+                },
+                completeCode: hashedCode,
+                status: AuthUserStatusEnum.WAITING_COMPLETE,
+            },
+            include: {
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                method: true,
+                            },
+                        },
+                    },
+                },
             },
         })
 
-        if (!token) {
-            throw new UnprocessableEntityException({
-                message: 'REFRESH_TOKEN_NOT_FOUND',
-                description: 'Refresh token not found in database',
-            })
-        }
+        this.events.send({
+            pattern: AuthEventPattern.COMPLETE_SIGNIN,
+            data: {
+                userId: user.id,
+                code: code,
+            },
+        })
 
-        if (token.isRevoked) {
-            throw new UnprocessableEntityException({
-                message: 'REFRESH_TOKEN_REVOKED',
-                description: 'User has already used this refresh token',
-            })
+        return {
+            ...user,
+            role: {
+                id: user.role.id,
+                name: user.role.name,
+                superuser: user.role.superuser,
+                editable: user.role.editable,
+                methods: user.role.permissions.map((u) => ({
+                    id: u.method.id,
+                    name: u.method.name,
+                    description: u.method.description,
+                    group: u.method.group,
+                    allowed: u.allowed,
+                })),
+            },
         }
+    }
 
-        const user = await this.prisma.authUser.findUnique({
+    async deleteUser(userId: string) {
+        const user = await this.prisma.authUser.update({
             where: {
-                id: token.userId,
+                id: userId,
+                deletedAt: {
+                    not: null,
+                },
+            },
+            data: {
+                status: AuthUserStatusEnum.BLOCKED,
+                deletedAt: new Date(),
             },
             include: {
                 role: {
@@ -106,106 +297,38 @@ export class AuthUserService {
             },
         })
 
-        if (!user) {
-            throw new UnprocessableEntityException(`REFRESH_TOKEN_MALFORMED`)
-        }
-
-        const { id } = user
-
-        const accessToken = await this.tokens.generateAccessToken(
-            id,
-            user.role.name,
-        )
-        const newRefreshToken = await this.tokens.generateRefreshToken(
-            id,
-            user.role.name,
-        )
-
-        await this.prisma.authRefreshToken.update({
-            where: {
-                id: token.id,
-            },
-            data: {
-                isRevoked: true,
-            },
-        })
-
-        const role = await this.role.getMyRole({
-            userId: user.id,
-        })
-
-        return {
-            userId: id,
-            accessToken,
-            refreshToken: newRefreshToken,
-            role,
-            expiresAt:
-                Math.floor(Date.now() / 1000) + this.tokens.accessTokenTTL,
-        }
+        return user
     }
 
-    async completeSignIn(data: CompleteSignIn) {
-        const { userId, code, password } = data
-
-        const user = await this.prisma.authUser.findUnique({
+    async _createOwnerIfNotExists() {
+        const isOwnerExist = await this.prisma.authUser.findUnique({
             where: {
-                id: userId,
+                email: this.config.adminEmail,
             },
-            select: {
-                id: true,
-                completeCode: true,
-                role: {
-                    select: {
-                        name: true,
+        })
+
+        if (!isOwnerExist) {
+            const salt = await genSalt()
+            const hashedPassword = await hash(this.config.adminPassword, salt)
+
+            await this.prisma.authUser.create({
+                data: {
+                    email: this.config.adminEmail,
+                    role: {
+                        connect: {
+                            name: 'owner',
+                        },
                     },
+                    firstname: 'Volt',
+                    lastname: 'Owner',
+                    password: hashedPassword,
+                    status: AuthUserStatusEnum.ACTIVE,
                 },
-            },
-        })
+            })
 
-        if (!user) {
-            throw new NotFoundException('User not found')
-        }
-
-        const isValid = await compare(code, user.completeCode)
-
-        if (!isValid) {
-            throw new BadRequestException('Invalid code')
-        }
-
-        const salt = await genSalt()
-        const hashedPassword = await hash(password, salt)
-
-        await this.prisma.authUser.update({
-            where: {
-                id: userId,
-            },
-            data: {
-                password: hashedPassword,
-                status: AuthUserStatusEnum.ACTIVE,
-            },
-        })
-
-        const refreshToken = await this.tokens.generateRefreshToken(
-            user.id,
-            user.role.name,
-        )
-
-        const accessToken = await this.tokens.generateAccessToken(
-            user.id,
-            user.role.name,
-        )
-
-        const role = await this.role.getMyRole({
-            userId: user.id,
-        })
-
-        return {
-            userId: user.id,
-            role,
-            accessToken,
-            refreshToken,
-            expiresAt:
-                Math.floor(Date.now() / 1000) + this.tokens.accessTokenTTL,
+            this.logger.log(`Owner created: ${this.config.adminEmail}`, {
+                label: 'auth',
+            })
         }
     }
 }

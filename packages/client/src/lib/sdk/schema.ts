@@ -75,11 +75,14 @@ export interface Query {
 export type OrderEnum = 'ASC' | 'DESC'
 
 export interface Mutation {
+    updateRole: Scalars['Boolean']
+    deleteRole: Scalars['Boolean']
     changePermissions: Scalars['Boolean']
     updateUser: Scalars['Boolean']
     signIn: AuthorizationResponse
     refreshToken: AuthorizationResponse
     createUser: UserType
+    deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
     __typename: 'Mutation'
 }
@@ -177,6 +180,8 @@ export interface GetRolesInput {
 }
 
 export interface MutationGenqlSelection {
+    updateRole?: { __args: { input: UpdateRoleInput } }
+    deleteRole?: { __args: { input: DeleteRoleInput } }
     changePermissions?: { __args: { input: ChangePermissionsInput } }
     updateUser?: { __args: { input: UpdateUserInput } }
     signIn?: AuthorizationResponseGenqlSelection & {
@@ -186,11 +191,23 @@ export interface MutationGenqlSelection {
         __args: { input: RefreshTokenInput }
     }
     createUser?: UserTypeGenqlSelection & { __args: { input: CreateUserInput } }
+    deleteUser?: { __args: { input: DeleteUserInput } }
     completeSignIn?: AuthorizationResponseGenqlSelection & {
         __args: { input: CompleteSignInInput }
     }
     __typename?: boolean | number
     __scalar?: boolean | number
+}
+
+export interface UpdateRoleInput {
+    roleId: Scalars['String']
+    name?: Scalars['String'] | null
+    superuser?: Scalars['Boolean'] | null
+    editable?: Scalars['Boolean'] | null
+}
+
+export interface DeleteRoleInput {
+    roleId: Scalars['String']
 }
 
 export interface ChangePermissionsInput {
@@ -227,6 +244,10 @@ export interface CreateUserInput {
     firstname: Scalars['String']
     lastname: Scalars['String']
     roleName: Scalars['String']
+}
+
+export interface DeleteUserInput {
+    userId: Scalars['String']
 }
 
 export interface CompleteSignInInput {

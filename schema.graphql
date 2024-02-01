@@ -91,12 +91,26 @@ input GetRolesInput {
 }
 
 type Mutation {
+  updateRole(input: UpdateRoleInput!): Boolean!
+  deleteRole(input: DeleteRoleInput!): Boolean!
   changePermissions(input: ChangePermissionsInput!): Boolean!
   updateUser(input: UpdateUserInput!): Boolean!
   signIn(input: SignInInput!): AuthorizationResponse!
   refreshToken(input: RefreshTokenInput!): AuthorizationResponse!
   createUser(input: CreateUserInput!): UserType!
+  deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+}
+
+input UpdateRoleInput {
+  roleId: String!
+  name: String
+  superuser: Boolean
+  editable: Boolean
+}
+
+input DeleteRoleInput {
+  roleId: String!
 }
 
 input ChangePermissionsInput {
@@ -133,6 +147,10 @@ input CreateUserInput {
   firstname: String!
   lastname: String!
   roleName: String!
+}
+
+input DeleteUserInput {
+  userId: String!
 }
 
 input CompleteSignInInput {

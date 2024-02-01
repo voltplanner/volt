@@ -127,6 +127,27 @@ export class ChangePermissionsInput {
 }
 
 @InputType()
+export class UpdateRoleInput {
+    @Field()
+    roleId: string
+
+    @Field({ nullable: true })
+    name?: string
+
+    @Field({ nullable: true })
+    superuser?: boolean
+
+    @Field({ nullable: true })
+    editable?: boolean
+}
+
+@InputType()
+export class DeleteRoleInput {
+    @Field()
+    roleId: string
+}
+
+@InputType()
 export class GetAvailableMethodsInput {
     @Field()
     name: string
@@ -214,6 +235,12 @@ export class CreateUserInput {
 
     @Field()
     roleName: string
+}
+
+@InputType()
+export class DeleteUserInput {
+    @Field()
+    userId: string
 }
 
 @ObjectType()

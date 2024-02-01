@@ -10,25 +10,28 @@ import {
     ChangePermissionsInput,
     CompleteSignInInput,
     CreateUserInput,
+    DeleteRoleInput,
+    DeleteUserInput,
     GetRolesInput,
     GetUsersInput,
     PaginatedUsers,
     RefreshTokenInput,
     RoleType,
     SignInInput,
+    UpdateRoleInput,
     UpdateUserInput,
     UserType,
 } from '../interfaces/auth.graphql'
-import { AuthAdminService } from '../services/auth-admin.service'
+import { AuthAuthService } from '../services/auth-auth.service'
 import { AuthRoleService } from '../services/auth-role.service'
 import { AuthUserService } from '../services/auth-user.service'
 
 @Resolver()
 export class AuthResolver {
     constructor(
+        private readonly authService: AuthAuthService,
         private readonly userService: AuthUserService,
-        private readonly adminService: AuthAdminService,
-        private readonly aclService: AuthRoleService,
+        private readonly roleService: AuthRoleService,
     ) {}
 
     @UseGuards(ACLGuard)
@@ -37,14 +40,14 @@ export class AuthResolver {
     async getUsers(
         @Args('input') input: GetUsersInput,
     ): Promise<PaginatedUsers> {
-        return await this.adminService.getUsers(input)
+        return await this.userService.getUsers(input)
     }
 
     @UseGuards(ACLGuard)
     @Query(() => [RoleType])
     @AccessControl({ group: 'roles', description: 'View roles' })
     async getRoles(@Args('input') input: GetRolesInput): Promise<RoleType[]> {
-        return await this.aclService.getRoles(input)
+        return await this.roleService.getRoles(input)
     }
 
     @UseGuards(ACLGuard)
@@ -54,10 +57,28 @@ export class AuthResolver {
         @Args('input') input: GetRolesInput,
         @CurrentUser() user: CurrentUserPayload,
     ): Promise<RoleType> {
-        return await this.aclService.getMyRole({
+        return await this.roleService.getMyRole({
             ...input,
             userId: user.userId,
         })
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({ group: 'roles', description: 'Update roles' })
+    async updateRole(@Args('input') input: UpdateRoleInput): Promise<boolean> {
+        await this.roleService.updateRole(input)
+
+        return true
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({ group: 'roles', description: 'Delete roles' })
+    async deleteRole(@Args('input') input: DeleteRoleInput): Promise<boolean> {
+        await this.roleService.deleteRole(input.roleId)
+
+        return true
     }
 
     @UseGuards(ACLGuard)
@@ -66,7 +87,7 @@ export class AuthResolver {
     async changePermissions(
         @Args('input') input: ChangePermissionsInput,
     ): Promise<boolean> {
-        await this.aclService.changePermissions(input)
+        await this.roleService.changePermissions(input)
 
         return true
     }
@@ -75,7 +96,7 @@ export class AuthResolver {
     @Mutation(() => Boolean)
     @AccessControl({ group: 'users', description: 'Update users' })
     async updateUser(@Args('input') input: UpdateUserInput): Promise<boolean> {
-        await this.adminService.updateUser(input)
+        await this.userService.updateUser(input)
 
         return true
     }
@@ -84,27 +105,36 @@ export class AuthResolver {
     async signIn(
         @Args('input') input: SignInInput,
     ): Promise<AuthorizationResponse> {
-        return await this.userService.signIn(input)
+        return await this.authService.signIn(input)
     }
 
     @Mutation(() => AuthorizationResponse)
     async refreshToken(
         @Args('input') input: RefreshTokenInput,
     ): Promise<AuthorizationResponse> {
-        return await this.userService.refreshToken(input.refreshToken)
+        return await this.authService.refreshToken(input.refreshToken)
     }
 
     @UseGuards(ACLGuard)
     @Mutation(() => UserType)
     @AccessControl({ group: 'users', description: 'Invite new users' })
     async createUser(@Args('input') input: CreateUserInput): Promise<UserType> {
-        return await this.adminService.createUser(input)
+        return await this.userService.createUser(input)
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({ group: 'users', description: 'Delete users' })
+    async deleteUser(@Args('input') input: DeleteUserInput): Promise<boolean> {
+        await this.userService.deleteUser(input.userId)
+
+        return true
     }
 
     @Mutation(() => AuthorizationResponse)
     async completeSignIn(
         @Args('input') input: CompleteSignInInput,
     ): Promise<AuthorizationResponse> {
-        return await this.userService.completeSignIn(input)
+        return await this.authService.completeSignIn(input)
     }
 }
