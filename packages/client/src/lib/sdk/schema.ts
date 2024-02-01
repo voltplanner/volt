@@ -74,7 +74,7 @@ export interface PaginatedUsers {
 
 export interface Query {
     getUsers: PaginatedUsers
-    getAvailableMethods: AvailableMethodsType
+    getRoleAvailableMethods: AvailableMethodsType
     getRoles: RoleType[]
     __typename: 'Query'
 }
@@ -160,7 +160,7 @@ export interface QueryGenqlSelection {
     getUsers?: PaginatedUsersGenqlSelection & {
         __args: { input: GetUsersInput }
     }
-    getAvailableMethods?: AvailableMethodsTypeGenqlSelection & {
+    getRoleAvailableMethods?: AvailableMethodsTypeGenqlSelection & {
         __args: { input: GetAvailableMethodsInput }
     }
     getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }

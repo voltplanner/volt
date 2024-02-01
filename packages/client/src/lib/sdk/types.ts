@@ -66,7 +66,7 @@ export default {
                     input: [14, 'GetUsersInput!'],
                 },
             ],
-            getAvailableMethods: [
+            getRoleAvailableMethods: [
                 8,
                 {
                     input: [18, 'GetAvailableMethodsInput!'],
