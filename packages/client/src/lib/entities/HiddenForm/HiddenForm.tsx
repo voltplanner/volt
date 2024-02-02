@@ -22,6 +22,7 @@ export const HiddenForm = ({
                             autofocus
                             variant="primary"
                             onChange={onChange}
+                            type='email'
                         />
                         <Button variant="primary" size="auto" type="submit">
                             {'Sign In'}

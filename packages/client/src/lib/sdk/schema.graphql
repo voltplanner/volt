@@ -63,7 +63,7 @@ type PaginatedUsers {
 
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
-  getAvailableMethods(input: GetAvailableMethodsInput!): AvailableMethodsType!
+  getRoleAvailableMethods(input: GetAvailableMethodsInput!): AvailableMethodsType!
   getRoles(input: GetRolesInput!): [RoleType!]!
 }
 

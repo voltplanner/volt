@@ -1,4 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
 html {
   -webkit-text-size-adjust: 100%;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -20,5 +23,4 @@ body {
   flex: 1;
   min-height: 100%;
   width: 100%;
-  box-sizing: border-box;
 }

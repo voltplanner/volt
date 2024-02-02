@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { Button, ReactIcon } from 'shared'
 import styled from 'styled-components'
 import { ApiSignIn } from './api/api'
+import { useFormStore } from './model/useFormStore'
+import { InternalLoginForm } from './ui/InternalLoginForm'
 
 type LoginFormProps = {
     title: string
@@ -10,11 +12,10 @@ type LoginFormProps = {
 
 export const LoginForm = (props: LoginFormProps) => {
     const { title } = props
-    const [email, setEmail] = useState('')
+    const { setEmail, setPassword, email, password } = useFormStore()
 
     // TODO: comment to disable eslint warning
     // const [password, setPassword] = useState('admin')
-    const [password] = useState('admin')
 
     // const { signIn, data, loading, error } = ApiSignIn({
     //     email,
@@ -26,14 +27,17 @@ export const LoginForm = (props: LoginFormProps) => {
         password,
     })
 
-    const onChange = (value: string) => {
+    const onChangeEmail = (value: string) => {
         setEmail(value)
+    }
+    const onChangePassword = (value: string) => {
+        setPassword(value)
     }
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
             e.preventDefault()
-            signIn()
+            await signIn()
             console.log('signIn', data)
         } catch (e) {
             console.log(e)
@@ -47,8 +51,13 @@ export const LoginForm = (props: LoginFormProps) => {
             </HeaderStyled>
             <TitleStyled>{title}</TitleStyled>
             <BodyStyled>
-                <Button variant="primary">Continue with Gitlab</Button>
-                <HiddenForm onChange={onChange} onSubmit={onSubmit} />
+                {/* <Button variant="primary">Continue with Gitlab</Button>
+                <HiddenForm onChange={onChangeEmail} onSubmit={onSubmit} /> */}
+                <InternalLoginForm
+                    onChangeEmail={onChangeEmail}
+                    onChangePassword={onChangePassword}
+                    onSubmit={onSubmit}
+                />
             </BodyStyled>
         </ContainerStyled>
     )

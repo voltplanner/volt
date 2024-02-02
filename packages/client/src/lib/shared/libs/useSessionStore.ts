@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
-interface IAuthState {
+interface SessionState {
     uid: string
     code: string
     getUserProfile: () => void
 }
-export const useAuthState = create<IAuthState>()(
+export const useSessionState = create<SessionState>()(
     devtools((set, get) => ({
         code: '',
         uid: '',

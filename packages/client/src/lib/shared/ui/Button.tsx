@@ -45,7 +45,11 @@ const ButtonStyled = styled.button<ButtonProps>`
     color: ${(props) => (props.variant === 'primary' ? 'white' : 'black')};
     &:hover {
         background: #188a7d;
-        transition: 0.1s;
+        transition: 0.3s;
+    }
+    &:active{
+        background: #188a7d;
+        filter: brightness(85%);
     }
 `
 

@@ -23,12 +23,17 @@ const InputStyled = styled.input<InputStyledProps>`
     border: none;
     border-radius: 4px;
     padding: 0 8px;
-    background-color: ${(props) =>
-        props.variant === 'primary' ? '#1b998b' : 'gray'};
+    background-color: #5f6867;
     color: ${(props) => (props.variant === 'primary' ? 'white' : 'black')};
-    &:hover {
-        background: #188a7d;
-        transition: 0.1s;
+    &:focus {
+        background: #1b998b;
+        transition: 0.3s;
+    }
+    &:not(:focus){
+        transition: 0.3s;
+    }
+    &::placeholder{
+        color: #c9c9c9;
     }
 `
 export const Input = memo((props: InputProps) => {
@@ -37,7 +42,6 @@ export const Input = memo((props: InputProps) => {
         value,
         onChange,
         type = 'text',
-        placeholder,
         autofocus,
         readonly,
         variant,
