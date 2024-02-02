@@ -4,20 +4,6 @@ type PaginatedMetaType {
   total: Float!
 }
 
-type AuthorizationResponse {
-  refreshToken: String!
-  accessToken: String!
-  userId: String!
-  expiresAt: Float!
-}
-
-type RoleType {
-  id: ID!
-  name: String!
-  editable: Boolean!
-  superuser: Boolean!
-}
-
 type MethodsType {
   id: ID!
   name: String!
@@ -26,7 +12,7 @@ type MethodsType {
   allowed: Boolean!
 }
 
-type AvailableMethodsType {
+type RoleType {
   id: ID!
   name: String!
   editable: Boolean!
@@ -61,10 +47,17 @@ type PaginatedUsers {
   meta: PaginatedMetaType!
 }
 
+type AuthorizationResponse {
+  refreshToken: String!
+  accessToken: String!
+  userId: String!
+  expiresAt: Float!
+}
+
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
-  getRoleAvailableMethods(input: GetAvailableMethodsInput!): AvailableMethodsType!
   getRoles(input: GetRolesInput!): [RoleType!]!
+  getMyRole(input: GetRolesInput!): RoleType!
 }
 
 input GetUsersInput {
@@ -92,21 +85,31 @@ input GetUsersFilterInput {
   status: AuthUserStatusEnum
 }
 
-input GetAvailableMethodsInput {
-  name: String!
-  groups: [String!]
-}
-
 input GetRolesInput {
   name: String
 }
 
 type Mutation {
+  updateRole(input: UpdateRoleInput!): Boolean!
+  deleteRole(input: DeleteRoleInput!): Boolean!
   changePermissions(input: ChangePermissionsInput!): Boolean!
-  updateUser(input: UpdateUserInput!): UserType!
+  updateUser(input: UpdateUserInput!): Boolean!
   signIn(input: SignInInput!): AuthorizationResponse!
+  refreshToken(input: RefreshTokenInput!): AuthorizationResponse!
   createUser(input: CreateUserInput!): UserType!
+  deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+}
+
+input UpdateRoleInput {
+  roleId: String!
+  name: String
+  superuser: Boolean
+  editable: Boolean
+}
+
+input DeleteRoleInput {
+  roleId: String!
 }
 
 input ChangePermissionsInput {
@@ -134,11 +137,19 @@ input SignInInput {
   password: String!
 }
 
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
 input CreateUserInput {
   email: String!
   firstname: String!
   lastname: String!
   roleName: String!
+}
+
+input DeleteUserInput {
+  userId: String!
 }
 
 input CompleteSignInInput {

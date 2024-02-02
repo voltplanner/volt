@@ -1,80 +1,148 @@
 import {
     BadRequestException,
+    Inject,
     Injectable,
+    Logger,
     NotFoundException,
 } from '@nestjs/common'
-import { compare, genSalt, hash } from 'bcrypt'
+import { genSalt, hash } from 'bcrypt'
+import { randomBytes } from 'crypto'
 
-import { AuthUserStatusEnum, PrismaService } from '../../shared/prisma'
-import {
-    CompleteSignIn,
-    SignInPayload,
-    SignInResponse,
-} from '../interfaces/auth.interfaces'
-import { AuthTokensService } from './auth-tokens.service'
+import { AuthUserStatusEnum, Prisma, PrismaService } from '../../shared/prisma'
+import { parseMetaArgs } from '../../shared/utils'
+import { AUTH_CONFIG, AuthConfig } from '../auth.config'
+import { CreateUser, GetUsers, UpdateUser } from '../interfaces/auth.interfaces'
+import { AuthEventPattern, AuthEventsService } from './auth-events.service'
 
 @Injectable()
 export class AuthUserService {
+    private logger = new Logger()
+
     constructor(
-        private readonly tokens: AuthTokensService,
+        @Inject(AUTH_CONFIG)
+        private readonly config: AuthConfig,
         private readonly prisma: PrismaService,
+        private readonly events: AuthEventsService,
     ) {}
 
-    async signIn(data: SignInPayload): Promise<SignInResponse> {
-        const { email } = data
+    async getUsers(data: GetUsers) {
+        const { filter, orderBy } = data
 
-        const user = await this.prisma.authUser.findUnique({
-            where: { email, status: AuthUserStatusEnum.ACTIVE },
-            select: {
-                id: true,
-                password: true,
+        const { skip, take, curPage, perPage } = parseMetaArgs({
+            curPage: data.curPage,
+            perPage: data.perPage,
+            defaults: {
+                curPage: 1,
+                perPage: 20,
+            },
+        })
+
+        const queryOptions: {
+            where?: Prisma.AuthUserWhereInput
+            orderBy?: Prisma.AuthUserOrderByWithRelationInput
+        } = {
+            where: {
+                email: undefined,
+                OR: undefined,
+                role: undefined,
+                status: undefined,
+            },
+            orderBy: undefined,
+        }
+
+        if (filter?.email) {
+            queryOptions.where['email'] = { contains: filter.email }
+        }
+
+        if (filter?.firstname) {
+            queryOptions.where.OR = [
+                {
+                    firstname: { contains: filter.firstname },
+                },
+                { lastname: { contains: filter.firstname } },
+            ]
+        }
+
+        if (filter?.lastname) {
+            queryOptions.where.OR = [
+                {
+                    firstname: { contains: filter.lastname },
+                },
+                { lastname: { contains: filter.lastname } },
+            ]
+        }
+
+        if (filter?.role) {
+            queryOptions.where.role = {
+                name: filter.role,
+            }
+        }
+
+        if (filter?.status) {
+            queryOptions.where.status = filter.status
+        }
+
+        if (orderBy) {
+            queryOptions.orderBy = {
+                [orderBy.field]: orderBy.order,
+            }
+        }
+
+        const users = await this.prisma.authUser.findMany({
+            ...queryOptions,
+            skip,
+            take,
+            include: {
                 role: {
-                    select: {
-                        name: true,
+                    include: {
+                        permissions: {
+                            include: {
+                                method: true,
+                            },
+                        },
                     },
                 },
             },
         })
 
-        if (!user) {
-            throw new BadRequestException('Invalid login or password')
-        }
-
-        const isValid = await compare(data.password, user.password)
-
-        if (!isValid) {
-            throw new BadRequestException('Invalid login or password')
-        }
-
-        const refreshToken = await this.tokens.generateRefreshToken(
-            user.id,
-            user.role.name,
-        )
-
-        const accessToken = await this.tokens.generateAccessToken(
-            user.id,
-            user.role.name,
-        )
+        const total = await this.prisma.authUser.count({
+            ...queryOptions,
+        })
 
         return {
-            userId: user.id,
-            accessToken,
-            refreshToken,
-            expiresAt:
-                Math.floor(Date.now() / 1000) + this.tokens.accessTokenTTL,
+            meta: {
+                curPage,
+                perPage,
+                total,
+            },
+            data: users.map((user) => ({
+                ...user,
+                role: {
+                    id: user.role.id,
+                    name: user.role.name,
+                    superuser: user.role.superuser,
+                    editable: user.role.editable,
+                    methods: user.role.permissions.map((u) => ({
+                        id: u.method.id,
+                        name: u.method.name,
+                        description: u.method.description,
+                        group: u.method.group,
+                        allowed: u.allowed,
+                    })),
+                },
+            })),
         }
     }
 
-    async completeSignIn(data: CompleteSignIn) {
-        const { userId, code, password } = data
+    async updateUser(data: UpdateUser) {
+        const { userId, password, status, role, ...updateFields } = data
 
-        const user = await this.prisma.authUser.findUnique({
+        const isUserExist = await this.prisma.authUser.findUnique({
             where: {
                 id: userId,
             },
             select: {
-                id: true,
-                completeCode: true,
+                status: true,
                 role: {
                     select: {
                         name: true,
@@ -83,45 +151,184 @@ export class AuthUserService {
             },
         })
 
-        if (!user) {
+        if (!isUserExist) {
             throw new NotFoundException('User not found')
         }
 
-        const isValid = await compare(code, user.completeCode)
-
-        if (!isValid) {
-            throw new BadRequestException('Invalid code')
+        const updateData: Prisma.AuthUserUpdateInput = {
+            ...updateFields,
+            password: undefined,
+            status: undefined,
+            role: undefined,
         }
 
-        const salt = await genSalt()
-        const hashedPassword = await hash(password, salt)
+        if (password) {
+            const salt = await genSalt()
+            const hashedPassword = await hash(password, salt)
 
-        await this.prisma.authUser.update({
+            updateData.password = hashedPassword
+        }
+
+        if (role) {
+            if (isUserExist.role.name === 'owner') {
+                throw new BadRequestException(`Can't change owner role`)
+            }
+
+            if (isUserExist.role.name === 'owner') {
+                throw new BadRequestException(
+                    `Can't change user role to this type`,
+                )
+            }
+
+            updateData.role = {
+                update: {
+                    name: role,
+                },
+            }
+        }
+
+        if (status) {
+            if (status === AuthUserStatusEnum.WAITING_COMPLETE) {
+                throw new BadRequestException(
+                    `Can't change user status to this type`,
+                )
+            }
+
+            if (isUserExist.status === AuthUserStatusEnum.WAITING_COMPLETE) {
+                throw new BadRequestException(
+                    `Can't change user status. Need to complete sign in`,
+                )
+            }
+
+            updateData.status = status
+        }
+
+        const user = await this.prisma.authUser.update({
             where: {
                 id: userId,
             },
-            data: {
-                password: hashedPassword,
-                status: AuthUserStatusEnum.ACTIVE,
+            data: updateData,
+            include: {
+                role: true,
             },
         })
 
-        const refreshToken = await this.tokens.generateRefreshToken(
-            user.id,
-            user.role.name,
-        )
+        return user
+    }
 
-        const accessToken = await this.tokens.generateAccessToken(
-            user.id,
-            user.role.name,
-        )
+    async createUser(data: CreateUser) {
+        const { email, firstname, lastname, roleName } = data
+
+        const code = randomBytes(32).toString('hex')
+
+        const salt = await genSalt()
+        const hashedCode = await hash(code, salt)
+
+        const user = await this.prisma.authUser.create({
+            data: {
+                email,
+                firstname,
+                lastname,
+                role: {
+                    connect: {
+                        name: roleName,
+                    },
+                },
+                completeCode: hashedCode,
+                status: AuthUserStatusEnum.WAITING_COMPLETE,
+            },
+            include: {
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                method: true,
+                            },
+                        },
+                    },
+                },
+            },
+        })
+
+        this.events.send({
+            pattern: AuthEventPattern.COMPLETE_SIGNIN,
+            data: {
+                userId: user.id,
+                code: code,
+            },
+        })
 
         return {
-            userId: user.id,
-            accessToken,
-            refreshToken,
-            expiresAt:
-                Math.floor(Date.now() / 1000) + this.tokens.accessTokenTTL,
+            ...user,
+            role: {
+                id: user.role.id,
+                name: user.role.name,
+                superuser: user.role.superuser,
+                editable: user.role.editable,
+                methods: user.role.permissions.map((u) => ({
+                    id: u.method.id,
+                    name: u.method.name,
+                    description: u.method.description,
+                    group: u.method.group,
+                    allowed: u.allowed,
+                })),
+            },
+        }
+    }
+
+    async deleteUser(userId: string) {
+        const user = await this.prisma.authUser.update({
+            where: {
+                id: userId,
+                deletedAt: {
+                    not: null,
+                },
+            },
+            data: {
+                status: AuthUserStatusEnum.BLOCKED,
+                deletedAt: new Date(),
+            },
+            include: {
+                role: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        })
+
+        return user
+    }
+
+    async _createOwnerIfNotExists() {
+        const isOwnerExist = await this.prisma.authUser.findUnique({
+            where: {
+                email: this.config.adminEmail,
+            },
+        })
+
+        if (!isOwnerExist) {
+            const salt = await genSalt()
+            const hashedPassword = await hash(this.config.adminPassword, salt)
+
+            await this.prisma.authUser.create({
+                data: {
+                    email: this.config.adminEmail,
+                    role: {
+                        connect: {
+                            name: 'owner',
+                        },
+                    },
+                    firstname: 'Volt',
+                    lastname: 'Owner',
+                    password: hashedPassword,
+                    status: AuthUserStatusEnum.ACTIVE,
+                },
+            })
+
+            this.logger.log(`Owner created: ${this.config.adminEmail}`, {
+                label: 'auth',
+            })
         }
     }
 }

@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 export type Scalars = {
-    Float: number,
-    String: string,
-    ID: string,
-    Boolean: boolean,
-    DateTime: any,
+    Float: number
+    ID: string
+    String: string
+    Boolean: boolean
+    DateTime: any
 }
 
 export interface PaginatedMetaType {
@@ -16,22 +16,6 @@ export interface PaginatedMetaType {
     perPage: Scalars['Float']
     total: Scalars['Float']
     __typename: 'PaginatedMetaType'
-}
-
-export interface AuthorizationResponse {
-    refreshToken: Scalars['String']
-    accessToken: Scalars['String']
-    userId: Scalars['String']
-    expiresAt: Scalars['Float']
-    __typename: 'AuthorizationResponse'
-}
-
-export interface RoleType {
-    id: Scalars['ID']
-    name: Scalars['String']
-    editable: Scalars['Boolean']
-    superuser: Scalars['Boolean']
-    __typename: 'RoleType'
 }
 
 export interface MethodsType {
@@ -43,13 +27,13 @@ export interface MethodsType {
     __typename: 'MethodsType'
 }
 
-export interface AvailableMethodsType {
+export interface RoleType {
     id: Scalars['ID']
     name: Scalars['String']
     editable: Scalars['Boolean']
     superuser: Scalars['Boolean']
     methods: MethodsType[]
-    __typename: 'AvailableMethodsType'
+    __typename: 'RoleType'
 }
 
 export interface UserType {
@@ -72,20 +56,32 @@ export interface PaginatedUsers {
     __typename: 'PaginatedUsers'
 }
 
+export interface AuthorizationResponse {
+    refreshToken: Scalars['String']
+    accessToken: Scalars['String']
+    userId: Scalars['String']
+    expiresAt: Scalars['Float']
+    __typename: 'AuthorizationResponse'
+}
+
 export interface Query {
     getUsers: PaginatedUsers
-    getRoleAvailableMethods: AvailableMethodsType
     getRoles: RoleType[]
+    getMyRole: RoleType
     __typename: 'Query'
 }
 
 export type OrderEnum = 'ASC' | 'DESC'
 
 export interface Mutation {
+    updateRole: Scalars['Boolean']
+    deleteRole: Scalars['Boolean']
     changePermissions: Scalars['Boolean']
-    updateUser: UserType
+    updateUser: Scalars['Boolean']
     signIn: AuthorizationResponse
+    refreshToken: AuthorizationResponse
     createUser: UserType
+    deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
     __typename: 'Mutation'
 }
@@ -98,25 +94,7 @@ export interface PaginatedMetaTypeGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface AuthorizationResponseGenqlSelection{
-    refreshToken?: boolean | number
-    accessToken?: boolean | number
-    userId?: boolean | number
-    expiresAt?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface RoleTypeGenqlSelection{
-    id?: boolean | number
-    name?: boolean | number
-    editable?: boolean | number
-    superuser?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface MethodsTypeGenqlSelection{
+export interface MethodsTypeGenqlSelection {
     id?: boolean | number
     name?: boolean | number
     group?: boolean | number
@@ -126,7 +104,7 @@ export interface MethodsTypeGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface AvailableMethodsTypeGenqlSelection{
+export interface RoleTypeGenqlSelection {
     id?: boolean | number
     name?: boolean | number
     editable?: boolean | number
@@ -156,10 +134,21 @@ export interface PaginatedUsersGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface QueryGenqlSelection{
-    getUsers?: (PaginatedUsersGenqlSelection & { __args: {input: GetUsersInput} })
-    getRoleAvailableMethods?: (AvailableMethodsTypeGenqlSelection & { __args: {input: GetAvailableMethodsInput} })
-    getRoles?: (RoleTypeGenqlSelection & { __args: {input: GetRolesInput} })
+export interface AuthorizationResponseGenqlSelection {
+    refreshToken?: boolean | number
+    accessToken?: boolean | number
+    userId?: boolean | number
+    expiresAt?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface QueryGenqlSelection {
+    getUsers?: PaginatedUsersGenqlSelection & {
+        __args: { input: GetUsersInput }
+    }
+    getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
+    getMyRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -170,21 +159,45 @@ export interface OrderByInput {field: Scalars['String'],order: OrderEnum}
 
 export interface GetUsersFilterInput {email?: (Scalars['String'] | null),firstname?: (Scalars['String'] | null),lastname?: (Scalars['String'] | null),role?: (Scalars['String'] | null),status?: (AuthUserStatusEnum | null)}
 
-export interface GetAvailableMethodsInput {name: Scalars['String'],groups?: (Scalars['String'][] | null)}
+export interface GetRolesInput {
+    name?: Scalars['String'] | null
+}
 
-export interface GetRolesInput {name?: (Scalars['String'] | null)}
-
-export interface MutationGenqlSelection{
-    changePermissions?: { __args: {input: ChangePermissionsInput} }
-    updateUser?: (UserTypeGenqlSelection & { __args: {input: UpdateUserInput} })
-    signIn?: (AuthorizationResponseGenqlSelection & { __args: {input: SignInInput} })
-    createUser?: (UserTypeGenqlSelection & { __args: {input: CreateUserInput} })
-    completeSignIn?: (AuthorizationResponseGenqlSelection & { __args: {input: CompleteSignInInput} })
+export interface MutationGenqlSelection {
+    updateRole?: { __args: { input: UpdateRoleInput } }
+    deleteRole?: { __args: { input: DeleteRoleInput } }
+    changePermissions?: { __args: { input: ChangePermissionsInput } }
+    updateUser?: { __args: { input: UpdateUserInput } }
+    signIn?: AuthorizationResponseGenqlSelection & {
+        __args: { input: SignInInput }
+    }
+    refreshToken?: AuthorizationResponseGenqlSelection & {
+        __args: { input: RefreshTokenInput }
+    }
+    createUser?: UserTypeGenqlSelection & { __args: { input: CreateUserInput } }
+    deleteUser?: { __args: { input: DeleteUserInput } }
+    completeSignIn?: AuthorizationResponseGenqlSelection & {
+        __args: { input: CompleteSignInInput }
+    }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface ChangePermissionsInput {roleId: Scalars['String'],permissions: PermissionInput[]}
+export interface UpdateRoleInput {
+    roleId: Scalars['String']
+    name?: Scalars['String'] | null
+    superuser?: Scalars['Boolean'] | null
+    editable?: Scalars['Boolean'] | null
+}
+
+export interface DeleteRoleInput {
+    roleId: Scalars['String']
+}
+
+export interface ChangePermissionsInput {
+    roleId: Scalars['String']
+    permissions: PermissionInput[]
+}
 
 export interface PermissionInput {methodId: Scalars['String'],allow: Scalars['Boolean']}
 
@@ -192,26 +205,45 @@ export interface UpdateUserInput {userId: Scalars['ID'],email?: (Scalars['String
 
 export interface SignInInput {email: Scalars['String'],password: Scalars['String']}
 
-export interface CreateUserInput {email: Scalars['String'],firstname: Scalars['String'],lastname: Scalars['String'],roleName: Scalars['String']}
+export interface RefreshTokenInput {
+    refreshToken: Scalars['String']
+}
 
-export interface CompleteSignInInput {userId: Scalars['String'],code: Scalars['String'],password: Scalars['String']}
+export interface CreateUserInput {
+    email: Scalars['String']
+    firstname: Scalars['String']
+    lastname: Scalars['String']
+    roleName: Scalars['String']
+}
+
+export interface DeleteUserInput {
+    userId: Scalars['String']
+}
+
+export interface CompleteSignInInput {
+    userId: Scalars['String']
+    code: Scalars['String']
+    password: Scalars['String']
+}
 
 
-    const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
-    export const isPaginatedMetaType = (obj?: { __typename?: any } | null): obj is PaginatedMetaType => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isPaginatedMetaType"')
-      return PaginatedMetaType_possibleTypes.includes(obj.__typename)
-    }
-    
+const MethodsType_possibleTypes: string[] = ['MethodsType']
+export const isMethodsType = (
+    obj?: { __typename?: any } | null,
+): obj is MethodsType => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isMethodsType"')
+    return MethodsType_possibleTypes.includes(obj.__typename)
+}
 
-
-    const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
-    export const isAuthorizationResponse = (obj?: { __typename?: any } | null): obj is AuthorizationResponse => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isAuthorizationResponse"')
-      return AuthorizationResponse_possibleTypes.includes(obj.__typename)
-    }
-    
-
+const RoleType_possibleTypes: string[] = ['RoleType']
+export const isRoleType = (
+    obj?: { __typename?: any } | null,
+): obj is RoleType => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isRoleType"')
+    return RoleType_possibleTypes.includes(obj.__typename)
+}
 
     const RoleType_possibleTypes: string[] = ['RoleType']
     export const isRoleType = (obj?: { __typename?: any } | null): obj is RoleType => {
@@ -221,12 +253,20 @@ export interface CompleteSignInInput {userId: Scalars['String'],code: Scalars['S
     
 
 
-    const MethodsType_possibleTypes: string[] = ['MethodsType']
-    export const isMethodsType = (obj?: { __typename?: any } | null): obj is MethodsType => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isMethodsType"')
-      return MethodsType_possibleTypes.includes(obj.__typename)
-    }
-    
+const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
+export const isAuthorizationResponse = (
+    obj?: { __typename?: any } | null,
+): obj is AuthorizationResponse => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isAuthorizationResponse"')
+    return AuthorizationResponse_possibleTypes.includes(obj.__typename)
+}
+
+const Query_possibleTypes: string[] = ['Query']
+export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
+    if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
+    return Query_possibleTypes.includes(obj.__typename)
+}
 
 
     const AvailableMethodsType_possibleTypes: string[] = ['AvailableMethodsType']

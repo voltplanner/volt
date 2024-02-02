@@ -8,13 +8,12 @@ import {
     patchAuthConfig,
 } from './auth.config'
 import { AuthResolver } from './resolvers/auth.resolver'
-import { AuthACLService } from './services/auth-acl.service'
-import { AuthAdminService } from './services/auth-admin.service'
+import { AuthAuthService } from './services/auth-auth.service'
 import { AuthBootstrapService } from './services/auth-bootstrap.service'
 import { AuthEventsService } from './services/auth-events.service'
+import { AuthRoleService } from './services/auth-role.service'
 import { AuthTokensService } from './services/auth-tokens.service'
 import { AuthUserService } from './services/auth-user.service'
-import { JwtStrategy } from './strategies/jwt.strategy'
 
 @Module({})
 export class AuthModule extends AuthConfigurableModuleClass {
@@ -27,14 +26,13 @@ export class AuthModule extends AuthConfigurableModuleClass {
                 provide: AUTH_CONFIG,
                 useValue: patchAuthConfig(options),
             },
-            AuthUserService,
+            AuthAuthService,
             AuthTokensService,
             AuthResolver,
             AuthEventsService,
-            AuthAdminService,
-            AuthACLService,
+            AuthUserService,
+            AuthRoleService,
             AuthBootstrapService,
-            JwtStrategy,
         ]
 
         return {

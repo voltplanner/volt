@@ -19,12 +19,12 @@ export class AuthTokensService {
         private readonly prisma: PrismaService,
     ) {}
 
-    async generateAccessToken(adminId: string, role: string): Promise<string> {
+    async generateAccessToken(userId: string, role: string): Promise<string> {
         const signOptions: SignOptions = {
             issuer: this.config.jwt.issuerUrl,
             audience: this.config.jwt.issuerUrl,
             expiresIn: this.config.jwt.accessTokenTTL,
-            subject: adminId,
+            subject: userId,
         }
 
         return await this.jwt.signAsync(
@@ -55,7 +55,7 @@ export class AuthTokensService {
         const opts: SignOptions = {
             issuer: this.config.jwt.issuerUrl,
             audience: this.config.jwt.issuerUrl,
-            expiresIn: this.config.jwt.accessTokenTTL,
+            expiresIn: this.config.jwt.refreshTokenTTL,
             subject: userId,
             jwtid: refreshToken.id,
         }
@@ -73,9 +73,7 @@ export class AuthTokensService {
 
     async decodeRefreshToken(token: string): Promise<RefreshTokenPayload> {
         try {
-            return await this.jwt.verifyAsync(token, {
-                secret: this.config.jwt.secret,
-            })
+            return await this.jwt.decode(token)
         } catch (error) {
             if (error instanceof TokenExpiredError) {
                 throw new UnprocessableEntityException('Refresh token expired')

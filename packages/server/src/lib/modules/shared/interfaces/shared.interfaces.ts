@@ -13,3 +13,8 @@ export enum OrderEnum {
     ASC = 'asc',
     DESC = 'desc',
 }
+
+export interface CurrentUserPayload {
+    role: string
+    userId: string
+}

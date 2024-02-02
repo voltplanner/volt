@@ -12,10 +12,9 @@ export interface AuthConfig {
         refreshTokenTTL: number
     }
     acl: {
-        defaultPermissions: {
+        defaultAllowPermissions: {
             methodName: string
             roleName: string
-            allow: boolean
         }[]
     }
     temp?: boolean
