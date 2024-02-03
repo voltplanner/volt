@@ -12,6 +12,7 @@ export default {
             id: [3],
             name: [4],
             group: [4],
+            editable: [5],
             description: [4],
             allowed: [5],
             __typename: [4],
@@ -32,7 +33,6 @@ export default {
             firstname: [4],
             lastname: [4],
             email: [4],
-            role: [6],
             status: [8],
             createdAt: [9],
             deletedAt: [9],
@@ -71,6 +71,7 @@ export default {
                     input: [17, 'GetRolesInput!'],
                 },
             ],
+            getMyUser: [7],
             __typename: [4],
         },
         GetUsersInput: {

@@ -168,6 +168,9 @@ export class MethodsType {
     group: string
 
     @Field()
+    editable: boolean
+
+    @Field()
     description: string
 
     @Field()
@@ -205,9 +208,6 @@ export class UserType {
 
     @Field()
     email: string
-
-    @Field(() => RoleType)
-    role: RoleType
 
     @Field(() => AuthUserStatusEnum)
     status: AuthUserStatusEnum

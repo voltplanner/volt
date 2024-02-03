@@ -45,6 +45,7 @@ CREATE TABLE "AuthRolePermission" (
     "roleId" TEXT NOT NULL,
     "methodId" TEXT NOT NULL,
     "allowed" BOOLEAN NOT NULL,
+    "editable" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "AuthRolePermission_pkey" PRIMARY KEY ("roleId","methodId")
 );

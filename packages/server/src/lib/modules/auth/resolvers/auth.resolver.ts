@@ -64,6 +64,15 @@ export class AuthResolver {
     }
 
     @UseGuards(ACLGuard)
+    @Query(() => UserType)
+    @AccessControl({ group: 'roles', description: 'View user role' })
+    async getMyUser(
+        @CurrentUser() user: CurrentUserPayload,
+    ): Promise<UserType> {
+        return await this.userService.getMyUser(user.userId)
+    }
+
+    @UseGuards(ACLGuard)
     @Mutation(() => Boolean)
     @AccessControl({ group: 'roles', description: 'Update roles' })
     async updateRole(@Args('input') input: UpdateRoleInput): Promise<boolean> {

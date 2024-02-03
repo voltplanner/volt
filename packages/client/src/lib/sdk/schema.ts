@@ -22,6 +22,7 @@ export interface MethodsType {
     id: Scalars['ID']
     name: Scalars['String']
     group: Scalars['String']
+    editable: Scalars['Boolean']
     description: Scalars['String']
     allowed: Scalars['Boolean']
     __typename: 'MethodsType'
@@ -41,7 +42,6 @@ export interface UserType {
     firstname: Scalars['String']
     lastname: Scalars['String']
     email: Scalars['String']
-    role: RoleType
     status: AuthUserStatusEnum
     createdAt: Scalars['DateTime']
     deletedAt: Scalars['DateTime'] | null
@@ -68,6 +68,7 @@ export interface Query {
     getUsers: PaginatedUsers
     getRoles: RoleType[]
     getMyRole: RoleType
+    getMyUser: UserType
     __typename: 'Query'
 }
 
@@ -98,6 +99,7 @@ export interface MethodsTypeGenqlSelection {
     id?: boolean | number
     name?: boolean | number
     group?: boolean | number
+    editable?: boolean | number
     description?: boolean | number
     allowed?: boolean | number
     __typename?: boolean | number
@@ -119,7 +121,6 @@ export interface UserTypeGenqlSelection {
     firstname?: boolean | number
     lastname?: boolean | number
     email?: boolean | number
-    role?: RoleTypeGenqlSelection
     status?: boolean | number
     createdAt?: boolean | number
     deletedAt?: boolean | number
@@ -149,6 +150,7 @@ export interface QueryGenqlSelection {
     }
     getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
     getMyRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
+    getMyUser?: UserTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
