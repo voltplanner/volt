@@ -2,11 +2,11 @@ Business Source License 1.1
 
 Parameters
 
-Licensor:             Volt Planner, Inc.
-Licensed Work:        Volt
-                      The Licensed Work is (c) 2020 Volt Planner, Inc.
+Licensor: Volt Planner, Inc.
+Licensed Work: Volt
+The Licensed Work is (c) 2020 Volt Planner, Inc.
 Additional Use Grant: You may make use of the Licensed Work, provided that
-                      you may not use the Licensed Work for a Task Planner Service.
+you may not use the Licensed Work for a Task Planner Service.
 
                       A “Task Planner Service” is a commercial offering that
                       allows third parties (other than your employees and
@@ -14,7 +14,7 @@ Additional Use Grant: You may make use of the Licensed Work, provided that
                       Licensed Work by creating projects and tasks
                       controlled by such third parties.
 
-Change Date:          2028-06-18
+Change Date: 2028-06-18
 
 Notice
 
@@ -25,7 +25,7 @@ under an Open Source License, as stated in this License.
 License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 “Business Source License” is a trademark of MariaDB Corporation Ab.
 
------------------------------------------------------------------------------
+---
 
 Business Source License 1.1
 
