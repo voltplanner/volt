@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 export type Scalars = {
-    Float: number
-    ID: string
-    String: string
-    Boolean: boolean
-    DateTime: any
+    Float: number,
+    ID: string,
+    String: string,
+    Boolean: boolean,
+    DateTime: any,
 }
 
 export interface PaginatedMetaType {
@@ -94,7 +94,7 @@ export interface PaginatedMetaTypeGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface MethodsTypeGenqlSelection {
+export interface MethodsTypeGenqlSelection{
     id?: boolean | number
     name?: boolean | number
     group?: boolean | number
@@ -104,7 +104,7 @@ export interface MethodsTypeGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface RoleTypeGenqlSelection {
+export interface RoleTypeGenqlSelection{
     id?: boolean | number
     name?: boolean | number
     editable?: boolean | number
@@ -134,7 +134,7 @@ export interface PaginatedUsersGenqlSelection{
     __scalar?: boolean | number
 }
 
-export interface AuthorizationResponseGenqlSelection {
+export interface AuthorizationResponseGenqlSelection{
     refreshToken?: boolean | number
     accessToken?: boolean | number
     userId?: boolean | number
@@ -143,12 +143,10 @@ export interface AuthorizationResponseGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface QueryGenqlSelection {
-    getUsers?: PaginatedUsersGenqlSelection & {
-        __args: { input: GetUsersInput }
-    }
-    getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
+export interface QueryGenqlSelection{
+    getUsers?: (PaginatedUsersGenqlSelection & { __args: {input: GetUsersInput} })
+    getRoles?: (RoleTypeGenqlSelection & { __args: {input: GetRolesInput} })
+    getMyRole?: (RoleTypeGenqlSelection & { __args: {input: GetRolesInput} })
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -159,45 +157,27 @@ export interface OrderByInput {field: Scalars['String'],order: OrderEnum}
 
 export interface GetUsersFilterInput {email?: (Scalars['String'] | null),firstname?: (Scalars['String'] | null),lastname?: (Scalars['String'] | null),role?: (Scalars['String'] | null),status?: (AuthUserStatusEnum | null)}
 
-export interface GetRolesInput {
-    name?: Scalars['String'] | null
-}
+export interface GetRolesInput {name?: (Scalars['String'] | null)}
 
-export interface MutationGenqlSelection {
-    updateRole?: { __args: { input: UpdateRoleInput } }
-    deleteRole?: { __args: { input: DeleteRoleInput } }
-    changePermissions?: { __args: { input: ChangePermissionsInput } }
-    updateUser?: { __args: { input: UpdateUserInput } }
-    signIn?: AuthorizationResponseGenqlSelection & {
-        __args: { input: SignInInput }
-    }
-    refreshToken?: AuthorizationResponseGenqlSelection & {
-        __args: { input: RefreshTokenInput }
-    }
-    createUser?: UserTypeGenqlSelection & { __args: { input: CreateUserInput } }
-    deleteUser?: { __args: { input: DeleteUserInput } }
-    completeSignIn?: AuthorizationResponseGenqlSelection & {
-        __args: { input: CompleteSignInInput }
-    }
+export interface MutationGenqlSelection{
+    updateRole?: { __args: {input: UpdateRoleInput} }
+    deleteRole?: { __args: {input: DeleteRoleInput} }
+    changePermissions?: { __args: {input: ChangePermissionsInput} }
+    updateUser?: { __args: {input: UpdateUserInput} }
+    signIn?: (AuthorizationResponseGenqlSelection & { __args: {input: SignInInput} })
+    refreshToken?: (AuthorizationResponseGenqlSelection & { __args: {input: RefreshTokenInput} })
+    createUser?: (UserTypeGenqlSelection & { __args: {input: CreateUserInput} })
+    deleteUser?: { __args: {input: DeleteUserInput} }
+    completeSignIn?: (AuthorizationResponseGenqlSelection & { __args: {input: CompleteSignInInput} })
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface UpdateRoleInput {
-    roleId: Scalars['String']
-    name?: Scalars['String'] | null
-    superuser?: Scalars['Boolean'] | null
-    editable?: Scalars['Boolean'] | null
-}
+export interface UpdateRoleInput {roleId: Scalars['String'],name?: (Scalars['String'] | null),superuser?: (Scalars['Boolean'] | null),editable?: (Scalars['Boolean'] | null)}
 
-export interface DeleteRoleInput {
-    roleId: Scalars['String']
-}
+export interface DeleteRoleInput {roleId: Scalars['String']}
 
-export interface ChangePermissionsInput {
-    roleId: Scalars['String']
-    permissions: PermissionInput[]
-}
+export interface ChangePermissionsInput {roleId: Scalars['String'],permissions: PermissionInput[]}
 
 export interface PermissionInput {methodId: Scalars['String'],allow: Scalars['Boolean']}
 
@@ -205,74 +185,35 @@ export interface UpdateUserInput {userId: Scalars['ID'],email?: (Scalars['String
 
 export interface SignInInput {email: Scalars['String'],password: Scalars['String']}
 
-export interface RefreshTokenInput {
-    refreshToken: Scalars['String']
-}
+export interface RefreshTokenInput {refreshToken: Scalars['String']}
 
-export interface CreateUserInput {
-    email: Scalars['String']
-    firstname: Scalars['String']
-    lastname: Scalars['String']
-    roleName: Scalars['String']
-}
+export interface CreateUserInput {email: Scalars['String'],firstname: Scalars['String'],lastname: Scalars['String'],roleName: Scalars['String']}
 
-export interface DeleteUserInput {
-    userId: Scalars['String']
-}
+export interface DeleteUserInput {userId: Scalars['String']}
 
-export interface CompleteSignInInput {
-    userId: Scalars['String']
-    code: Scalars['String']
-    password: Scalars['String']
-}
+export interface CompleteSignInInput {userId: Scalars['String'],code: Scalars['String'],password: Scalars['String']}
 
 
-const MethodsType_possibleTypes: string[] = ['MethodsType']
-export const isMethodsType = (
-    obj?: { __typename?: any } | null,
-): obj is MethodsType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isMethodsType"')
-    return MethodsType_possibleTypes.includes(obj.__typename)
-}
+    const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
+    export const isPaginatedMetaType = (obj?: { __typename?: any } | null): obj is PaginatedMetaType => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isPaginatedMetaType"')
+      return PaginatedMetaType_possibleTypes.includes(obj.__typename)
+    }
+    
 
-const RoleType_possibleTypes: string[] = ['RoleType']
-export const isRoleType = (
-    obj?: { __typename?: any } | null,
-): obj is RoleType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isRoleType"')
-    return RoleType_possibleTypes.includes(obj.__typename)
-}
+
+    const MethodsType_possibleTypes: string[] = ['MethodsType']
+    export const isMethodsType = (obj?: { __typename?: any } | null): obj is MethodsType => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isMethodsType"')
+      return MethodsType_possibleTypes.includes(obj.__typename)
+    }
+    
+
 
     const RoleType_possibleTypes: string[] = ['RoleType']
     export const isRoleType = (obj?: { __typename?: any } | null): obj is RoleType => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isRoleType"')
       return RoleType_possibleTypes.includes(obj.__typename)
-    }
-    
-
-
-const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
-export const isAuthorizationResponse = (
-    obj?: { __typename?: any } | null,
-): obj is AuthorizationResponse => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isAuthorizationResponse"')
-    return AuthorizationResponse_possibleTypes.includes(obj.__typename)
-}
-
-const Query_possibleTypes: string[] = ['Query']
-export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
-    if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
-    return Query_possibleTypes.includes(obj.__typename)
-}
-
-
-    const AvailableMethodsType_possibleTypes: string[] = ['AvailableMethodsType']
-    export const isAvailableMethodsType = (obj?: { __typename?: any } | null): obj is AvailableMethodsType => {
-      if (!obj?.__typename) throw new Error('__typename is missing in "isAvailableMethodsType"')
-      return AvailableMethodsType_possibleTypes.includes(obj.__typename)
     }
     
 
@@ -289,6 +230,14 @@ export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
     export const isPaginatedUsers = (obj?: { __typename?: any } | null): obj is PaginatedUsers => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isPaginatedUsers"')
       return PaginatedUsers_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
+    export const isAuthorizationResponse = (obj?: { __typename?: any } | null): obj is AuthorizationResponse => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isAuthorizationResponse"')
+      return AuthorizationResponse_possibleTypes.includes(obj.__typename)
     }
     
 

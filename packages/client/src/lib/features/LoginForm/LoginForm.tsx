@@ -1,10 +1,11 @@
 import { HiddenForm } from 'entities'
 import { useState } from 'react'
-import { Button, ReactIcon } from 'shared'
+import { BackIcon, Button, ReactIcon } from 'shared'
 import styled from 'styled-components'
 import { ApiSignIn } from './api/api'
 import { useFormStore } from './model/useFormStore'
 import { InternalLoginForm } from './ui/InternalLoginForm'
+import { ExternalLoginForm } from './ui/ExternalLoginForm'
 
 type LoginFormProps = {
     title: string
@@ -12,8 +13,9 @@ type LoginFormProps = {
 
 export const LoginForm = (props: LoginFormProps) => {
     const { title } = props
-    const { setEmail, setPassword, email, password } = useFormStore()
-
+    const { setEmail, setPassword, resetStore, email, password } =
+        useFormStore()
+    const [isInternal, setIsInternal] = useState(false)
     // TODO: comment to disable eslint warning
     // const [password, setPassword] = useState('admin')
 
@@ -34,6 +36,10 @@ export const LoginForm = (props: LoginFormProps) => {
         setPassword(value)
     }
 
+    const onInternalClick = () => {
+        setIsInternal((prev) => !prev)
+        resetStore()
+    }
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
             e.preventDefault()
@@ -43,22 +49,39 @@ export const LoginForm = (props: LoginFormProps) => {
             console.log(e)
         }
     }
+    const formSelector = () => {
+        if (isInternal) {
+            return (
+                <InternalLoginForm
+                    onChangeEmail={onChangeEmail}
+                    onChangePassword={onChangePassword}
+                    onSubmit={onSubmit}
+                    disabled={false}
+                />
+            )
+        }
 
+        return <ExternalLoginForm onClick={onInternalClick} />
+    }
     return (
         <ContainerStyled>
             <HeaderStyled>
                 <ReactIcon height="48px" width="48px" />
             </HeaderStyled>
-            <TitleStyled>{title}</TitleStyled>
-            <BodyStyled>
-                {/* <Button variant="primary">Continue with Gitlab</Button>
-                <HiddenForm onChange={onChangeEmail} onSubmit={onSubmit} /> */}
-                <InternalLoginForm
-                    onChangeEmail={onChangeEmail}
-                    onChangePassword={onChangePassword}
-                    onSubmit={onSubmit}
-                />
-            </BodyStyled>
+            <TitleWrapper>
+                {isInternal && (
+                    <Button
+                        style={{ position: 'absolute', left: 0 }}
+                        variant="ghost"
+                        onClick={onInternalClick}
+                    >
+                        <BackIcon />
+                    </Button>
+                )}
+                <TitleStyled>{title}</TitleStyled>
+            </TitleWrapper>
+            {formSelector()}
+            <BodyStyled></BodyStyled>
         </ContainerStyled>
     )
 }
@@ -94,6 +117,14 @@ const BodyStyled = styled.div`
     width: 100%;
     flex-direction: column;
     gap: 12px;
+`
+const TitleWrapper = styled.div`
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 `
 const TitleStyled = styled.h2`
     font-size: 26px;
