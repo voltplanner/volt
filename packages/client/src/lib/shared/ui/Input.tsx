@@ -26,13 +26,17 @@ const InputStyled = styled.input<InputStyledProps>`
     background-color: #5f6867;
     color: ${(props) => (props.variant === 'primary' ? 'white' : 'black')};
     &:focus {
-        background: #1b998b;
+        background: #bababa;
+        transition: 0.3s;
+        color: #5f6867;
+        &::placeholder {
+            color: #5f6867;
+        }
+    }
+    &:not(:focus) {
         transition: 0.3s;
     }
-    &:not(:focus){
-        transition: 0.3s;
-    }
-    &::placeholder{
+    &::placeholder {
         color: #c9c9c9;
     }
 `
