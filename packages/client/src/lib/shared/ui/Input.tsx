@@ -25,16 +25,13 @@ const InputStyled = styled.input<InputStyledProps>`
     padding: 0 8px;
     background-color: #5f6867;
     color: ${(props) => (props.variant === 'primary' ? 'white' : 'black')};
+    transition: 0.3s;
     &:focus {
         background: #bababa;
-        transition: 0.3s;
         color: #5f6867;
         &::placeholder {
             color: #5f6867;
         }
-    }
-    &:not(:focus) {
-        transition: 0.3s;
     }
     &::placeholder {
         color: #c9c9c9;
