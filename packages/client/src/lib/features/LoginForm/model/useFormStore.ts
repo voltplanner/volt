@@ -7,6 +7,7 @@ interface FormState {
     password: string;
     setEmail: (email: string) => void;
     setPassword: (password: string) => void;
+    resetStore: () => void;
 }
 export const useFormStore = create<FormState>()(
     devtools((set, get) => ({
@@ -14,6 +15,10 @@ export const useFormStore = create<FormState>()(
         password: '',
         setEmail: (email) => set(produce((draft) => { draft.email = email })),
         setPassword: (password) => set(produce((draft) => { draft.password = password })),
+        resetStore: () => set(produce((draft) => {
+            draft.email = ''
+            draft.password = ''
+        })),
     })),
 )
 
