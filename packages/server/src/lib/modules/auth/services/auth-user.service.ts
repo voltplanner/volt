@@ -25,6 +25,20 @@ export class AuthUserService {
         private readonly events: AuthEventsService,
     ) {}
 
+    async getMyUser(userId: string) {
+        const user = await this.prisma.authUser.findUnique({
+            where: {
+                id: userId,
+            },
+        })
+
+        if (!user) {
+            throw new NotFoundException('No user found')
+        }
+
+        return user
+    }
+
     async getUsers(data: GetUsers) {
         const { filter, orderBy } = data
 
@@ -92,17 +106,6 @@ export class AuthUserService {
             ...queryOptions,
             skip,
             take,
-            include: {
-                role: {
-                    include: {
-                        permissions: {
-                            include: {
-                                method: true,
-                            },
-                        },
-                    },
-                },
-            },
         })
 
         const total = await this.prisma.authUser.count({
@@ -115,22 +118,7 @@ export class AuthUserService {
                 perPage,
                 total,
             },
-            data: users.map((user) => ({
-                ...user,
-                role: {
-                    id: user.role.id,
-                    name: user.role.name,
-                    superuser: user.role.superuser,
-                    editable: user.role.editable,
-                    methods: user.role.permissions.map((u) => ({
-                        id: u.method.id,
-                        name: u.method.name,
-                        description: u.method.description,
-                        group: u.method.group,
-                        allowed: u.allowed,
-                    })),
-                },
-            })),
+            data: users,
         }
     }
 
@@ -208,9 +196,6 @@ export class AuthUserService {
                 id: userId,
             },
             data: updateData,
-            include: {
-                role: true,
-            },
         })
 
         return user
@@ -237,17 +222,6 @@ export class AuthUserService {
                 completeCode: hashedCode,
                 status: AuthUserStatusEnum.WAITING_COMPLETE,
             },
-            include: {
-                role: {
-                    include: {
-                        permissions: {
-                            include: {
-                                method: true,
-                            },
-                        },
-                    },
-                },
-            },
         })
 
         this.events.send({
@@ -258,22 +232,7 @@ export class AuthUserService {
             },
         })
 
-        return {
-            ...user,
-            role: {
-                id: user.role.id,
-                name: user.role.name,
-                superuser: user.role.superuser,
-                editable: user.role.editable,
-                methods: user.role.permissions.map((u) => ({
-                    id: u.method.id,
-                    name: u.method.name,
-                    description: u.method.description,
-                    group: u.method.group,
-                    allowed: u.allowed,
-                })),
-            },
-        }
+        return user
     }
 
     async deleteUser(userId: string) {
@@ -287,13 +246,6 @@ export class AuthUserService {
             data: {
                 status: AuthUserStatusEnum.BLOCKED,
                 deletedAt: new Date(),
-            },
-            include: {
-                role: {
-                    select: {
-                        name: true,
-                    },
-                },
             },
         })
 

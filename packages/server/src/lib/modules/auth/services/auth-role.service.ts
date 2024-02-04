@@ -94,6 +94,7 @@ export class AuthRoleService {
                 description: u.method.description,
                 group: u.method.group,
                 allowed: u.allowed,
+                editable: u.editable,
             })),
         }
     }
@@ -125,6 +126,7 @@ export class AuthRoleService {
                 description: u.method.description,
                 group: u.method.group,
                 allowed: u.allowed,
+                editable: u.editable,
             })),
         }))
     }
@@ -133,19 +135,15 @@ export class AuthRoleService {
         const { roleId, permissions } = data
 
         for (const permission of permissions) {
-            await this.prisma.authRolePermission.upsert({
+            await this.prisma.authRolePermission.update({
                 where: {
                     roleId_methodId: {
                         roleId,
                         methodId: permission.methodId,
                     },
+                    editable: true,
                 },
-                create: {
-                    roleId,
-                    methodId: permission.methodId,
-                    allowed: permission.allow,
-                },
-                update: {
+                data: {
                     allowed: permission.allow,
                 },
             })
@@ -224,6 +222,7 @@ export class AuthRoleService {
                 name: v.discoveredMethod.methodName,
                 description: v.meta.description,
                 group: v.meta.group,
+                editable: v.meta.editable,
             }
         })
 
@@ -236,7 +235,7 @@ export class AuthRoleService {
             this.logger.log(`Auth methods created: ${methodsCreated.count}`)
         }
 
-        const defaultAllowPermissions = this.config.acl.defaultAllowPermissions
+        const defaultAllowPermissions = this.config.defaultAllowPermissions
 
         const roles = await this.prisma.authRole.findMany({
             select: {
@@ -257,6 +256,7 @@ export class AuthRoleService {
             roleId: string
             methodId: string
             allowed: boolean
+            editable?: boolean
         }[] = []
 
         for (const role of roles) {
@@ -274,19 +274,21 @@ export class AuthRoleService {
                         roleId: role.id,
                         methodId: methodId,
                         allowed: true,
+                        editable: false,
                     })
                     continue
                 }
 
-                if (
-                    rolePermissions.find(
-                        (v) => v.methodName === method.name,
-                    ) !== undefined
-                ) {
+                const rolePermission = rolePermissions.find(
+                    (v) => v.methodName === method.name,
+                )
+
+                if (rolePermission !== undefined) {
                     permissionsToCreateForRole.push({
                         roleId: role.id,
                         methodId: methodId,
                         allowed: true,
+                        editable: rolePermission.editable,
                     })
                 } else {
                     permissionsToCreateForRole.push({

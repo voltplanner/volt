@@ -8,6 +8,7 @@ type MethodsType {
   id: ID!
   name: String!
   group: String!
+  editable: Boolean!
   description: String!
   allowed: Boolean!
 }
@@ -25,7 +26,6 @@ type UserType {
   firstname: String!
   lastname: String!
   email: String!
-  role: RoleType!
   status: AuthUserStatusEnum!
   createdAt: DateTime!
   deletedAt: DateTime
@@ -58,6 +58,7 @@ type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
   getRoles(input: GetRolesInput!): [RoleType!]!
   getMyRole(input: GetRolesInput!): RoleType!
+  getMyUser: UserType!
 }
 
 input GetUsersInput {

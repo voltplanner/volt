@@ -23,26 +23,15 @@ export default {
                 4
             ]
         },
-        "Float": {},
-        "MethodsType": {
-            "id": [
-                3
-            ],
-            "name": [
-                4
-            ],
-            "group": [
-                4
-            ],
-            "description": [
-                4
-            ],
-            "allowed": [
-                5
-            ],
-            "__typename": [
-                4
-            ]
+        Float: {},
+        MethodsType: {
+            id: [3],
+            name: [4],
+            group: [4],
+            editable: [5],
+            description: [4],
+            allowed: [5],
+            __typename: [4],
         },
         "ID": {},
         "String": {},
@@ -67,34 +56,15 @@ export default {
                 4
             ]
         },
-        "UserType": {
-            "id": [
-                4
-            ],
-            "firstname": [
-                4
-            ],
-            "lastname": [
-                4
-            ],
-            "email": [
-                4
-            ],
-            "role": [
-                6
-            ],
-            "status": [
-                8
-            ],
-            "createdAt": [
-                9
-            ],
-            "deletedAt": [
-                9
-            ],
-            "__typename": [
-                4
-            ]
+        UserType: {
+            id: [4],
+            firstname: [4],
+            lastname: [4],
+            email: [4],
+            status: [8],
+            createdAt: [9],
+            deletedAt: [9],
+            __typename: [4],
         },
         "AuthUserStatusEnum": {},
         "DateTime": {},
@@ -154,9 +124,8 @@ export default {
                     ]
                 }
             ],
-            "__typename": [
-                4
-            ]
+            getMyUser: [7],
+            __typename: [4],
         },
         "GetUsersInput": {
             "curPage": [

@@ -1,6 +1,12 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common'
 import { merge } from 'lodash'
 
+export interface AuthDefaultPermissions {
+    methodName: string
+    roleName: string
+    editable?: boolean
+}
+
 export interface AuthConfig {
     adminEmail: string
     adminPassword: string
@@ -11,12 +17,7 @@ export interface AuthConfig {
         accessTokenTTL: number
         refreshTokenTTL: number
     }
-    acl: {
-        defaultAllowPermissions: {
-            methodName: string
-            roleName: string
-        }[]
-    }
+    defaultAllowPermissions: AuthDefaultPermissions[]
     temp?: boolean
 }
 

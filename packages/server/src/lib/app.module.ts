@@ -32,9 +32,7 @@ import { PrismaModule } from './modules/shared/prisma'
             adminEmail: environment.adminEmail,
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
-            acl: {
-                defaultAllowPermissions,
-            },
+            defaultAllowPermissions,
         }),
         NotificationsModule.forRoot({
             ...environment.mailer,

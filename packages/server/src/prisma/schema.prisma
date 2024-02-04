@@ -50,6 +50,7 @@ model AuthRolePermission {
   method   AuthMethod @relation(fields: [methodId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   methodId String
   allowed  Boolean
+  editable Boolean    @default(true)
 
   @@id([roleId, methodId])
 }
