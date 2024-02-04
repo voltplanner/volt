@@ -4,9 +4,10 @@ interface InternalLoginFormProps {
     onChangeEmail: (value: string) => void
     onChangePassword: (value: string) => void
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+    disabled: boolean
 }
 export const InternalLoginForm = (props: InternalLoginFormProps) => {
-    const { onChangeEmail, onChangePassword, onSubmit } = props
+    const { onChangeEmail, onChangePassword, onSubmit, disabled } = props
     return (
         <FormStyled onSubmit={onSubmit}>
             <WrapperStyled>
@@ -14,17 +15,16 @@ export const InternalLoginForm = (props: InternalLoginFormProps) => {
                     autofocus
                     variant="primary"
                     onChange={onChangeEmail}
-                    placeholder='Email'
+                    placeholder="Email"
                     type="email"
-                    />
+                />
                 <Input
-                    autofocus
                     variant="primary"
                     onChange={onChangePassword}
-                    placeholder='Password'
+                    placeholder="Password"
                     type="password"
                 />
-                <Button variant="primary" type="submit">
+                <Button variant="primary" type="submit" disabled={disabled}>
                     {'Sign In'}
                 </Button>
             </WrapperStyled>
@@ -42,7 +42,7 @@ const WrapperStyled = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: auto; /* Or set a specific height for the container */
+    height: auto;
     width: 100%;
     gap: 8px;
 `
