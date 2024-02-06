@@ -1,7 +1,9 @@
-import { SVGProps } from "react"
-import { JSX } from "react/jsx-runtime"
+import { SVGProps } from 'react'
+import { JSX } from 'react/jsx-runtime'
 
-export const BackIcon = (props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) => {
+export const BackIcon = (
+    props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
+) => {
     return (
         <svg
             viewBox="0 0 512 512"

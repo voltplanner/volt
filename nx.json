@@ -21,16 +21,6 @@
       "cache": true,
       "dependsOn": ["graphql:prepare"]
     },
-    "lint": {
-      "dependsOn": ["prisma:generate"],
-      "cache": true,
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.js"
-      ]
-    },
     "@nx/jest:jest": {
       "cache": true,
       "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
@@ -43,6 +33,16 @@
           "codeCoverage": true
         }
       }
+    },
+    "@nx/eslint:lint": {
+      "dependsOn": ["prisma:generate"],
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.js"
+      ]
     }
   },
   "nxCloudAccessToken": "YmMxNzVmMGUtNjNhMC00NDJiLWEyYjktODQ1YTdmN2FmMTY2fHJlYWQtd3JpdGU=",
