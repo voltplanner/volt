@@ -6,7 +6,7 @@
     "nx": "nx",
     "lint": "npm run nx -- run-many --t lint",
     "lint:fix": "npm run postinstall && nx run-many --t lint --fix && nx format:write --all",
-    "postinstall": "nx run server:prisma:generate && nx run client:sdk:generate"
+    "postinstall": "nx run server:prisma:generate && nx run client:sdk:generate && npm run lint:fix"
   },
   "private": true,
   "devDependencies": {
