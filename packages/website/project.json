@@ -16,6 +16,12 @@
         "command": "docusaurus start packages/website"
       }
     },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docusaurus deploy packages/website"
+      }
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"]
