@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpackage_based=self.webpackChunkpackage_based||[]).push([[535],{5626:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/volt/blog/welcome","unlisted":false}]}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpackage_based=self.webpackChunkpackage_based||[]).push([[506],{1003:a=>{a.exports=JSON.parse('{"label":"info","permalink":"/volt/blog/tags/info","allTagsPath":"/volt/blog/tags","count":1,"unlisted":false}')}}]);

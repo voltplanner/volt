@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://voltplanner.github.io/volt/blog</id>
+    <title>Volt Blog</title>
+    <updated>2024-02-07T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://voltplanner.github.io/volt/blog"/>
+    <subtitle>Volt Blog</subtitle>
+    <icon>https://voltplanner.github.io/volt/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Welcome]]></title>
+        <id>https://voltplanner.github.io/volt/blog/welcome</id>
+        <link href="https://voltplanner.github.io/volt/blog/welcome"/>
+        <updated>2024-02-07T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Welcome to Volt! Modern project management app, powered by the community.]]></summary>
+        <content type="html"><![CDATA[<p>Welcome to Volt! Modern project management app, powered by the community.</p>]]></content>
+        <author>
+            <name>Tema Rusanov</name>
+            <uri>https://github.com/temarusanov</uri>
+        </author>
+        <category label="info" term="info"/>
+    </entry>
+</feed>
