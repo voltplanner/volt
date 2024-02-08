@@ -8,8 +8,12 @@ import {
 import { genSalt, hash } from 'bcrypt'
 import { randomBytes } from 'crypto'
 
-import { AuthUserStatusEnum, Prisma, PrismaService } from '../../shared/prisma'
-import { parseMetaArgs } from '../../shared/utils'
+import {
+    AuthUserStatusEnum,
+    Prisma,
+    PrismaService,
+} from '../../../shared/prisma'
+import { parseMetaArgs } from '../../../shared/utils'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import { CreateUser, GetUsers, UpdateUser } from '../interfaces/auth.interfaces'
 import { AuthEventPattern, AuthEventsService } from './auth-events.service'

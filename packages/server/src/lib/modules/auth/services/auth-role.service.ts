@@ -4,8 +4,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import {
     ACCESS_CONTROL_METAKEY,
     AccessControlPayload,
-} from '../../shared/decorators'
-import { PrismaService } from '../../shared/prisma'
+} from '../../../shared/decorators'
+import { PrismaService } from '../../../shared/prisma'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import {
     ChangePermissionPayload,

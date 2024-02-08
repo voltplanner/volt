@@ -1,5 +1,5 @@
-import { OrderEnum } from '../../shared/interfaces/shared.interfaces'
-import { AuthUserStatusEnum } from '../../shared/prisma'
+import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
+import { AuthUserStatusEnum } from '../../../shared/prisma'
 
 export interface RefreshTokenPayload {
     jti: string

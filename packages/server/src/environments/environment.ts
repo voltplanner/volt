@@ -1,6 +1,6 @@
 import { get } from 'env-var'
 
-import { parseSmtpConnectionUrl } from '../lib/modules/shared/utils'
+import { parseSmtpConnectionUrl } from '../lib/shared/utils'
 
 export const environment = {
     production: false,

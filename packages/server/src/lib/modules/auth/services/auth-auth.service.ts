@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import { compare, genSalt, hash } from 'bcrypt'
 
-import { AuthUserStatusEnum, PrismaService } from '../../shared/prisma'
+import { AuthUserStatusEnum, PrismaService } from '../../../shared/prisma'
 import { AuthorizationResponse } from '../interfaces/auth.graphql'
 import {
     CompleteSignIn,

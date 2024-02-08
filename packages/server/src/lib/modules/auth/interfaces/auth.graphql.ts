@@ -10,8 +10,8 @@ import { IsEmail } from 'class-validator'
 import {
     OrderByInput,
     PaginatedResponseType,
-} from '../../shared/graphql/shared.graphql'
-import { AuthUserStatusEnum } from '../../shared/prisma'
+} from '../../../shared/graphql/shared.graphql'
+import { AuthUserStatusEnum } from '../../../shared/prisma'
 
 registerEnumType(AuthUserStatusEnum, {
     name: 'AuthUserStatusEnum',

@@ -8,7 +8,7 @@ import {
     AuthEventsService,
 } from '../modules/auth/services/auth-events.service'
 import { NotificationsService } from '../modules/notifications/services/notifications.service'
-import { NotificationTypeEnum } from '../modules/shared/prisma'
+import { NotificationTypeEnum } from '../shared/prisma'
 
 @Injectable()
 export class AuthIntegration {

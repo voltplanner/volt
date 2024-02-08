@@ -10,7 +10,7 @@ import { GqlExecutionContext } from '@nestjs/graphql'
 import { JwtService } from '@nestjs/jwt'
 import { AuthGuard } from '@nestjs/passport'
 
-import { environment } from '../../../../environments/environment'
+import { environment } from '../../../environments/environment'
 import { CurrentUserPayload } from '../interfaces/shared.interfaces'
 import { PrismaService } from '../prisma'
 

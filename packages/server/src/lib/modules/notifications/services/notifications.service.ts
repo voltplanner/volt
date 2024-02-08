@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { MailerService } from '@nestjs-modules/mailer'
 
-import { NotificationTypeEnum, PrismaService } from '../../shared/prisma'
+import { NotificationTypeEnum, PrismaService } from '../../../shared/prisma'
 import { SendNotificationPayload } from '../interfaces/notifications.interfaces'
 
 @Injectable()

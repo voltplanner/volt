@@ -1,4 +1,4 @@
-import { NotificationTypeEnum } from '../../shared/prisma'
+import { NotificationTypeEnum } from '../../../shared/prisma'
 
 export interface SendNotificationPayload {
     type: NotificationTypeEnum

@@ -5,12 +5,12 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { JwtModule } from '@nestjs/jwt'
 import { join } from 'path'
 
-import { environment } from '../environments/environment'
-import { defaultAllowPermissions } from '../environments/permissions'
-import { AuthIntegration } from './integrations/auth.integration'
-import { AuthModule } from './modules/auth/auth.module'
-import { NotificationsModule } from './modules/notifications/notifications.module'
-import { PrismaModule } from './modules/shared/prisma'
+import { environment } from '../../environments/environment'
+import { defaultAllowPermissions } from '../../environments/permissions'
+import { AuthIntegration } from '../integrations/auth.integration'
+import { AuthModule } from '../modules/auth/auth.module'
+import { NotificationsModule } from '../modules/notifications/notifications.module'
+import { PrismaModule } from '../shared/prisma'
 
 @Module({
     imports: [

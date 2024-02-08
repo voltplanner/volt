@@ -4,7 +4,7 @@ import { Logger } from '@tinybudgie/logger'
 import { get } from 'env-var'
 
 import { environment } from '../environments/environment'
-import { AppModule } from './app.module'
+import { AppModule } from './app/app.module'
 
 const logger = new Logger()
 

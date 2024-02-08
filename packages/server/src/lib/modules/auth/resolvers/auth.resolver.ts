@@ -1,10 +1,10 @@
 import { UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
-import { AccessControl } from '../../shared/decorators'
-import { CurrentUser } from '../../shared/decorators/current-user.decorator'
-import { ACLGuard } from '../../shared/guards/acl.guard'
-import { CurrentUserPayload } from '../../shared/interfaces/shared.interfaces'
+import { AccessControl } from '../../../shared/decorators'
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator'
+import { ACLGuard } from '../../../shared/guards/acl.guard'
+import { CurrentUserPayload } from '../../../shared/interfaces/shared.interfaces'
 import {
     AuthorizationResponse,
     ChangePermissionsInput,
