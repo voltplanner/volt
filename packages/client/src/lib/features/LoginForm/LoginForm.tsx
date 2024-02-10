@@ -42,11 +42,16 @@ export const LoginForm = (props: LoginFormProps) => {
     }
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
+            console.log({ email, password })
             e.preventDefault()
             await signIn()
             console.log('signIn', data)
+            localStorage.setItem('accessToken', data?.signIn?.accessToken)
+            localStorage.setItem('expiresAt', data?.signIn?.expiresAt)
+            localStorage.setItem('refreshToken', data?.signIn?.refreshToken)
+            localStorage.setItem('userId', data?.signIn?.userId)
         } catch (e) {
-            console.log(e)
+            console.log('error => ', e)
         }
     }
     const formSelector = () => {
