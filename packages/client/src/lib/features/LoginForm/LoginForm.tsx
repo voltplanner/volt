@@ -1,4 +1,3 @@
-import { HiddenForm } from 'entities'
 import { useState } from 'react'
 import { BackIcon, Button, ReactIcon } from 'shared'
 import styled from 'styled-components'
@@ -6,6 +5,7 @@ import { ApiSignIn } from './api/api'
 import { useFormStore } from './model/useFormStore'
 import { InternalLoginForm } from './ui/InternalLoginForm'
 import { ExternalLoginForm } from './ui/ExternalLoginForm'
+import { useSessionStore } from 'shared/libs/useSessionStore'
 
 type LoginFormProps = {
     title: string
@@ -15,16 +15,10 @@ export const LoginForm = (props: LoginFormProps) => {
     const { title } = props
     const { setEmail, setPassword, resetStore, email, password } =
         useFormStore()
+    const { login } = useSessionStore()
     const [isInternal, setIsInternal] = useState(false)
-    // TODO: comment to disable eslint warning
-    // const [password, setPassword] = useState('admin')
 
-    // const { signIn, data, loading, error } = ApiSignIn({
-    //     email,
-    //     password,
-    // })
-
-    const { signIn, data } = ApiSignIn({
+    const { signIn } = ApiSignIn({
         email,
         password,
     })
@@ -35,21 +29,15 @@ export const LoginForm = (props: LoginFormProps) => {
     const onChangePassword = (value: string) => {
         setPassword(value)
     }
-
     const onInternalClick = () => {
         setIsInternal((prev) => !prev)
         resetStore()
     }
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
-            console.log({ email, password })
             e.preventDefault()
-            await signIn()
-            console.log('signIn', data)
-            localStorage.setItem('accessToken', data?.signIn?.accessToken)
-            localStorage.setItem('expiresAt', data?.signIn?.expiresAt)
-            localStorage.setItem('refreshToken', data?.signIn?.refreshToken)
-            localStorage.setItem('userId', data?.signIn?.userId)
+            const { data } = await signIn()
+            login(data.signIn)
         } catch (e) {
             console.log('error => ', e)
         }
