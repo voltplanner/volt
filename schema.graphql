@@ -1,3 +1,7 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
 type PaginatedMetaType {
   curPage: Float!
   perPage: Float!
@@ -76,10 +80,10 @@ type NotificationWebResponse {
 
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
-  getRoles(input: GetRolesInput!): PaginatedRoles!
-  getMyRole: RoleType!
-  getUser(input: GetUserInput!): UserType!
-  getMyNotificationPreferences: GetNotificationPreferences!
+  getRoles(input: GetRolesInput!): [RoleType!]!
+  getMyRole(input: GetRolesInput!): RoleType!
+  getMyUser: UserType!
+  getFile(input: GetFileInput!): String!
 }
 
 input GetUsersInput {
@@ -117,8 +121,8 @@ input GetRolesFilterInput {
   name: String
 }
 
-input GetUserInput {
-  userId: ID!
+input GetFileInput {
+  id: String!
 }
 
 type Mutation {
@@ -133,9 +137,7 @@ type Mutation {
   createUser(input: CreateUserInput!): UserType!
   deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
-  changeMyNotificationPreferences(
-    input: ChangeMyNotificationPreferences!
-  ): Boolean!
+  uploadFile(input: UploadFileInput!): Boolean!
 }
 
 input UpdateRoleInput {
@@ -204,14 +206,6 @@ input CompleteSignInInput {
   password: String!
 }
 
-input ChangeMyNotificationPreferences {
-  emailEnabled: Boolean
-  email: String
-  webEnabled: Boolean
-  telegramEnabled: Boolean
-  telegramAccount: Float
-}
-
-type Subscription {
-  getNotifications: NotificationWebResponse!
+input UploadFileInput {
+  id: String!
 }

@@ -4,6 +4,8 @@
   "dependencies": {
     "@apollo/server": "^4.10.0",
     "@apollo/subgraph": "^2.7.1",
+    "@aws-sdk/client-s3": "^3.511.0",
+    "@aws-sdk/lib-storage": "^3.511.0",
     "@golevelup/nestjs-discovery": "^4.0.0",
     "@nestjs-modules/mailer": "^1.10.3",
     "@nestjs/apollo": "^12.0.11",
@@ -34,11 +36,13 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.0",
     "@types/lodash": "^4.14.202",
+    "@types/multer": "^1.4.11",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38"
   }

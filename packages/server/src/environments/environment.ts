@@ -31,4 +31,15 @@ export const environment = {
             rootUrl: get('ROOT_URL').required().asUrlString(),
         },
     },
+    s3Storage: {
+        s3StorageUrl: get('S3_STORAGE_URL').asString(),
+        s3StorageRegion: get('S3_STORAGE_REGION').asString(),
+        s3StorageBucketName: get('S3_STORAGE_BUCKET_NAME')
+            .default('volt')
+            .asString(),
+        s3StorageAccessKeyId: get('S3_STORAGE_ACCESS_KEY_ID').asString(),
+        s3StorageSecretAccessKey: get(
+            'S3_STORAGE_SECRET_ACCESS_KEY',
+        ).asString(),
+    },
 }
