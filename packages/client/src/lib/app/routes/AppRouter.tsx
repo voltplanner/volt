@@ -1,16 +1,17 @@
 import { ApiRefreshToken } from 'shared/api/refresh'
 import { Suspense, memo, useEffect, useMemo, useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import { routeConfig, useSessionStore } from 'shared'
 import styled from 'styled-components'
 
 const AppRouter = () => {
     const [isAuth, setIsAuth] = useState(false)
+    const navigate = useNavigate()
     const { session, getLocalSession, login, logout } = useSessionStore()
     const { refreshToken } = ApiRefreshToken({
         refreshToken: session.refreshToken,
     })
-    
+
     const handleRefresh = async () => {
         await getLocalSession()
         try {
@@ -22,6 +23,7 @@ const AppRouter = () => {
             console.error('Error refreshing token:', error)
             setIsAuth(false)
             logout()
+            navigate('/')
         }
     }
 
@@ -37,10 +39,16 @@ const AppRouter = () => {
     useEffect(() => {
         const expirationTime = Number(localStorage.getItem('expiresAt'))
         const currentTimeInSeconds = Math.floor(Date.now() / 1000)
-        if (expirationTime <= currentTimeInSeconds) {
+        const token = localStorage.getItem('accessToken')
+        if (!token) {
+            setIsAuth(false)
+            navigate('/')
+        } else if (expirationTime <= currentTimeInSeconds) {
             handleRefresh()
+        } else {
+            setIsAuth(true)
         }
-    }, [])
+    }, [session.accessToken])
     return (
         <Routes>
             {routes.map(({ element, path }) => (
