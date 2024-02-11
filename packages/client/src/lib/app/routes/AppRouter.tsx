@@ -1,8 +1,9 @@
 import { ApiRefreshToken } from 'shared/api/refresh'
 import { Suspense, memo, useEffect, useMemo, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
-import { routeConfig, useSessionStore } from 'shared'
+import { routeConfig } from 'shared'
 import styled from 'styled-components'
+import { useSessionStore } from 'entities'
 
 const AppRouter = () => {
     const [isAuth, setIsAuth] = useState(false)

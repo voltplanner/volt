@@ -5,7 +5,7 @@ import { ApiSignIn } from './api/api'
 import { useFormStore } from './model/useFormStore'
 import { InternalLoginForm } from './ui/InternalLoginForm'
 import { ExternalLoginForm } from './ui/ExternalLoginForm'
-import { useSessionStore } from 'shared/libs/useSessionStore'
+import { useSessionStore } from 'entities'
 import { useNavigate } from 'react-router-dom'
 
 type LoginFormProps = {
