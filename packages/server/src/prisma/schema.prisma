@@ -96,3 +96,15 @@ enum NotificationTypeEnum {
   EMAIL
   WEB
 }
+
+model File {
+  id           String               @id @default(uuid())
+  originalName String
+  mimeType     String
+  size         Int
+  eTag         String
+  bucket       String
+  key          String
+  location     String
+  userId       String
+}
