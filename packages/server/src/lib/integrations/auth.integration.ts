@@ -3,7 +3,6 @@ import { tap } from 'rxjs'
 
 import { environment } from '../../environments/environment'
 import {
-    AuthCompleteSignUpEvent,
     AuthEventPattern,
     AuthEventsService,
 } from '../modules/auth/services/auth-events.service'
@@ -29,7 +28,7 @@ export class AuthIntegration {
 
     listenCompleteSignIn() {
         this.authEvents
-            .listen<AuthCompleteSignUpEvent>(AuthEventPattern.COMPLETE_SIGNIN)
+            .listen(AuthEventPattern.COMPLETE_SIGNIN)
             .pipe(
                 tap((event) => {
                     const { data } = event
