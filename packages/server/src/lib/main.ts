@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { Logger } from '@tinybudgie/logger'
 import { get } from 'env-var'
+import { graphqlUploadExpress } from 'graphql-upload'
 
 import { environment } from '../environments/environment'
 import { AppModule } from './app/app.module'
@@ -20,6 +21,11 @@ async function bootstrap() {
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     })
+
+    app.use(graphqlUploadExpress({
+        maxFileSize: parseInt(get('MAX_FILE_SIZE').asString(), 10),
+        maxFiles: parseInt(get('MAX_FILES').asString(), 10),
+    }))
 
     app.useGlobalPipes(new ValidationPipe())
 
