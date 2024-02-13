@@ -27,15 +27,50 @@ export class AuthRoleService {
     ) {}
 
     async createRole(data: CreateRole) {
+        const allMethods = await this.prisma.authMethod.findMany({
+            select: {
+                id: true,
+            },
+        })
+
         const role = await this.prisma.authRole.create({
             data: {
                 name: data.name.toLowerCase(),
                 editable: false,
                 superuser: false,
+                permissions: {
+                    createMany: {
+                        data: allMethods.map((method) => ({
+                            allowed: false,
+                            methodId: method.id,
+                            editable: true,
+                        })),
+                    },
+                },
+            },
+            include: {
+                permissions: {
+                    include: {
+                        method: true,
+                    },
+                },
             },
         })
 
-        return role
+        return {
+            id: role.id,
+            name: role.name,
+            superuser: role.superuser,
+            editable: role.editable,
+            methods: role.permissions.map((u) => ({
+                id: u.method.id,
+                name: u.method.name,
+                description: u.method.description,
+                group: u.method.group,
+                allowed: u.allowed,
+                editable: u.editable,
+            })),
+        }
     }
 
     async updateRole(data: UpdateRole) {

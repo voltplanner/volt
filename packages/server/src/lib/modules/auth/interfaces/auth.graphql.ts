@@ -142,6 +142,12 @@ export class UpdateRoleInput {
 }
 
 @InputType()
+export class CreateRoleInput {
+    @Field()
+    name: string
+}
+
+@InputType()
 export class DeleteRoleInput {
     @Field()
     roleId: string

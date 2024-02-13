@@ -9,6 +9,7 @@ import {
     AuthorizationResponse,
     ChangePermissionsInput,
     CompleteSignInInput,
+    CreateRoleInput,
     CreateUserInput,
     DeleteRoleInput,
     DeleteUserInput,
@@ -79,6 +80,13 @@ export class AuthResolver {
         await this.roleService.updateRole(input)
 
         return true
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({ group: 'roles', description: 'Create roles' })
+    async createRole(@Args('input') input: CreateRoleInput): Promise<RoleType> {
+        return await this.roleService.createRole(input)
     }
 
     @UseGuards(ACLGuard)
