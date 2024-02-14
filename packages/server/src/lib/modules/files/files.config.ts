@@ -1,13 +1,16 @@
+import * as AWS from '@aws-sdk/client-s3'
 import { ConfigurableModuleBuilder } from '@nestjs/common'
 import { merge } from 'lodash'
 
 export interface FilesConfig {
-    production: boolean
-    s3StorageUrl: string
-    s3StorageRegion: string
-    s3StorageBucketName: string
-    s3StorageAccessKeyId: string
-    s3StorageSecretAccessKey: string
+    awsS3Region: string
+    awsS3BucketName: string
+    awsS3AccessKeyId: string
+    awsS3SecretAccessKey: string
+    awsS3ForcePathStyle: boolean
+    awsS3AccelerateUrl?: string
+    awsS3UploadBucketUrl: string
+    awsS3Acl: AWS.ObjectCannedACL
 }
 
 export const DEFAULT_FILES_CONFIG = {}

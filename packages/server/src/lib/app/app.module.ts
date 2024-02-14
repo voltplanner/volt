@@ -38,10 +38,7 @@ import { PrismaModule } from '../shared/prisma'
         NotificationsModule.forRoot({
             ...environment.mailer,
         }),
-        FilesModule.forRoot({
-            production: environment.production,
-            ...environment.s3Storage,
-        }),
+        FilesModule.forRoot(environment.awsS3Storage),
     ],
     controllers: [],
     providers: [AuthIntegration],

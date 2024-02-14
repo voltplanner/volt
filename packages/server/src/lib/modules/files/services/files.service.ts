@@ -1,6 +1,10 @@
 import * as AWS from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import {
+    Inject,
+    Injectable,
+    Logger,
+    OnApplicationBootstrap,
+} from '@nestjs/common'
 import { Readable } from 'stream'
 import { v4 as generateUuidV4 } from 'uuid'
 
@@ -10,7 +14,7 @@ import { FILES_CONFIG, FilesConfig } from '../files.config'
 import { GetFile } from '../interfaces/files.interfaces'
 
 @Injectable()
-export class FilesService {
+export class FilesService implements OnApplicationBootstrap {
     private logger = new Logger()
     private s3Client: AWS.S3
 
@@ -18,18 +22,17 @@ export class FilesService {
         @Inject(FILES_CONFIG)
         private readonly config: FilesConfig,
         private readonly prisma: PrismaService,
-    ) {
-        const s3ClientConfig: AWS.S3ClientConfig = {
-            credentials: {
-                accessKeyId: config.s3StorageAccessKeyId,
-                secretAccessKey: config.s3StorageSecretAccessKey,
-            },
-            region: config.s3StorageRegion,
-        }
+    ) {}
 
-        if (!config.production) {
-            s3ClientConfig.endpoint = config.s3StorageUrl
-            s3ClientConfig.forcePathStyle = true
+    async onApplicationBootstrap(): Promise<void> {
+        const s3ClientConfig: AWS.S3ClientConfig = {
+            endpoint: this.getEndpoint(),
+            credentials: {
+                accessKeyId: this.config.awsS3AccessKeyId,
+                secretAccessKey: this.config.awsS3SecretAccessKey,
+            },
+            region: this.config.awsS3Region,
+            forcePathStyle: this.config.awsS3ForcePathStyle,
         }
 
         this.s3Client = new AWS.S3(s3ClientConfig)
@@ -48,32 +51,35 @@ export class FilesService {
     async uploadFileGraphql(file: Promise<UploadFileDto>, userId: string) {
         const { filename, mimetype, createReadStream } = await file
 
-        const fileKey = generateUuidV4()
         try {
-            const uploadResult = await new Upload({
-                client: this.s3Client,
-                params: {
-                    Bucket: this.config.s3StorageBucketName,
-                    Key: fileKey,
-                    Body: await FilesService.streamToBuffer(createReadStream()),
-                    BucketKeyEnabled: false,
-                },
-            }).done()
+            const key = generateUuidV4()
+            const body = await FilesService.streamToBuffer(createReadStream())
 
-            console.log(uploadResult)
+            const uploadResult = await this.s3Client.putObject({
+                ACL: this.config.awsS3Acl,
+                Bucket: this.config.awsS3BucketName,
+                Key: key,
+                ContentType: mimetype,
+                Body: body,
+                BucketKeyEnabled: false,
+            })
+
+            const locationEndpoint = this.getPublicEndpoint(true)
 
             const savedFileData = await this.prisma.file.create({
                 data: {
                     originalName: filename,
                     mimeType: mimetype,
-                    size: 0,
-                    bucket: this.config.s3StorageBucketName,
-                    key: uploadResult.Key,
+                    size: body.byteLength,
+                    bucket: this.config.awsS3BucketName,
+                    key,
                     eTag: uploadResult.ETag,
-                    location: uploadResult.Location,
+                    location: `${locationEndpoint}/${key}`,
                     userId,
                 },
             })
+
+            this.logger.log(`File uploaded: ${JSON.stringify(savedFileData)}`)
 
             return savedFileData.id
         } catch (error) {
@@ -83,36 +89,83 @@ export class FilesService {
     }
 
     async uploadFileRest(file: Express.Multer.File, userId: string) {
-        const fileKey = generateUuidV4()
         try {
-            const uploadResult = await new Upload({
-                client: this.s3Client,
-                params: {
-                    Bucket: this.config.s3StorageBucketName,
-                    Key: fileKey,
-                    Body: file.buffer,
-                    BucketKeyEnabled: false,
-                },
-            }).done()
+            const key = generateUuidV4()
+
+            const uploadResult = await this.s3Client.putObject({
+                ACL: this.config.awsS3Acl,
+                Bucket: this.config.awsS3BucketName,
+                Key: key,
+                ContentType: file.mimetype,
+                Body: file.buffer,
+                BucketKeyEnabled: false,
+            })
+
+            const locationEndpoint = this.getPublicEndpoint(true)
 
             const savedFileData = await this.prisma.file.create({
                 data: {
                     originalName: file.originalname,
                     mimeType: file.mimetype,
                     size: file.size,
-                    bucket: this.config.s3StorageBucketName,
-                    key: uploadResult.Key,
+                    bucket: this.config.awsS3BucketName,
+                    key: key,
                     eTag: uploadResult.ETag,
-                    location: uploadResult.Location,
+                    location: `${locationEndpoint}/${key}`,
                     userId,
                 },
             })
+
+            this.logger.log(`File uploaded: ${JSON.stringify(savedFileData)}`)
 
             return savedFileData.id
         } catch (error) {
             this.logger.error(error)
             throw error
         }
+    }
+
+    private getEndpoint() {
+        if (this.config.awsS3AccelerateUrl) {
+            return this.config.awsS3AccelerateUrl
+        }
+
+        // support old path-style S3 uploads and new virtual host uploads by
+        // checking for the bucket name in the endpoint url.
+        if (this.config.awsS3BucketName) {
+            const url = new URL(this.config.awsS3UploadBucketUrl)
+            if (url.hostname.startsWith(this.config.awsS3BucketName + '.')) {
+                return undefined
+            }
+        }
+
+        return this.config.awsS3UploadBucketUrl
+    }
+
+    private getPublicEndpoint(isServerUpload?: boolean) {
+        if (this.config.awsS3AccelerateUrl) {
+            return this.config.awsS3AccelerateUrl
+        }
+
+        // lose trailing slash if there is one and convert fake-s3 url to localhost
+        // for access outside of docker containers in local development
+        const isDocker = this.config.awsS3UploadBucketUrl.match(/http:\/\/s3:/)
+
+        const host = this.config.awsS3UploadBucketUrl
+            .replace('s3:', 'localhost:')
+            .replace(/\/$/, '')
+
+        // support old path-style S3 uploads and new virtual host uploads by checking
+        // for the bucket name in the endpoint url before appending.
+        const isVirtualHost = host.includes(this.config.awsS3BucketName)
+
+        if (isVirtualHost) {
+            return host
+        }
+
+        return `${host}/${isServerUpload && isDocker ? 's3/' : ''}${
+            this.config.awsS3BucketName
+        }`
     }
 
     private static async streamToBuffer(stream: Readable): Promise<Buffer> {
