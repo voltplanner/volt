@@ -22,10 +22,13 @@ async function bootstrap() {
         credentials: true,
     })
 
-    app.use(graphqlUploadExpress({
-        maxFileSize: parseInt(get('MAX_FILE_SIZE').asString(), 10),
-        maxFiles: parseInt(get('MAX_FILES').asString(), 10),
-    }))
+    // Should be disabled to upload with REST to avoid "Misordered multipart fields" error
+    app.use(
+        graphqlUploadExpress({
+            maxFileSize: parseInt(get('AWS_S3_MAX_FILE_SIZE').asString(), 10),
+            maxFiles: parseInt(get('AWS_S3_MAX_FILES').asString(), 10),
+        }),
+    )
 
     app.useGlobalPipes(new ValidationPipe())
 

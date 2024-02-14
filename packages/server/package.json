@@ -5,7 +5,6 @@
     "@apollo/server": "^4.10.0",
     "@apollo/subgraph": "^2.7.1",
     "@aws-sdk/client-s3": "^3.511.0",
-    "@aws-sdk/lib-storage": "^3.511.0",
     "@golevelup/nestjs-discovery": "^4.0.0",
     "@nestjs-modules/mailer": "^1.10.3",
     "@nestjs/apollo": "^12.0.11",

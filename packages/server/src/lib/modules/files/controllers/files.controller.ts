@@ -16,7 +16,7 @@ export class FilesController {
     uploadFile(@UploadedFile() file: Express.Multer.File) {
         return this.filesService.uploadFileRest(
             file,
-            generateUuidV4(), // todo add userId
+            generateUuidV4(), // TODO add userId after implement ACL and @CurrentUser() decorator for REST
         )
     }
 }
