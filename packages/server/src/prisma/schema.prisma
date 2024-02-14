@@ -25,6 +25,7 @@ model AuthUser {
   deletedAt     DateTime?
   tokens        AuthRefreshToken[]
   notifications Notification[]
+  files         File[]
 }
 
 model AuthRefreshToken {
@@ -95,4 +96,17 @@ model Notification {
 enum NotificationTypeEnum {
   EMAIL
   WEB
+}
+
+model File {
+  id           String               @id @default(uuid())
+  originalName String
+  mimeType     String
+  size         Int
+  eTag         String
+  bucket       String
+  key          String
+  location     String
+  user         AuthUser             @relation(fields: [userId], references: [id])
+  userId       String
 }

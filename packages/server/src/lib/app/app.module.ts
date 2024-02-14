@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment'
 import { defaultAllowPermissions } from '../../environments/permissions'
 import { AuthIntegration } from '../integrations/auth.integration'
 import { AuthModule } from '../modules/auth/auth.module'
+import { FilesModule } from '../modules/files/files.module'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
 import { PrismaModule } from '../shared/prisma'
 
@@ -37,6 +38,7 @@ import { PrismaModule } from '../shared/prisma'
         NotificationsModule.forRoot({
             ...environment.mailer,
         }),
+        FilesModule.forRoot(environment.awsS3Storage),
     ],
     controllers: [],
     providers: [AuthIntegration],
