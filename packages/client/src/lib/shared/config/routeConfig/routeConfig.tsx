@@ -1,4 +1,4 @@
-import { AboutPage } from 'pages'
+import { AboutPage, RolesPage } from 'pages'
 import { AuthPage } from 'pages'
 import { MainPage } from 'pages'
 import { NotFoundPage } from 'pages'
@@ -11,6 +11,7 @@ type AppRoutesProps = RouteProps & {
 
 export enum AppRoutes {
     MAIN = 'main',
+    ROLES = 'roles',
     ABOUT = 'about',
     SETTINGS = 'settings',
     AUTH = 'auth',
@@ -20,6 +21,7 @@ export enum AppRoutes {
 export const RoutePath: Record<AppRoutes, string> = {
     [AppRoutes.AUTH]: '/',
     [AppRoutes.MAIN]: '/main',
+    [AppRoutes.ROLES]: '/roles',
     [AppRoutes.ABOUT]: '/about',
     [AppRoutes.SETTINGS]: '/settings',
     [AppRoutes.NOT_FOUND]: '*',
@@ -29,6 +31,11 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     [AppRoutes.MAIN]: {
         path: RoutePath.main,
         element: <MainPage />,
+        authOnly: true,
+    },
+    [AppRoutes.ROLES]: {
+        path: RoutePath.roles,
+        element: <RolesPage />,
         authOnly: true,
     },
     [AppRoutes.ABOUT]: {
