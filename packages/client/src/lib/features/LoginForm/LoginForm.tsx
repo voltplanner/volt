@@ -1,4 +1,3 @@
-import { HiddenForm } from 'entities'
 import { useState } from 'react'
 import { BackIcon, Button, ReactIcon } from 'shared'
 import styled from 'styled-components'
@@ -6,6 +5,8 @@ import { ApiSignIn } from './api/api'
 import { useFormStore } from './model/useFormStore'
 import { InternalLoginForm } from './ui/InternalLoginForm'
 import { ExternalLoginForm } from './ui/ExternalLoginForm'
+import { useSessionStore } from 'entities'
+import { useNavigate } from 'react-router-dom'
 
 type LoginFormProps = {
     title: string
@@ -15,16 +16,10 @@ export const LoginForm = (props: LoginFormProps) => {
     const { title } = props
     const { setEmail, setPassword, resetStore, email, password } =
         useFormStore()
+    const { login } = useSessionStore()
     const [isInternal, setIsInternal] = useState(false)
-    // TODO: comment to disable eslint warning
-    // const [password, setPassword] = useState('admin')
-
-    // const { signIn, data, loading, error } = ApiSignIn({
-    //     email,
-    //     password,
-    // })
-
-    const { signIn, data } = ApiSignIn({
+    const navigate = useNavigate()
+    const { signIn } = ApiSignIn({
         email,
         password,
     })
@@ -35,7 +30,6 @@ export const LoginForm = (props: LoginFormProps) => {
     const onChangePassword = (value: string) => {
         setPassword(value)
     }
-
     const onInternalClick = () => {
         setIsInternal((prev) => !prev)
         resetStore()
@@ -43,10 +37,11 @@ export const LoginForm = (props: LoginFormProps) => {
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
             e.preventDefault()
-            await signIn()
-            console.log('signIn', data)
+            const { data } = await signIn()
+            login(data.signIn)
+            navigate('/main')
         } catch (e) {
-            console.log(e)
+            console.log('error => ', e)
         }
     }
     const formSelector = () => {
