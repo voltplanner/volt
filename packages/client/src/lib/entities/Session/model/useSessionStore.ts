@@ -25,33 +25,42 @@ export const useSessionStore = create<SessionStore>()(
             refreshToken: '',
         },
         getUserProfile: () => console.log('1'),
-        getLocalSession: () => set(
-            produce((draft: SessionStore) => {
-                draft.session.accessToken = localStorage.getItem('accessToken') ?? ''
-                draft.session.expiresAt = Number(localStorage.getItem('expiresAt'))
-                draft.session.refreshToken = localStorage.getItem('refreshToken') ?? ''
-                draft.session.userId = localStorage.getItem('userId') ?? ''
-            }),
-        ),
-        login: (data) => set(
-            produce((draft: SessionStore) => {
-                if (data) {
-                    localStorage.setItem('accessToken', data.accessToken)
-                    localStorage.setItem('expiresAt', data.expiresAt.toString())
-                    localStorage.setItem('refreshToken', data.refreshToken)
-                    localStorage.setItem('userId', data.userId)
-                    draft.session.accessToken = data.accessToken
-                    draft.session.expiresAt = data.expiresAt
-                    draft.session.refreshToken = data.refreshToken
-                    draft.session.userId = data.userId
-                }
-            }),
-        ),
+        getLocalSession: () =>
+            set(
+                produce((draft: SessionStore) => {
+                    draft.session.accessToken =
+                        localStorage.getItem('accessToken') ?? ''
+                    draft.session.expiresAt = Number(
+                        localStorage.getItem('expiresAt'),
+                    )
+                    draft.session.refreshToken =
+                        localStorage.getItem('refreshToken') ?? ''
+                    draft.session.userId = localStorage.getItem('userId') ?? ''
+                }),
+            ),
+        login: (data) =>
+            set(
+                produce((draft: SessionStore) => {
+                    if (data) {
+                        localStorage.setItem('accessToken', data.accessToken)
+                        localStorage.setItem(
+                            'expiresAt',
+                            data.expiresAt.toString(),
+                        )
+                        localStorage.setItem('refreshToken', data.refreshToken)
+                        localStorage.setItem('userId', data.userId)
+                        draft.session.accessToken = data.accessToken
+                        draft.session.expiresAt = data.expiresAt
+                        draft.session.refreshToken = data.refreshToken
+                        draft.session.userId = data.userId
+                    }
+                }),
+            ),
         logout: () => {
             localStorage.removeItem('accessToken')
             localStorage.removeItem('expiresAt')
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('userId')
-        }
+        },
     })),
 )

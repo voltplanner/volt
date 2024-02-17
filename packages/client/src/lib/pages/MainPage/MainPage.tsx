@@ -1,4 +1,3 @@
-
 const MainPage = () => {
     return (
         <div

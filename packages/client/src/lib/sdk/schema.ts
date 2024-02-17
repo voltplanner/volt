@@ -76,6 +76,7 @@ export type OrderEnum = 'ASC' | 'DESC'
 
 export interface Mutation {
     updateRole: Scalars['Boolean']
+    createRole: Scalars['Boolean']
     deleteRole: Scalars['Boolean']
     changePermissions: Scalars['Boolean']
     updateUser: Scalars['Boolean']
@@ -181,6 +182,7 @@ export interface GetRolesInput {
 
 export interface MutationGenqlSelection {
     updateRole?: { __args: { input: UpdateRoleInput } }
+    createRole?: { __args: { input: CreateRoleInput } }
     deleteRole?: { __args: { input: DeleteRoleInput } }
     changePermissions?: { __args: { input: ChangePermissionsInput } }
     updateUser?: { __args: { input: UpdateUserInput } }
@@ -204,6 +206,10 @@ export interface UpdateRoleInput {
     name?: Scalars['String'] | null
     superuser?: Scalars['Boolean'] | null
     editable?: Scalars['Boolean'] | null
+}
+
+export interface CreateRoleInput {
+    name: Scalars['String']
 }
 
 export interface DeleteRoleInput {

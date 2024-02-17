@@ -1,7 +1,7 @@
 interface NoAvatarIconProps {
     width?: string
     height?: string
-    objectFit?: "none" | "contain" | "cover" | "fill" | "scale-down"
+    objectFit?: 'none' | 'contain' | 'cover' | 'fill' | 'scale-down'
 }
 export const NoAvatarIcon = ({
     width = '20px',

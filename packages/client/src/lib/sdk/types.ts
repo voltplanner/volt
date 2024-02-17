@@ -106,52 +106,58 @@ export default {
                     input: [19, 'UpdateRoleInput!'],
                 },
             ],
+            createRole: [
+                5,
+                {
+                    input: [20, 'CreateRoleInput!'],
+                },
+            ],
             deleteRole: [
                 5,
                 {
-                    input: [20, 'DeleteRoleInput!'],
+                    input: [21, 'DeleteRoleInput!'],
                 },
             ],
             changePermissions: [
                 5,
                 {
-                    input: [21, 'ChangePermissionsInput!'],
+                    input: [22, 'ChangePermissionsInput!'],
                 },
             ],
             updateUser: [
                 5,
                 {
-                    input: [23, 'UpdateUserInput!'],
+                    input: [24, 'UpdateUserInput!'],
                 },
             ],
             signIn: [
                 11,
                 {
-                    input: [24, 'SignInInput!'],
+                    input: [25, 'SignInInput!'],
                 },
             ],
             refreshToken: [
                 11,
                 {
-                    input: [25, 'RefreshTokenInput!'],
+                    input: [26, 'RefreshTokenInput!'],
                 },
             ],
             createUser: [
                 7,
                 {
-                    input: [26, 'CreateUserInput!'],
+                    input: [27, 'CreateUserInput!'],
                 },
             ],
             deleteUser: [
                 5,
                 {
-                    input: [27, 'DeleteUserInput!'],
+                    input: [28, 'DeleteUserInput!'],
                 },
             ],
             completeSignIn: [
                 11,
                 {
-                    input: [28, 'CompleteSignInInput!'],
+                    input: [29, 'CompleteSignInInput!'],
                 },
             ],
             __typename: [4],
@@ -163,13 +169,17 @@ export default {
             editable: [5],
             __typename: [4],
         },
+        CreateRoleInput: {
+            name: [4],
+            __typename: [4],
+        },
         DeleteRoleInput: {
             roleId: [4],
             __typename: [4],
         },
         ChangePermissionsInput: {
             roleId: [4],
-            permissions: [22],
+            permissions: [23],
             __typename: [4],
         },
         PermissionInput: {
