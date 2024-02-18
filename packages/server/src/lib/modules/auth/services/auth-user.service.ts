@@ -15,7 +15,12 @@ import {
 } from '../../../shared/prisma'
 import { parseMetaArgs } from '../../../shared/utils'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
-import { CreateUser, GetUsers, UpdateUser } from '../interfaces/auth.interfaces'
+import {
+    ChangeUserRolePayload,
+    CreateUser,
+    GetUsers,
+    UpdateUser,
+} from '../interfaces/auth.interfaces'
 import { AuthEventPattern, AuthEventsService } from './auth-events.service'
 
 @Injectable()
@@ -29,7 +34,7 @@ export class AuthUserService {
         private readonly events: AuthEventsService,
     ) {}
 
-    async getMyUser(userId: string) {
+    async getUser(userId: string) {
         const user = await this.prisma.authUser.findUnique({
             where: {
                 id: userId,
@@ -254,6 +259,23 @@ export class AuthUserService {
         })
 
         return user
+    }
+
+    async changeUserRole(data: ChangeUserRolePayload) {
+        const { userId, roleName } = data
+
+        await this.prisma.authUser.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                role: {
+                    connect: {
+                        name: roleName,
+                    },
+                },
+            },
+        })
     }
 
     async _createOwnerIfNotExists() {

@@ -22,7 +22,7 @@ type RoleType {
 }
 
 type UserType {
-  id: String!
+  id: ID!
   firstname: String!
   lastname: String!
   email: String!
@@ -50,15 +50,15 @@ type PaginatedUsers {
 type AuthorizationResponse {
   refreshToken: String!
   accessToken: String!
-  userId: String!
+  userId: ID!
   expiresAt: Float!
 }
 
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
   getRoles(input: GetRolesInput!): [RoleType!]!
-  getMyRole(input: GetRolesInput!): RoleType!
-  getMyUser: UserType!
+  getRole(input: GetRolesInput!): RoleType!
+  getUser(input: GetUserInput!): UserType!
 }
 
 input GetUsersInput {
@@ -87,11 +87,18 @@ input GetUsersFilterInput {
 }
 
 input GetRolesInput {
+  userId: ID!
   name: String
+}
+
+input GetUserInput {
+  userId: ID!
 }
 
 type Mutation {
   updateRole(input: UpdateRoleInput!): Boolean!
+  changeUserRole(input: ChangeUserRoleInput!): Boolean!
+  createRole(input: CreateRoleInput!): Boolean!
   deleteRole(input: DeleteRoleInput!): Boolean!
   changePermissions(input: ChangePermissionsInput!): Boolean!
   updateUser(input: UpdateUserInput!): Boolean!
@@ -103,23 +110,32 @@ type Mutation {
 }
 
 input UpdateRoleInput {
-  roleId: String!
+  roleId: ID!
   name: String
   superuser: Boolean
   editable: Boolean
 }
 
+input ChangeUserRoleInput {
+  userId: ID!
+  roleName: String!
+}
+
+input CreateRoleInput {
+  name: String!
+}
+
 input DeleteRoleInput {
-  roleId: String!
+  roleId: ID!
 }
 
 input ChangePermissionsInput {
-  roleId: String!
+  roleId: ID!
   permissions: [PermissionInput!]!
 }
 
 input PermissionInput {
-  methodId: String!
+  methodId: ID!
   allow: Boolean!
 }
 
@@ -150,11 +166,11 @@ input CreateUserInput {
 }
 
 input DeleteUserInput {
-  userId: String!
+  userId: ID!
 }
 
 input CompleteSignInInput {
-  userId: String!
+  userId: ID!
   code: String!
   password: String!
 }

@@ -70,6 +70,11 @@ export type UpdateUser = {
     status?: AuthUserStatusEnum
 }
 
+export interface ChangeUserRolePayload {
+    userId: string
+    roleName: string
+}
+
 export interface FindFilter {
     skip?: number
     take?: number

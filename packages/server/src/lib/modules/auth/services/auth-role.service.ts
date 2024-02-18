@@ -100,7 +100,7 @@ export class AuthRoleService {
         return role
     }
 
-    async getMyRole(data: GetMyRole) {
+    async getRole(data: GetMyRole) {
         const role = await this.prisma.authRole.findFirst({
             where: {
                 user: {
