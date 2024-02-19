@@ -1,15 +1,14 @@
 import { useMutation } from '@apollo/client'
-import { generateMutationOp } from '../../../sdk'
+import { generateMutationOp } from '../../sdk'
 import gql from 'graphql-tag'
 
-export interface SignInPayload {
-    email: string
-    password: string
+export interface RefreshTokenPayload {
+    refreshToken: string
 }
 
-export const ApiSignIn = (payload: SignInPayload) => {
+export const ApiRefreshToken = (payload: RefreshTokenPayload) => {
     const { query, variables } = generateMutationOp({
-        signIn: {
+        refreshToken: {
             __args: {
                 input: {
                     ...payload,
@@ -22,12 +21,12 @@ export const ApiSignIn = (payload: SignInPayload) => {
         },
     })
 
-    const [signIn, { data, loading, error }] = useMutation(gql(query), {
+    const [refreshToken, { data, loading, error }] = useMutation(gql(query), {
         variables,
     })
 
     return {
-        signIn,
+        refreshToken,
         data,
         loading,
         error,

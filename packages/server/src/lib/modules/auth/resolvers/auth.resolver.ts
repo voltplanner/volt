@@ -2,17 +2,18 @@ import { UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
 import { AccessControl } from '../../../shared/decorators'
-import { CurrentUser } from '../../../shared/decorators/current-user.decorator'
 import { ACLGuard } from '../../../shared/guards/acl.guard'
-import { CurrentUserPayload } from '../../../shared/interfaces/shared.interfaces'
 import {
     AuthorizationResponse,
     ChangePermissionsInput,
+    ChangeUserRoleInput,
     CompleteSignInInput,
+    CreateRoleInput,
     CreateUserInput,
     DeleteRoleInput,
     DeleteUserInput,
     GetRolesInput,
+    GetUserInput,
     GetUsersInput,
     PaginatedUsers,
     RefreshTokenInput,
@@ -53,23 +54,15 @@ export class AuthResolver {
     @UseGuards(ACLGuard)
     @Query(() => RoleType)
     @AccessControl({ group: 'roles', description: 'View user role' })
-    async getMyRole(
-        @Args('input') input: GetRolesInput,
-        @CurrentUser() user: CurrentUserPayload,
-    ): Promise<RoleType> {
-        return await this.roleService.getMyRole({
-            ...input,
-            userId: user.userId,
-        })
+    async getRole(@Args('input') input: GetRolesInput): Promise<RoleType> {
+        return await this.roleService.getRole(input)
     }
 
     @UseGuards(ACLGuard)
     @Query(() => UserType)
-    @AccessControl({ group: 'roles', description: 'View user role' })
-    async getMyUser(
-        @CurrentUser() user: CurrentUserPayload,
-    ): Promise<UserType> {
-        return await this.userService.getMyUser(user.userId)
+    @AccessControl({ group: 'user', description: 'View user info' })
+    async getUser(@Args('input') input: GetUserInput): Promise<UserType> {
+        return await this.userService.getUser(input.userId)
     }
 
     @UseGuards(ACLGuard)
@@ -79,6 +72,24 @@ export class AuthResolver {
         await this.roleService.updateRole(input)
 
         return true
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({ group: 'roles', description: 'Change user roles' })
+    async changeUserRole(
+        @Args('input') input: ChangeUserRoleInput,
+    ): Promise<boolean> {
+        await this.userService.changeUserRole(input)
+
+        return true
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({ group: 'roles', description: 'Create roles' })
+    async createRole(@Args('input') input: CreateRoleInput): Promise<RoleType> {
+        return await this.roleService.createRole(input)
     }
 
     @UseGuards(ACLGuard)

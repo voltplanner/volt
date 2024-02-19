@@ -1,1 +1,2 @@
-export { HiddenForm } from './HiddenForm/HiddenForm'
+export { HiddenForm } from './HiddenForm'
+export { useSessionStore } from './Session'
