@@ -38,7 +38,7 @@ export interface RoleType {
 }
 
 export interface UserType {
-    id: Scalars['String']
+    id: Scalars['ID']
     firstname: Scalars['String']
     lastname: Scalars['String']
     email: Scalars['String']
@@ -59,7 +59,7 @@ export interface PaginatedUsers {
 export interface AuthorizationResponse {
     refreshToken: Scalars['String']
     accessToken: Scalars['String']
-    userId: Scalars['String']
+    userId: Scalars['ID']
     expiresAt: Scalars['Float']
     __typename: 'AuthorizationResponse'
 }
@@ -67,8 +67,8 @@ export interface AuthorizationResponse {
 export interface Query {
     getUsers: PaginatedUsers
     getRoles: RoleType[]
-    getMyRole: RoleType
-    getMyUser: UserType
+    getRole: RoleType
+    getUser: UserType
     __typename: 'Query'
 }
 
@@ -76,6 +76,7 @@ export type OrderEnum = 'ASC' | 'DESC'
 
 export interface Mutation {
     updateRole: Scalars['Boolean']
+    changeUserRole: Scalars['Boolean']
     createRole: Scalars['Boolean']
     deleteRole: Scalars['Boolean']
     changePermissions: Scalars['Boolean']
@@ -150,8 +151,8 @@ export interface QueryGenqlSelection {
         __args: { input: GetUsersInput }
     }
     getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyUser?: UserTypeGenqlSelection
+    getRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
+    getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -177,11 +178,17 @@ export interface GetUsersFilterInput {
 }
 
 export interface GetRolesInput {
+    userId: Scalars['ID']
     name?: Scalars['String'] | null
+}
+
+export interface GetUserInput {
+    userId: Scalars['ID']
 }
 
 export interface MutationGenqlSelection {
     updateRole?: { __args: { input: UpdateRoleInput } }
+    changeUserRole?: { __args: { input: ChangeUserRoleInput } }
     createRole?: { __args: { input: CreateRoleInput } }
     deleteRole?: { __args: { input: DeleteRoleInput } }
     changePermissions?: { __args: { input: ChangePermissionsInput } }
@@ -202,10 +209,15 @@ export interface MutationGenqlSelection {
 }
 
 export interface UpdateRoleInput {
-    roleId: Scalars['String']
+    roleId: Scalars['ID']
     name?: Scalars['String'] | null
     superuser?: Scalars['Boolean'] | null
     editable?: Scalars['Boolean'] | null
+}
+
+export interface ChangeUserRoleInput {
+    userId: Scalars['ID']
+    roleName: Scalars['String']
 }
 
 export interface CreateRoleInput {
@@ -213,16 +225,16 @@ export interface CreateRoleInput {
 }
 
 export interface DeleteRoleInput {
-    roleId: Scalars['String']
+    roleId: Scalars['ID']
 }
 
 export interface ChangePermissionsInput {
-    roleId: Scalars['String']
+    roleId: Scalars['ID']
     permissions: PermissionInput[]
 }
 
 export interface PermissionInput {
-    methodId: Scalars['String']
+    methodId: Scalars['ID']
     allow: Scalars['Boolean']
 }
 
@@ -253,11 +265,11 @@ export interface CreateUserInput {
 }
 
 export interface DeleteUserInput {
-    userId: Scalars['String']
+    userId: Scalars['ID']
 }
 
 export interface CompleteSignInInput {
-    userId: Scalars['String']
+    userId: Scalars['ID']
     code: Scalars['String']
     password: Scalars['String']
 }

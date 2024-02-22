@@ -29,7 +29,7 @@ export default {
             __typename: [4],
         },
         UserType: {
-            id: [4],
+            id: [3],
             firstname: [4],
             lastname: [4],
             email: [4],
@@ -48,7 +48,7 @@ export default {
         AuthorizationResponse: {
             refreshToken: [4],
             accessToken: [4],
-            userId: [4],
+            userId: [3],
             expiresAt: [1],
             __typename: [4],
         },
@@ -65,13 +65,18 @@ export default {
                     input: [17, 'GetRolesInput!'],
                 },
             ],
-            getMyRole: [
+            getRole: [
                 6,
                 {
                     input: [17, 'GetRolesInput!'],
                 },
             ],
-            getMyUser: [7],
+            getUser: [
+                7,
+                {
+                    input: [18, 'GetUserInput!'],
+                },
+            ],
             __typename: [4],
         },
         GetUsersInput: {
@@ -96,14 +101,31 @@ export default {
             __typename: [4],
         },
         GetRolesInput: {
+            userId: [3],
             name: [4],
+            __typename: [4],
+        },
+        GetUserInput: {
+            userId: [3],
             __typename: [4],
         },
         Mutation: {
             updateRole: [
                 5,
                 {
-                    input: [19, 'UpdateRoleInput!'],
+                    input: [20, 'UpdateRoleInput!'],
+                },
+            ],
+            changeUserRole: [
+                5,
+                {
+                    input: [21, 'ChangeUserRoleInput!'],
+                },
+            ],
+            createRole: [
+                5,
+                {
+                    input: [22, 'CreateRoleInput!'],
                 },
             ],
             createRole: [
@@ -115,58 +137,63 @@ export default {
             deleteRole: [
                 5,
                 {
-                    input: [21, 'DeleteRoleInput!'],
+                    input: [23, 'DeleteRoleInput!'],
                 },
             ],
             changePermissions: [
                 5,
                 {
-                    input: [22, 'ChangePermissionsInput!'],
+                    input: [24, 'ChangePermissionsInput!'],
                 },
             ],
             updateUser: [
                 5,
                 {
-                    input: [24, 'UpdateUserInput!'],
+                    input: [26, 'UpdateUserInput!'],
                 },
             ],
             signIn: [
                 11,
                 {
-                    input: [25, 'SignInInput!'],
+                    input: [27, 'SignInInput!'],
                 },
             ],
             refreshToken: [
                 11,
                 {
-                    input: [26, 'RefreshTokenInput!'],
+                    input: [28, 'RefreshTokenInput!'],
                 },
             ],
             createUser: [
                 7,
                 {
-                    input: [27, 'CreateUserInput!'],
+                    input: [29, 'CreateUserInput!'],
                 },
             ],
             deleteUser: [
                 5,
                 {
-                    input: [28, 'DeleteUserInput!'],
+                    input: [30, 'DeleteUserInput!'],
                 },
             ],
             completeSignIn: [
                 11,
                 {
-                    input: [29, 'CompleteSignInInput!'],
+                    input: [31, 'CompleteSignInInput!'],
                 },
             ],
             __typename: [4],
         },
         UpdateRoleInput: {
-            roleId: [4],
+            roleId: [3],
             name: [4],
             superuser: [5],
             editable: [5],
+            __typename: [4],
+        },
+        ChangeUserRoleInput: {
+            userId: [3],
+            roleName: [4],
             __typename: [4],
         },
         CreateRoleInput: {
@@ -174,16 +201,16 @@ export default {
             __typename: [4],
         },
         DeleteRoleInput: {
-            roleId: [4],
+            roleId: [3],
             __typename: [4],
         },
         ChangePermissionsInput: {
-            roleId: [4],
-            permissions: [23],
+            roleId: [3],
+            permissions: [25],
             __typename: [4],
         },
         PermissionInput: {
-            methodId: [4],
+            methodId: [3],
             allow: [5],
             __typename: [4],
         },
@@ -214,11 +241,11 @@ export default {
             __typename: [4],
         },
         DeleteUserInput: {
-            userId: [4],
+            userId: [3],
             __typename: [4],
         },
         CompleteSignInInput: {
-            userId: [4],
+            userId: [3],
             code: [4],
             password: [4],
             __typename: [4],
