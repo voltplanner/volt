@@ -5,13 +5,16 @@ import {
     ACCESS_CONTROL_METAKEY,
     AccessControlPayload,
 } from '../../../shared/decorators'
-import { PrismaService } from '../../../shared/prisma'
+import { PaginatedResponse } from '../../../shared/interfaces/shared.interfaces'
+import { Prisma, PrismaService } from '../../../shared/prisma'
+import { parseMetaArgs } from '../../../shared/utils'
 import { AUTH_CONFIG, AuthConfig } from '../auth.config'
 import {
     ChangePermissionPayload,
     CreateRole,
     GetMyRole,
     GetRoles,
+    GetRolesResponse,
     UpdateRole,
 } from '../interfaces/auth.interfaces'
 
@@ -134,13 +137,38 @@ export class AuthRoleService {
         }
     }
 
-    async getRoles(data: GetRoles) {
-        const roles = await this.prisma.authRole.findMany({
-            where: {
-                name: {
-                    contains: data.name,
-                },
+    async getRoles(
+        data: GetRoles,
+    ): Promise<PaginatedResponse<GetRolesResponse>> {
+        const { filter } = data
+
+        const { skip, take, curPage, perPage } = parseMetaArgs({
+            curPage: data.curPage,
+            perPage: data.perPage,
+            defaults: {
+                curPage: 1,
+                perPage: 20,
             },
+        })
+
+        const queryOptions: {
+            where?: Prisma.AuthRoleWhereInput
+            orderBy?: Prisma.AuthRoleOrderByWithRelationInput
+        } = {
+            where: {
+                name: undefined,
+            },
+            orderBy: undefined,
+        }
+
+        if (filter?.name) {
+            queryOptions.where['name'] = { contains: filter.name }
+        }
+
+        const roles = await this.prisma.authRole.findMany({
+            ...queryOptions,
+            skip,
+            take,
             include: {
                 permissions: {
                     include: {
@@ -150,20 +178,31 @@ export class AuthRoleService {
             },
         })
 
-        return roles.map((v) => ({
-            id: v.id,
-            name: v.name,
-            superuser: v.superuser,
-            editable: v.editable,
-            methods: v.permissions.map((u) => ({
-                id: u.method.id,
-                name: u.method.name,
-                description: u.method.description,
-                group: u.method.group,
-                allowed: u.allowed,
-                editable: u.editable,
+        const total = await this.prisma.authRole.count({
+            ...queryOptions,
+        })
+
+        return {
+            meta: {
+                curPage,
+                perPage,
+                total,
+            },
+            data: roles.map((v) => ({
+                id: v.id,
+                name: v.name,
+                superuser: v.superuser,
+                editable: v.editable,
+                methods: v.permissions.map((u) => ({
+                    id: u.method.id,
+                    name: u.method.name,
+                    description: u.method.description,
+                    group: u.method.group,
+                    allowed: u.allowed,
+                    editable: u.editable,
+                })),
             })),
-        }))
+        }
     }
 
     async changePermissions(data: ChangePermissionPayload) {
