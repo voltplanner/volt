@@ -15,12 +15,16 @@ export const environment = {
         refreshTokenTTL: get('JWT_REFRESH_TOKEN_TTL').required().asInt(),
         secret: get('JWT_SECRET').required().asString(),
     },
-    mailer: {
+    notifications: {
         transport: parseSmtpConnectionUrl(
             get('SMTP_URL').required().asUrlString(),
         ),
         defaults: {
             from: get('SMTP_NO_REPLY_EMAIL'),
+        },
+        telegram: {
+            botToken: get('TELEGRAM_BOT_TOKEN').asString(),
+            rootUrl: get('ROOT_URL').required().asUrlString(),
         },
     },
 }

@@ -20,7 +20,6 @@ export class AuthModule extends AuthConfigurableModuleClass {
     static forRoot(options: typeof AUTH_OPTIONS_TYPE): DynamicModule {
         const imports: any[] = [DiscoveryModule]
         const controllers: Type<any>[] = []
-        const exports: any[] = [AUTH_CONFIG, AuthEventsService]
         const providers: Provider[] = [
             {
                 provide: AUTH_CONFIG,
@@ -40,7 +39,7 @@ export class AuthModule extends AuthConfigurableModuleClass {
             imports,
             controllers,
             providers,
-            exports,
+            exports: providers,
         }
     }
 }

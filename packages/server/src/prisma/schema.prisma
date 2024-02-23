@@ -20,11 +20,10 @@ model AuthUser {
   role   AuthRole @relation(fields: [roleId], references: [id])
   roleId String
 
-  status        AuthUserStatusEnum @default(WAITING_COMPLETE)
-  createdAt     DateTime           @default(now())
-  deletedAt     DateTime?
-  tokens        AuthRefreshToken[]
-  notifications Notification[]
+  status    AuthUserStatusEnum @default(WAITING_COMPLETE)
+  createdAt DateTime           @default(now())
+  deletedAt DateTime?
+  tokens    AuthRefreshToken[]
 }
 
 model AuthRefreshToken {
@@ -79,20 +78,32 @@ model SystemSettings {
   id String @id @default(uuid())
 }
 
+model NotificationPreferences {
+  id              String         @id @default(uuid())
+  externalUserId  String         @unique
+  emailEnabled    Boolean
+  email           String?
+  webEnabled      Boolean
+  telegramEnabled Boolean
+  telegramAccount Int?
+  nofications     Notification[]
+}
+
 model Notification {
-  id      String               @id @default(uuid())
-  topic   String
-  message String
-  link    String?
-  type    NotificationTypeEnum
-  sent    Boolean              @default(false)
-  sentAt  DateTime?
-  error   String?
-  user    AuthUser             @relation(fields: [userId], references: [id])
-  userId  String
+  id            String                   @id @default(uuid())
+  topic         String
+  message       String
+  link          String?
+  type          NotificationTypeEnum
+  sent          Boolean                  @default(false)
+  sentAt        DateTime?
+  error         String?
+  Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
+  preferencesId String?
 }
 
 enum NotificationTypeEnum {
   EMAIL
   WEB
+  TELEGRAM
 }

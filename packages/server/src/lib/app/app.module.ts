@@ -8,7 +8,9 @@ import { join } from 'path'
 import { environment } from '../../environments/environment'
 import { defaultAllowPermissions } from '../../environments/permissions'
 import { AuthIntegration } from '../integrations/auth.integration'
+import { NotificationsIntegration } from '../integrations/notification.integration'
 import { AuthModule } from '../modules/auth/auth.module'
+import { AuthUserService } from '../modules/auth/services/auth-user.service'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
 import { PrismaModule } from '../shared/prisma'
 
@@ -34,8 +36,10 @@ import { PrismaModule } from '../shared/prisma'
             jwt: environment.jwt,
             defaultAllowPermissions,
         }),
-        NotificationsModule.forRoot({
-            ...environment.mailer,
+        NotificationsModule.forRootAsync({
+            useFactory: (authUserService: AuthUserService) =>
+                new NotificationsIntegration(authUserService),
+            inject: [AuthUserService],
         }),
     ],
     controllers: [],

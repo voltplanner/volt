@@ -33,7 +33,7 @@ export class AuthIntegration {
                 tap((event) => {
                     const { data } = event
                     this.notificationService.sendNotification({
-                        type: NotificationTypeEnum.EMAIL,
+                        forceSendType: NotificationTypeEnum.EMAIL,
                         userId: data.userId,
                         topic: 'Complete registration in Volt',
                         message: `${environment.rootUrl}login?code=${data.code}&userId=${data.userId}`,

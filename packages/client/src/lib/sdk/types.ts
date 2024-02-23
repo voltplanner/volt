@@ -1,5 +1,5 @@
 export default {
-    scalars: [1, 3, 4, 5, 8, 9, 15],
+    scalars: [1, 3, 4, 5, 9, 10, 16],
     types: {
         PaginatedMetaType: {
             curPage: [1],
@@ -28,20 +28,25 @@ export default {
             methods: [2],
             __typename: [4],
         },
+        PaginatedRoles: {
+            data: [6],
+            meta: [0],
+            __typename: [4],
+        },
         UserType: {
             id: [3],
             firstname: [4],
             lastname: [4],
             email: [4],
-            status: [8],
-            createdAt: [9],
-            deletedAt: [9],
+            status: [9],
+            createdAt: [10],
+            deletedAt: [10],
             __typename: [4],
         },
         AuthUserStatusEnum: {},
         DateTime: {},
         PaginatedUsers: {
-            data: [7],
+            data: [8],
             meta: [0],
             __typename: [4],
         },
@@ -54,27 +59,22 @@ export default {
         },
         Query: {
             getUsers: [
-                10,
+                11,
                 {
-                    input: [13, 'GetUsersInput!'],
+                    input: [14, 'GetUsersInput!'],
                 },
             ],
             getRoles: [
-                6,
-                {
-                    input: [17, 'GetRolesInput!'],
-                },
-            ],
-            getRole: [
-                6,
-                {
-                    input: [17, 'GetRolesInput!'],
-                },
-            ],
-            getUser: [
                 7,
                 {
-                    input: [18, 'GetUserInput!'],
+                    input: [18, 'GetRolesInput!'],
+                },
+            ],
+            getMyRole: [6],
+            getUser: [
+                8,
+                {
+                    input: [20, 'GetUserInput!'],
                 },
             ],
             __typename: [4],
@@ -82,13 +82,13 @@ export default {
         GetUsersInput: {
             curPage: [1],
             perPage: [1],
-            orderBy: [14],
-            filter: [16],
+            orderBy: [15],
+            filter: [17],
             __typename: [4],
         },
         OrderByInput: {
             field: [4],
-            order: [15],
+            order: [16],
             __typename: [4],
         },
         OrderEnum: {},
@@ -97,11 +97,16 @@ export default {
             firstname: [4],
             lastname: [4],
             role: [4],
-            status: [8],
+            status: [9],
             __typename: [4],
         },
         GetRolesInput: {
-            userId: [3],
+            curPage: [1],
+            perPage: [1],
+            filter: [19],
+            __typename: [4],
+        },
+        GetRolesFilterInput: {
             name: [4],
             __typename: [4],
         },
@@ -113,67 +118,67 @@ export default {
             updateRole: [
                 5,
                 {
-                    input: [20, 'UpdateRoleInput!'],
+                    input: [22, 'UpdateRoleInput!'],
                 },
             ],
             changeUserRole: [
                 5,
                 {
-                    input: [21, 'ChangeUserRoleInput!'],
+                    input: [23, 'ChangeUserRoleInput!'],
                 },
             ],
             createRole: [
                 5,
                 {
-                    input: [22, 'CreateRoleInput!'],
+                    input: [24, 'CreateRoleInput!'],
                 },
             ],
             deleteRole: [
                 5,
                 {
-                    input: [23, 'DeleteRoleInput!'],
+                    input: [25, 'DeleteRoleInput!'],
                 },
             ],
             changePermissions: [
                 5,
                 {
-                    input: [24, 'ChangePermissionsInput!'],
+                    input: [26, 'ChangePermissionsInput!'],
                 },
             ],
             updateUser: [
                 5,
                 {
-                    input: [26, 'UpdateUserInput!'],
+                    input: [28, 'UpdateUserInput!'],
                 },
             ],
             signIn: [
-                11,
+                12,
                 {
-                    input: [27, 'SignInInput!'],
+                    input: [29, 'SignInInput!'],
                 },
             ],
             refreshToken: [
-                11,
+                12,
                 {
-                    input: [28, 'RefreshTokenInput!'],
+                    input: [30, 'RefreshTokenInput!'],
                 },
             ],
             createUser: [
-                7,
+                8,
                 {
-                    input: [29, 'CreateUserInput!'],
+                    input: [31, 'CreateUserInput!'],
                 },
             ],
             deleteUser: [
                 5,
                 {
-                    input: [30, 'DeleteUserInput!'],
+                    input: [32, 'DeleteUserInput!'],
                 },
             ],
             completeSignIn: [
-                11,
+                12,
                 {
-                    input: [31, 'CompleteSignInInput!'],
+                    input: [33, 'CompleteSignInInput!'],
                 },
             ],
             __typename: [4],
@@ -200,7 +205,7 @@ export default {
         },
         ChangePermissionsInput: {
             roleId: [3],
-            permissions: [25],
+            permissions: [27],
             __typename: [4],
         },
         PermissionInput: {
@@ -215,7 +220,7 @@ export default {
             lastname: [4],
             password: [4],
             role: [4],
-            status: [8],
+            status: [9],
             __typename: [4],
         },
         SignInInput: {
