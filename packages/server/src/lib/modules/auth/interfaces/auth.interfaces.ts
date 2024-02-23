@@ -47,7 +47,26 @@ export interface GetMyRole {
 }
 
 export interface GetRoles {
-    name?: string
+    curPage?: number
+    perPage?: number
+    filter?: {
+        name?: string
+    }
+}
+
+export interface GetRolesResponse {
+    id: string
+    name: string
+    superuser: boolean
+    editable: boolean
+    methods: {
+        id: string
+        name: string
+        description: string
+        group: string
+        allowed: boolean
+        editable: boolean
+    }[]
 }
 
 export interface CompleteSignIn {
