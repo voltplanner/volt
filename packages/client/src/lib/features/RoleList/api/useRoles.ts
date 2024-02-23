@@ -7,20 +7,15 @@ export const useRoles = () => {
         __name: 'getRoles',
         getRoles: {
             __args: {
-                input: {},
+                input: {
+                    userId: ''
+                },
             },
             editable: true,
             id: true,
             name: true,
             superuser: true,
-            methods: {
-                allowed: true,
-                description: true,
-                editable: true,
-                group: true,
-                id: true,
-                name: true,
-            },
+            
         },
     })
 

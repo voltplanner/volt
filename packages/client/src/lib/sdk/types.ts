@@ -128,12 +128,6 @@ export default {
                     input: [22, 'CreateRoleInput!'],
                 },
             ],
-            createRole: [
-                5,
-                {
-                    input: [20, 'CreateRoleInput!'],
-                },
-            ],
             deleteRole: [
                 5,
                 {
