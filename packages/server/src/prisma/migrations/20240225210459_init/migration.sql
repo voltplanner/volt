@@ -140,7 +140,6 @@ CREATE TABLE "task" (
     "estimated_date_start" TIMESTAMP(6),
     "estimated_date_end" TIMESTAMP(6),
     "estimated_duration" BIGINT,
-    "effort" BIGINT,
     "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP(6) NOT NULL,
@@ -156,6 +155,21 @@ CREATE TABLE "task" (
     "parent_id" UUID,
 
     CONSTRAINT "task_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "task_effort" (
+    "id" UUID NOT NULL,
+    "value" BIGINT NOT NULL,
+    "description" TEXT NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6) NOT NULL,
+    "is_deleted" BOOLEAN NOT NULL DEFAULT false,
+    "task_id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+
+    CONSTRAINT "task_effort_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -396,6 +410,12 @@ ALTER TABLE "task" ADD CONSTRAINT "FK__TASK__ASSIGNED_TO" FOREIGN KEY ("assigned
 
 -- AddForeignKey
 ALTER TABLE "task" ADD CONSTRAINT "task_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "task"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "task_effort" ADD CONSTRAINT "FK__TASK_EFFORT__TASK" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "task_effort" ADD CONSTRAINT "FK__TASK_EFFORT__USER" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task_type" ADD CONSTRAINT "FK__TASK_TYPE__PROJECT" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

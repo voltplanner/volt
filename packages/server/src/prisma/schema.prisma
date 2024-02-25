@@ -32,6 +32,7 @@ model AuthUser {
   changes       TaskChange[]
   comments      TaskComment[]
   attachments   TaskAttachment[]
+  efforts       TaskEffort[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -133,7 +134,7 @@ enum NotificationTypeEnum {
 
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
-// PROJECTS / TASKS
+// PROJECTS
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
 
@@ -195,6 +196,12 @@ model ProjectOnUser {
   @@map("project_on_user")
 }
 
+// -------------------------------------------------------------------
+// -------------------------------------------------------------------
+// TASKS
+// -------------------------------------------------------------------
+// -------------------------------------------------------------------
+
 model Task {
   id String @id @default(uuid()) @db.Uuid
 
@@ -204,7 +211,6 @@ model Task {
   estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
   estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
   estimatedDuration  BigInt?   @map("estimated_duration") @db.BigInt
-  effort             BigInt?   @db.BigInt
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -224,6 +230,7 @@ model Task {
 
   tags             TaskOnTaskTag[]
   changes          TaskChange[]
+  efforts          TaskEffort[]
   comments         TaskComment[]
   attachments      TaskAttachment[]
   connectedMain    TaskRelation[]   @relation("FK__TASK_RELATION__TASK_MAIN")
@@ -238,6 +245,26 @@ model Task {
   parent   Task?   @relation("FK__TASK__PARENT", fields: [parentId], references: [id])
 
   @@map("task")
+}
+
+model TaskEffort {
+  id String @id @default(uuid()) @db.Uuid
+
+  value       BigInt @db.BigInt
+  description String @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt DateTime @map("deleted_at") @db.Timestamp(6)
+  isDeleted Boolean  @default(false) @map("is_deleted") @db.Boolean
+
+  taskId String @map("task_id") @db.Uuid
+  task   Task   @relation(fields: [taskId], references: [id], map: "FK__TASK_EFFORT__TASK")
+
+  userId String   @map("user_id") @db.Uuid
+  user   AuthUser @relation(fields: [userId], references: [id], map: "FK__TASK_EFFORT__USER")
+
+  @@map("task_effort")
 }
 
 model TaskType {
