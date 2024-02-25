@@ -103,12 +103,21 @@ export class GetUsersInput {
 }
 
 @InputType()
-export class GetRolesInput {
-    @Field(() => ID)
-    userId: string
-
+export class GetRolesFilterInput {
     @Field({ nullable: true })
     name?: string
+}
+
+@InputType()
+export class GetRolesInput {
+    @Field({ nullable: true })
+    curPage?: number
+
+    @Field({ nullable: true })
+    perPage?: number
+
+    @Field(() => GetRolesFilterInput, { nullable: true })
+    filter?: GetRolesFilterInput
 }
 
 @InputType()
@@ -218,6 +227,9 @@ export class RoleType {
     @Field(() => [MethodsType])
     methods: MethodsType[]
 }
+
+@ObjectType()
+export class PaginatedRoles extends PaginatedResponseType(RoleType) {}
 
 @ObjectType()
 export class UserType {

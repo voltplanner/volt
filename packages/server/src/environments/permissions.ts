@@ -27,12 +27,12 @@ export const defaultAllowPermissions: AuthDefaultPermissions[] = [
         roleName: 'admin',
     },
     {
-        methodName: AuthResolver.prototype.getRole.name,
+        methodName: AuthResolver.prototype.getMyRole.name,
         roleName: 'admin',
         editable: false,
     },
     {
-        methodName: AuthResolver.prototype.getRole.name,
+        methodName: AuthResolver.prototype.getMyRole.name,
         roleName: 'member',
         editable: false,
     },

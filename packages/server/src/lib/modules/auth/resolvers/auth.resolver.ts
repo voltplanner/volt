@@ -2,7 +2,9 @@ import { UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
 import { AccessControl } from '../../../shared/decorators'
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator'
 import { ACLGuard } from '../../../shared/guards/acl.guard'
+import { CurrentUserPayload } from '../../../shared/interfaces/shared.interfaces'
 import {
     AuthorizationResponse,
     ChangePermissionsInput,
@@ -15,6 +17,7 @@ import {
     GetRolesInput,
     GetUserInput,
     GetUsersInput,
+    PaginatedRoles,
     PaginatedUsers,
     RefreshTokenInput,
     RoleType,
@@ -45,17 +48,23 @@ export class AuthResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Query(() => [RoleType])
+    @Query(() => PaginatedRoles)
     @AccessControl({ group: 'roles', description: 'View roles' })
-    async getRoles(@Args('input') input: GetRolesInput): Promise<RoleType[]> {
+    async getRoles(
+        @Args('input') input: GetRolesInput,
+    ): Promise<PaginatedRoles> {
         return await this.roleService.getRoles(input)
     }
 
     @UseGuards(ACLGuard)
     @Query(() => RoleType)
     @AccessControl({ group: 'roles', description: 'View user role' })
-    async getRole(@Args('input') input: GetRolesInput): Promise<RoleType> {
-        return await this.roleService.getRole(input)
+    async getMyRole(
+        @CurrentUser() user: CurrentUserPayload,
+    ): Promise<RoleType> {
+        return await this.roleService.getRole({
+            userId: user.userId,
+        })
     }
 
     @UseGuards(ACLGuard)
