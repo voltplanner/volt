@@ -8,7 +8,9 @@
     "prepare": "husky",
     "postinstall": "npm run lint:fix",
     "infra:local:up": "docker-compose --file=packages/devops/local/docker-compose.yaml up -d",
-    "infra:local:down": "docker-compose --file=packages/devops/local/docker-compose.yaml down"
+    "infra:local:down": "docker-compose --file=packages/devops/local/docker-compose.yaml down",
+    "infra:local:volumes:create": "docker volume create volt-local-volume-postgres",
+    "infra:local:volumes:delete": "docker volume rm volt-local-volume-postgres"
   },
   "private": true,
   "devDependencies": {

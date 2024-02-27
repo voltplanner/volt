@@ -27,3 +27,7 @@ Volt is [BUSL 1.1](./LICENSE.md)
 ## Activity
 
 ![Alt](https://repobeats.axiom.co/api/embed/ab9e069a7bd2d20ce915817f836c66a893cd0492.svg 'Repobeats analytics image')
+
+npx nx run devops:local:up
+npx nx run server:serve
+npx nx run server:prisma:studio
