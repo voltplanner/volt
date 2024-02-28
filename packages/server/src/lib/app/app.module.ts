@@ -9,9 +9,11 @@ import { environment } from '../../environments/environment'
 import { defaultAllowPermissions } from '../../environments/permissions'
 import { AuthIntegration } from '../integrations/auth.integration'
 import { NotificationsIntegration } from '../integrations/notification.integration'
+import { AUTH_EVENTS } from '../modules/auth/auth.config'
 import { AuthModule } from '../modules/auth/auth.module'
 import { AuthUserService } from '../modules/auth/services/auth-user.service'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
+import { RxJsEventsService } from '../shared/events/rxjs-events.service'
 import { PrismaModule } from '../shared/prisma'
 
 @Module({
@@ -35,12 +37,13 @@ import { PrismaModule } from '../shared/prisma'
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
             defaultAllowPermissions,
+            eventsProvider: RxJsEventsService,
         }),
-        NotificationsModule.forRootAsync({
-            useFactory: (authUserService: AuthUserService) =>
-                new NotificationsIntegration(authUserService),
-            inject: [AuthUserService],
-        }),
+        // NotificationsModule.forRootAsync({
+        //     useFactory: (authUserService: AuthUserService) =>
+        //         new NotificationsIntegration(authUserService),
+        //     inject: [AuthUserService],
+        // }),
     ],
     controllers: [],
     providers: [AuthIntegration],

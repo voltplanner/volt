@@ -3,6 +3,7 @@ import { DynamicModule, Module, Provider, Type } from '@nestjs/common'
 
 import {
     AUTH_CONFIG,
+    AUTH_EVENTS,
     AUTH_OPTIONS_TYPE,
     AuthConfigurableModuleClass,
     patchAuthConfig,
@@ -24,6 +25,10 @@ export class AuthModule extends AuthConfigurableModuleClass {
             {
                 provide: AUTH_CONFIG,
                 useValue: patchAuthConfig(options),
+            },
+            {
+                provide: AUTH_EVENTS,
+                useClass: options.eventsProvider,
             },
             AuthAuthService,
             AuthTokensService,
