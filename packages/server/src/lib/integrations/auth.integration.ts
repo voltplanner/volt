@@ -1,21 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { tap } from 'rxjs'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 
 import { environment } from '../../environments/environment'
 import {
+    AUTH_EVENTS,
     AuthEventPattern,
-    AuthEventsService,
-} from '../modules/auth/services/auth-events.service'
+    AuthEventServiceInterface,
+} from '../modules/auth/configs/auth-events.config'
 import { NotificationsService } from '../modules/notifications/services/notifications.service'
-import { NotificationTypeEnum } from '../shared/prisma'
 
 @Injectable()
 export class AuthIntegration {
     private logger = new Logger()
 
     constructor(
-        private readonly authEvents: AuthEventsService,
-        private readonly notificationService: NotificationsService,
+        @Inject(AUTH_EVENTS)
+        private readonly authEvents: AuthEventServiceInterface,
+        private readonly notificationsService: NotificationsService,
     ) {}
 
     async onApplicationBootstrap() {
@@ -27,21 +27,18 @@ export class AuthIntegration {
     }
 
     listenCompleteSignIn() {
-        this.authEvents
-            .listen(AuthEventPattern.COMPLETE_SIGNIN)
-            .pipe(
-                tap((event) => {
-                    const { data } = event
-                    this.notificationService.sendNotification({
-                        type: NotificationTypeEnum.EMAIL,
-                        userId: data.userId,
-                        topic: 'Complete registration in Volt',
-                        message: `${environment.rootUrl}login?code=${data.code}&userId=${data.userId}`,
-                    })
-                }),
-            )
-            .subscribe({
-                error: (error) => this.logger.error(error, error.stack),
-            })
+        this.authEvents.listen(
+            AuthEventPattern.COMPLETE_SIGNIN,
+            async (event) => {
+                const { data } = event
+
+                await this.notificationsService.sendForceEmailNotification({
+                    email: data.email,
+                    userId: data.userId,
+                    topic: 'Complete registration in Volt',
+                    message: `${environment.rootUrl}login?code=${data.code}&userId=${data.userId}`,
+                })
+            },
+        )
     }
 }
