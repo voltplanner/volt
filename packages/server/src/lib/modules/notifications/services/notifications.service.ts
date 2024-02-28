@@ -4,6 +4,7 @@ import { NotificationTypeEnum, PrismaService } from '../../../shared/prisma'
 import { SendNotificationPayload } from '../interfaces/notifications.interfaces'
 import { NotificationsEmailService } from './email.service'
 import { NotificationsPreferencesService } from './preferences.service'
+import { NotificationsTelegramService } from './telegram.service'
 
 @Injectable()
 export class NotificationsService {
@@ -12,30 +13,27 @@ export class NotificationsService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly email: NotificationsEmailService,
+        private readonly telegram: NotificationsTelegramService,
         private readonly preferences: NotificationsPreferencesService,
     ) {}
 
     async sendNotification(data: SendNotificationPayload) {
-        const { message, topic, userId, link, forceSendType } = data
+        const { message, topic, userId, link } = data
 
         const preferences = await this.preferences.getPreferences(userId)
 
         const notificationTypesToSend: NotificationTypeEnum[] = []
 
-        if (forceSendType !== undefined) {
-            notificationTypesToSend.push(forceSendType)
-        } else {
-            if (preferences.emailEnabled) {
-                notificationTypesToSend.push(NotificationTypeEnum.EMAIL)
-            }
+        if (preferences.emailEnabled) {
+            notificationTypesToSend.push(NotificationTypeEnum.EMAIL)
+        }
 
-            if (preferences.telegramEnabled) {
-                notificationTypesToSend.push(NotificationTypeEnum.TELEGRAM)
-            }
+        if (preferences.telegramEnabled) {
+            notificationTypesToSend.push(NotificationTypeEnum.TELEGRAM)
+        }
 
-            if (preferences.webEnabled) {
-                notificationTypesToSend.push(NotificationTypeEnum.WEB)
-            }
+        if (preferences.webEnabled) {
+            notificationTypesToSend.push(NotificationTypeEnum.WEB)
         }
 
         for (const type of notificationTypesToSend) {
@@ -58,7 +56,14 @@ export class NotificationsService {
                 if (type === NotificationTypeEnum.EMAIL) {
                     await this.email.send({
                         email: preferences.email,
-                        userId,
+                        topic,
+                        message,
+                    })
+                }
+
+                if (type === NotificationTypeEnum.TELEGRAM) {
+                    await this.telegram.send({
+                        telegramAccount: preferences.telegramAccount,
                         topic,
                         message,
                     })
@@ -88,5 +93,59 @@ export class NotificationsService {
                 },
             })
         }
+    }
+
+    async sendForceEmailNotification(
+        data: SendNotificationPayload & { email: string },
+    ) {
+        const { message, topic, userId, link, email } = data
+
+        await this.preferences.getPreferences(userId)
+
+        const createdNotification = await this.prisma.notification.create({
+            data: {
+                type: NotificationTypeEnum.EMAIL,
+                sent: false,
+                topic,
+                message,
+                link,
+                Preferences: {
+                    connect: {
+                        externalUserId: userId,
+                    },
+                },
+            },
+        })
+
+        try {
+            await this.email.send({
+                email,
+                topic,
+                message,
+            })
+        } catch (error) {
+            this.logger.error(
+                `Can't send messsage to email. Reason ${error.message}`,
+            )
+            await this.prisma.notification.update({
+                where: {
+                    id: createdNotification.id,
+                },
+                data: {
+                    sent: false,
+                    error: error.message,
+                },
+            })
+        }
+
+        await this.prisma.notification.update({
+            where: {
+                id: createdNotification.id,
+            },
+            data: {
+                sent: true,
+                sentAt: new Date(),
+            },
+        })
     }
 }

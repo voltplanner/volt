@@ -1,17 +1,16 @@
 import { DiscoveryModule } from '@golevelup/nestjs-discovery'
 import { DynamicModule, Module, Provider, Type } from '@nestjs/common'
 
+import { AUTH_EVENTS } from './configs/auth-events.config'
 import {
     AUTH_CONFIG,
-    AUTH_EVENTS,
     AUTH_OPTIONS_TYPE,
     AuthConfigurableModuleClass,
     patchAuthConfig,
-} from './auth.config'
+} from './configs/auth-module.config'
 import { AuthResolver } from './resolvers/auth.resolver'
 import { AuthAuthService } from './services/auth-auth.service'
 import { AuthBootstrapService } from './services/auth-bootstrap.service'
-import { AuthEventsService } from './services/auth-events.service'
 import { AuthRoleService } from './services/auth-role.service'
 import { AuthTokensService } from './services/auth-tokens.service'
 import { AuthUserService } from './services/auth-user.service'
@@ -33,7 +32,6 @@ export class AuthModule extends AuthConfigurableModuleClass {
             AuthAuthService,
             AuthTokensService,
             AuthResolver,
-            AuthEventsService,
             AuthUserService,
             AuthRoleService,
             AuthBootstrapService,

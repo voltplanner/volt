@@ -8,21 +8,24 @@ import {
 import { genSalt, hash } from 'bcrypt'
 import { randomBytes } from 'crypto'
 
-import { EventsServiceInterface } from '../../../shared/events/interfaces/events.interfaces'
 import {
     AuthUserStatusEnum,
     Prisma,
     PrismaService,
 } from '../../../shared/prisma'
 import { parseMetaArgs } from '../../../shared/utils'
-import { AUTH_CONFIG, AUTH_EVENTS, AuthConfig } from '../auth.config'
+import {
+    AUTH_EVENTS,
+    AuthEventPattern,
+    AuthEventServiceInterface,
+} from '../configs/auth-events.config'
+import { AUTH_CONFIG, AuthConfig } from '../configs/auth-module.config'
 import {
     ChangeUserRolePayload,
     CreateUser,
     GetUsers,
     UpdateUser,
 } from '../interfaces/auth.interfaces'
-import { AuthEventPattern } from './auth-events.service'
 
 @Injectable()
 export class AuthUserService {
@@ -32,7 +35,7 @@ export class AuthUserService {
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
         @Inject(AUTH_EVENTS)
-        private readonly events: EventsServiceInterface,
+        private readonly events: AuthEventServiceInterface,
         private readonly prisma: PrismaService,
     ) {}
 
@@ -240,6 +243,7 @@ export class AuthUserService {
             data: {
                 userId: user.id,
                 code: code,
+                email: user.email,
             },
         })
 

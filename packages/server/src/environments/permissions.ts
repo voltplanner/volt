@@ -1,4 +1,4 @@
-import { AuthDefaultPermissions } from '../lib/modules/auth/auth.config'
+import { AuthDefaultPermissions } from '../lib/modules/auth/configs/auth-module.config'
 import { AuthResolver } from '../lib/modules/auth/resolvers/auth.resolver'
 import { NotificationsResolver } from '../lib/modules/notifications/resolvers/notifications.resolver'
 
@@ -48,12 +48,28 @@ export const defaultAllowPermissions: AuthDefaultPermissions[] = [
         editable: false,
     },
     {
-        methodName: NotificationsResolver.prototype.linkTelegramAccount.name,
+        methodName:
+            NotificationsResolver.prototype.getMyNotificationPreferences.name,
         roleName: 'admin',
         editable: false,
     },
     {
-        methodName: NotificationsResolver.prototype.unlinkTelegramAccount.name,
+        methodName:
+            NotificationsResolver.prototype.getMyNotificationPreferences.name,
+        roleName: 'member',
+        editable: false,
+    },
+    {
+        methodName:
+            NotificationsResolver.prototype.changeMyNotificationPreferences
+                .name,
+        roleName: 'admin',
+        editable: false,
+    },
+    {
+        methodName:
+            NotificationsResolver.prototype.changeMyNotificationPreferences
+                .name,
         roleName: 'member',
         editable: false,
     },

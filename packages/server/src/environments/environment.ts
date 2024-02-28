@@ -24,7 +24,7 @@ export const environment = {
             get('SMTP_URL').required().asUrlString(),
         ),
         defaults: {
-            from: get('SMTP_NO_REPLY_EMAIL'),
+            from: get('SMTP_NO_REPLY_EMAIL').required().asString(),
         },
         telegram: {
             botToken: get('TELEGRAM_BOT_TOKEN').asString(),

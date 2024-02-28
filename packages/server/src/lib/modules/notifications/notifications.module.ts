@@ -7,7 +7,7 @@ import {
     NOTIFICATIONS_OPTIONS_TYPE,
     NotificationsConfigurableModuleClass,
     patchNotificationsConfig,
-} from './notifications.config'
+} from './configs/notifications-module.config'
 import { NotificationsResolver } from './resolvers/notifications.resolver'
 import { NotificationsEmailService } from './services/email.service'
 import { NotificationsService } from './services/notifications.service'
@@ -32,8 +32,8 @@ export class NotificationsModule extends NotificationsConfigurableModuleClass {
 
         const imports: any[] = [
             ...(options?.imports ?? []),
-            MailerModule.forRoot({
-                options,
+            MailerModule.forRootAsync({
+                useFactory,
             }),
         ]
 

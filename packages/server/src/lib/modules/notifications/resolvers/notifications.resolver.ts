@@ -1,48 +1,47 @@
 import { UseGuards } from '@nestjs/common'
-import { Args, Mutation, Resolver } from '@nestjs/graphql'
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 
 import { AccessControl } from '../../../shared/decorators'
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator'
 import { ACLGuard } from '../../../shared/guards/acl.guard'
 import { CurrentUserPayload } from '../../../shared/interfaces/shared.interfaces'
-import { LinkTelegramAccountInput } from '../interfaces/notifications.graphql'
-import { NotificationsTelegramService } from '../services/telegram.service'
+import {
+    ChangeMyNotificationPreferences,
+    GetNotificationPreferences,
+} from '../interfaces/notifications.graphql'
+import { NotificationsPreferencesService } from '../services/preferences.service'
 
 @Resolver()
 export class NotificationsResolver {
     constructor(
-        private readonly telegramService: NotificationsTelegramService,
+        private readonly preferencesService: NotificationsPreferencesService,
     ) {}
 
     @UseGuards(ACLGuard)
-    @Mutation(() => Boolean)
+    @Query(() => GetNotificationPreferences)
     @AccessControl({
         group: 'notifications',
-        description: 'Link telegram account',
+        description: `Get user's notification preferences`,
     })
-    async linkTelegramAccount(
-        @Args('input') input: LinkTelegramAccountInput,
+    async getMyNotificationPreferences(
         @CurrentUser() user: CurrentUserPayload,
-    ): Promise<boolean> {
-        await this.telegramService.linkTelegramAccount({
-            userId: user.userId,
-            chatId: input.chatId,
-        })
-
-        return true
+    ): Promise<GetNotificationPreferences> {
+        return await this.preferencesService.getPreferences(user.userId)
     }
 
     @UseGuards(ACLGuard)
     @Mutation(() => Boolean)
     @AccessControl({
         group: 'notifications',
-        description: 'Unlink telegram account',
+        description: `Change notification preferences`,
     })
-    async unlinkTelegramAccount(
+    async changeMyNotificationPreferences(
+        @Args('input') input: ChangeMyNotificationPreferences,
         @CurrentUser() user: CurrentUserPayload,
     ): Promise<boolean> {
-        await this.telegramService.unlinkTelegramAccount({
+        await this.preferencesService.changePreferences({
             userId: user.userId,
+            ...input,
         })
 
         return true

@@ -1,7 +1,37 @@
-import { Field, InputType } from '@nestjs/graphql'
+import { Field, InputType, ObjectType } from '@nestjs/graphql'
 
 @InputType()
-export class LinkTelegramAccountInput {
+export class ChangeMyNotificationPreferences {
+    @Field({ nullable: true })
+    emailEnabled?: boolean
+
+    @Field({ nullable: true })
+    email?: string
+
+    @Field({ nullable: true })
+    webEnabled?: boolean
+
+    @Field({ nullable: true })
+    telegramEnabled?: boolean
+
+    @Field({ nullable: true })
+    telegramAccount?: number
+}
+
+@ObjectType()
+export class GetNotificationPreferences {
     @Field()
-    chatId: number
+    emailEnabled: boolean
+
+    @Field({ nullable: true })
+    email: string
+
+    @Field()
+    webEnabled: boolean
+
+    @Field()
+    telegramEnabled: boolean
+
+    @Field({ nullable: true })
+    telegramAccount: number
 }

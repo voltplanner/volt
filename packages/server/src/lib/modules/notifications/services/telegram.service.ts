@@ -1,28 +1,21 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { Api, Bot, Context, RawApi } from 'grammy'
 
-import { PrismaService } from '../../../shared/prisma'
-import {
-    LinkTelegramAccountPayload,
-    SendEmailPayload,
-    UnlinkTelegramAccountPayload,
-} from '../interfaces/notifications.interfaces'
 import {
     NOTIFICATIONS_CONFIG,
     NotificationsConfig,
-} from '../notifications.config'
-import { NotificationsPreferencesService } from './preferences.service'
+} from '../configs/notifications-module.config'
+import { SendTelegramPayload } from '../interfaces/notifications.interfaces'
 
 @Injectable()
 export class NotificationsTelegramService {
+    private logger = new Logger()
     private isTelegramConfigured = false
     private telegramBot: Bot<Context, Api<RawApi>>
 
     constructor(
         @Inject(NOTIFICATIONS_CONFIG)
         private readonly config: NotificationsConfig,
-        private readonly prisma: PrismaService,
-        private readonly preferences: NotificationsPreferencesService,
     ) {}
 
     async onModuleInit() {
@@ -33,64 +26,37 @@ export class NotificationsTelegramService {
 
         this.telegramBot = new Bot(this.config.telegram.botToken)
         this.isTelegramConfigured = true
+        this.logger.log('Telegram notification enabled')
 
         this.telegramBot.command('start', (ctx) => {
             const authorizeUrl = this.generateLink(ctx.chat.id)
-
+            console.log(authorizeUrl)
             return ctx.reply(
-                `Hello, to enable notifications via Telegram, [authorize within this link](${authorizeUrl})!`,
+                `Hello, to enable notifications via Telegram, [authorize within this link](${authorizeUrl})`,
+                { parse_mode: 'MarkdownV2' },
             )
+        })
+
+        this.telegramBot.start().catch((error) => {
+            this.isTelegramConfigured = false
+            this.logger.error(error)
         })
     }
 
-    async send(data: SendEmailPayload) {
-        const { userId, message, topic } = data
+    async send(data: SendTelegramPayload) {
+        const { message, topic, telegramAccount } = data
 
         if (!this.isTelegramConfigured) {
             return
         }
 
-        const preferences = await this.preferences.getPreferences(userId)
-
         await this.telegramBot.api.sendMessage(
-            preferences.telegramAccount,
+            telegramAccount,
             `${topic}\n\n${message}`,
         )
     }
 
     generateLink(chatId: number) {
-        return `${this.config.telegram.rootUrl}/telegram?chatId=${chatId}`
-    }
-
-    async linkTelegramAccount(data: LinkTelegramAccountPayload) {
-        const { chatId, userId } = data
-
-        const preferences = await this.preferences.getPreferences(userId)
-
-        await this.prisma.notificationPreferences.update({
-            where: {
-                id: preferences.id,
-            },
-            data: {
-                telegramEnabled: true,
-                telegramAccount: chatId,
-            },
-        })
-    }
-
-    async unlinkTelegramAccount(data: UnlinkTelegramAccountPayload) {
-        const { userId } = data
-
-        const preferences = await this.preferences.getPreferences(userId)
-
-        await this.prisma.notificationPreferences.update({
-            where: {
-                id: preferences.id,
-            },
-            data: {
-                telegramEnabled: false,
-                telegramAccount: null,
-            },
-        })
+        return `${this.config.telegram.rootUrl}telegram?chatId=${chatId}`
     }
 }

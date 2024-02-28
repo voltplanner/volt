@@ -1,9 +1,7 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common'
 import { merge } from 'lodash'
 
-import { EventsServiceInterfaceConstructor } from '../../shared/events/interfaces/events.interfaces'
-
-export const AUTH_EVENTS = 'AUTH_EVENTS'
+import { AuthEventServiceInterfaceConstructor } from './auth-events.config'
 
 export interface AuthDefaultPermissions {
     methodName: string
@@ -22,7 +20,7 @@ export interface AuthConfig {
         refreshTokenTTL: number
     }
     defaultAllowPermissions: AuthDefaultPermissions[]
-    eventsProvider: EventsServiceInterfaceConstructor
+    eventsProvider: AuthEventServiceInterfaceConstructor
     temp?: boolean
 }
 

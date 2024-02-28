@@ -1,15 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { tap } from 'rxjs'
 
 import { environment } from '../../environments/environment'
-import { AUTH_EVENTS } from '../modules/auth/auth.config'
 import {
+    AUTH_EVENTS,
     AuthEventPattern,
-    AuthEventsService,
-} from '../modules/auth/services/auth-events.service'
+    AuthEventServiceInterface,
+} from '../modules/auth/configs/auth-events.config'
 import { NotificationsService } from '../modules/notifications/services/notifications.service'
-import { EventsServiceInterface } from '../shared/events/interfaces/events.interfaces'
-import { NotificationTypeEnum } from '../shared/prisma'
 
 @Injectable()
 export class AuthIntegration {
@@ -17,7 +14,8 @@ export class AuthIntegration {
 
     constructor(
         @Inject(AUTH_EVENTS)
-        private readonly authEvents: EventsServiceInterface,
+        private readonly authEvents: AuthEventServiceInterface,
+        private readonly notificationsService: NotificationsService,
     ) {}
 
     async onApplicationBootstrap() {
@@ -28,30 +26,18 @@ export class AuthIntegration {
         }
     }
 
-    // listenCompleteSignIn() {
-    //     this.authEvents
-    //         .listen(AuthEventPattern.COMPLETE_SIGNIN)
-    //         .pipe(
-    //             tap((event) => {
-    //                 const { data } = event
-    //                 this.notificationService.sendNotification({
-    //                     forceSendType: NotificationTypeEnum.EMAIL,
-    //                     userId: data.userId,
-    //                     topic: 'Complete registration in Volt',
-    //                     message: `${environment.rootUrl}login?code=${data.code}&userId=${data.userId}`,
-    //                 })
-    //             }),
-    //         )
-    //         .subscribe({
-    //             error: (error) => this.logger.error(error, error.stack),
-    //         })
-    // }
-
     listenCompleteSignIn() {
         this.authEvents.listen(
             AuthEventPattern.COMPLETE_SIGNIN,
             async (event) => {
-                console.log(event)
+                const { data } = event
+
+                await this.notificationsService.sendForceEmailNotification({
+                    email: data.email,
+                    userId: data.userId,
+                    topic: 'Complete registration in Volt',
+                    message: `${environment.rootUrl}login?code=${data.code}&userId=${data.userId}`,
+                })
             },
         )
     }
