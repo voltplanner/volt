@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../shared/prisma";
 
 @Injectable()
-export class ProjectsService {
+export class ProjectService {
     constructor(
         private readonly _prisma: PrismaService,
     ) {}

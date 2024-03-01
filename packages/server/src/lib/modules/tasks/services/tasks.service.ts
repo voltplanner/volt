@@ -1,9 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../shared/prisma";
 
-// https://habr.com/ru/articles/153861/
-// https://habr.com/ru/articles/63416/
-
 // https://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 // https://postgres.men/database/postgresql/nested-sets-introduction/
 // https://postgres.men/database/trees/nested-sets-rules/
@@ -147,7 +144,7 @@ export class TasksService {
                 level: newLevel,
 
                 name,
-                number: maxNumber._max.number || 1,
+                number: maxNumber._max.number + 1 || 1,
 
                 typeId,
                 statusId,
