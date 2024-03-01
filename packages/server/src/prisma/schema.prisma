@@ -10,21 +10,21 @@ datasource db {
 }
 
 model AuthUser {
-  id                String             @id @default(uuid()) @db.Uuid
-  email             String             @unique @db.VarChar(128)
-  firstname         String             @db.VarChar(64)
-  lastname          String             @db.VarChar(64)
-  password          String?            @db.VarChar(64)
-  completeCode      String?            @db.VarChar(16)
-  roleId            String             @map("role_id") @db.Uuid
-  status            AuthUserStatusEnum @default(WAITING_COMPLETE)
-  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt         DateTime           @default(now()) @map("updated_at") @db.Timestamp(6)
-  deletedAt         DateTime?          @map("deleted_at") @db.Timestamp(6)
-  isDeleted         Boolean            @default(false) @map("is_deleted")
-  tokens            AuthRefreshToken[]
-  role              AuthRole           @relation(fields: [roleId], references: [id], map: "FK__AUTH_USER__ROLE")
-  notifications     Notification[]
+  id           String  @id @default(uuid())
+  email        String  @unique
+  firstname    String
+  lastname     String
+  password     String?
+  completeCode String?
+
+  role   AuthRole @relation(fields: [roleId], references: [id])
+  roleId String
+
+  status    AuthUserStatusEnum @default(WAITING_COMPLETE)
+  createdAt DateTime           @default(now())
+  deletedAt DateTime?
+  tokens    AuthRefreshToken[]
+
   projectsCreatedBy Project[]
   projects          ProjectOnUser[]
   tasksAssignedTo   Task[]             @relation("FK__TASK__ASSIGNED_TO")
@@ -93,19 +93,28 @@ model SystemSettings {
   @@map("system_settings")
 }
 
-model Notification {
-  id      String               @id @default(uuid()) @db.Uuid
-  topic   String
-  message String
-  link    String?
-  type    NotificationTypeEnum
-  sent    Boolean              @default(false)
-  sentAt  DateTime?            @map("sent_at")
-  error   String?
-  userId  String               @map("user_id") @db.Uuid
-  user    AuthUser             @relation(fields: [userId], references: [id], map: "FK__NOTIFICATION__USER")
+model NotificationPreferences {
+  id              String         @id @default(uuid())
+  externalUserId  String         @unique
+  emailEnabled    Boolean
+  email           String?
+  webEnabled      Boolean
+  telegramEnabled Boolean
+  telegramAccount Int?
+  nofications     Notification[]
+}
 
-  @@map("notifications")
+model Notification {
+  id            String                   @id @default(uuid())
+  topic         String
+  message       String
+  link          String?
+  type          NotificationTypeEnum
+  sent          Boolean                  @default(false)
+  sentAt        DateTime?
+  error         String?
+  Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
+  preferencesId String?
 }
 
 model Project {
@@ -424,6 +433,7 @@ enum AuthUserStatusEnum {
 enum NotificationTypeEnum {
   EMAIL
   WEB
+  TELEGRAM
 
   @@map("notification_type_enum")
 }

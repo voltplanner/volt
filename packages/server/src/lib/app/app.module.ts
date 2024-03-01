@@ -10,6 +10,7 @@ import { defaultAllowPermissions } from '../../environments/permissions'
 import { AuthIntegration } from '../integrations/auth.integration'
 import { AuthModule } from '../modules/auth/auth.module'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
+import { RxJsEventsService } from '../shared/events/rxjs-events.service'
 import { PrismaModule } from '../shared/prisma'
 
 @Module({
@@ -33,9 +34,12 @@ import { PrismaModule } from '../shared/prisma'
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
             defaultAllowPermissions,
+            eventsProvider: RxJsEventsService,
         }),
         NotificationsModule.forRoot({
-            ...environment.mailer,
+            defaults: environment.notifications.defaults,
+            transport: environment.notifications.transport,
+            telegram: environment.notifications.telegram,
         }),
     ],
     controllers: [],
