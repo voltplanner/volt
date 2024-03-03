@@ -1,11 +1,16 @@
 import { Test } from '@nestjs/testing'
-import { environment } from './../environments/environment'
-import { AuthUserStatusEnum, PrismaModule, PrismaService } from './shared/prisma'
-import { ProjectsStatusService } from './modules/projects/services/projects-status.service'
+
+import { environment } from '../../environments/environment'
+import { TasksService } from '../modules/tasks/services/tasks.service'
+import { TasksStatusService } from '../modules/tasks/services/tasks-status.service'
+import { TasksTypeService } from '../modules/tasks/services/tasks-type.service'
+import {
+    AuthUserStatusEnum,
+    PrismaModule,
+    PrismaService,
+} from '../shared/prisma'
 import { ProjectsService } from './modules/projects/services/projects.service'
-import { TasksStatusService } from './modules/tasks/services/tasks-status.service'
-import { TasksTypeService } from './modules/tasks/services/tasks-type.service'
-import { TasksService } from './modules/tasks/services/tasks.service'
+import { ProjectsStatusService } from './modules/projects/services/projects-status.service'
 
 describe('', () => {
     let projectsStatusService: ProjectsStatusService
@@ -31,14 +36,17 @@ describe('', () => {
                 ProjectsService,
                 TasksService,
             ],
-        }).compile();
+        }).compile()
 
-        projectsStatusService = moduleRef.get<ProjectsStatusService>(ProjectsStatusService);
-        tasksStatusService = moduleRef.get<TasksStatusService>(TasksStatusService);
-        tasksTypeService = moduleRef.get<TasksTypeService>(TasksTypeService);
-        projectsService = moduleRef.get<ProjectsService>(ProjectsService);
-        prismaService = moduleRef.get<PrismaService>(PrismaService);
-        tasksService = moduleRef.get<TasksService>(TasksService);
+        projectsStatusService = moduleRef.get<ProjectsStatusService>(
+            ProjectsStatusService,
+        )
+        tasksStatusService =
+            moduleRef.get<TasksStatusService>(TasksStatusService)
+        tasksTypeService = moduleRef.get<TasksTypeService>(TasksTypeService)
+        projectsService = moduleRef.get<ProjectsService>(ProjectsService)
+        prismaService = moduleRef.get<PrismaService>(PrismaService)
+        tasksService = moduleRef.get<TasksService>(TasksService)
 
         const allMethods = await prismaService.authMethod.findMany({
             select: {
@@ -84,7 +92,7 @@ describe('', () => {
     it('', async () => {
         const projectStatusId = await projectsStatusService.create({
             code: 'p_s_1_code',
-            name: 'p_s_1_name'
+            name: 'p_s_1_name',
         })
 
         const projectId = await projectsService.create({
@@ -117,7 +125,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_1
+            parentId: taskId_1,
         })
         const taskId_3 = await tasksService.create({
             createdById: userId,
@@ -125,7 +133,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_1
+            parentId: taskId_1,
         })
         const taskId_4 = await tasksService.create({
             createdById: userId,
@@ -133,7 +141,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_1
+            parentId: taskId_1,
         })
         const taskId_5 = await tasksService.create({
             createdById: userId,
@@ -141,7 +149,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_2
+            parentId: taskId_2,
         })
         const taskId_6 = await tasksService.create({
             createdById: userId,
@@ -149,7 +157,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_3
+            parentId: taskId_3,
         })
         const taskId_7 = await tasksService.create({
             createdById: userId,
@@ -157,7 +165,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_3
+            parentId: taskId_3,
         })
         const taskId_8 = await tasksService.create({
             createdById: userId,
@@ -165,7 +173,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_3
+            parentId: taskId_3,
         })
         const taskId_9 = await tasksService.create({
             createdById: userId,
@@ -173,7 +181,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_4
+            parentId: taskId_4,
         })
         const taskId_10 = await tasksService.create({
             createdById: userId,
@@ -181,7 +189,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_5
+            parentId: taskId_5,
         })
         const taskId_11 = await tasksService.create({
             createdById: userId,
@@ -189,7 +197,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_5
+            parentId: taskId_5,
         })
         const taskId_12 = await tasksService.create({
             createdById: userId,
@@ -197,7 +205,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_7
+            parentId: taskId_7,
         })
         const taskId_13 = await tasksService.create({
             createdById: userId,
@@ -205,7 +213,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_7
+            parentId: taskId_7,
         })
         const taskId_14 = await tasksService.create({
             createdById: userId,
@@ -213,7 +221,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_7
+            parentId: taskId_7,
         })
         const taskId_15 = await tasksService.create({
             createdById: userId,
@@ -221,7 +229,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_9
+            parentId: taskId_9,
         })
         const taskId_16 = await tasksService.create({
             createdById: userId,
@@ -229,9 +237,8 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_9
+            parentId: taskId_9,
         })
-
 
         const taskId_31 = await tasksService.create({
             createdById: userId,
@@ -246,7 +253,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_31
+            parentId: taskId_31,
         })
         const taskId_33 = await tasksService.create({
             createdById: userId,
@@ -254,7 +261,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_31
+            parentId: taskId_31,
         })
         const taskId_34 = await tasksService.create({
             createdById: userId,
@@ -262,7 +269,7 @@ describe('', () => {
             projectId,
             statusId: taskStatusId,
             typeId: taskTypeId,
-            parentId: taskId_33
+            parentId: taskId_33,
         })
 
         await tasksService.delete({

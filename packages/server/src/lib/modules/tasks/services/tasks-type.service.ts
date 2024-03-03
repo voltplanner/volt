@@ -1,11 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../shared/prisma";
+import { Injectable } from '@nestjs/common'
+
+import { PrismaService } from '../../../shared/prisma'
 
 @Injectable()
 export class TasksTypeService {
-    constructor(
-        private readonly _prisma: PrismaService,
-    ) {}
+    constructor(private readonly _prisma: PrismaService) {}
 
     async create(dto: {
         name: string

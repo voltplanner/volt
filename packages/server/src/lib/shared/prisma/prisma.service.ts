@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { PrismaClient } from 'generatedprisma'
 
+import { Prisma } from '.'
 import { PRISMA_CONFIG, PrismaConfig } from './prisma.config'
 
 @Injectable()
@@ -42,12 +43,65 @@ export class PrismaService
         PrismaService.instance = this
     }
 
+    private _getClientModelName<T extends Prisma.ModelName>(
+        modelName: T,
+    ): Uncapitalize<T> {
+        return (modelName.charAt(0).toLowerCase() +
+            modelName.slice(1)) as Uncapitalize<T>
+    }
+
+    private _isModelHasSomeFields(
+        modelName: Prisma.ModelName,
+        fieldNames: string[],
+    ): boolean {
+        const clientModelName = this._getClientModelName(modelName)
+
+        return fieldNames.some((i) => i in this[clientModelName].fields)
+    }
+
     async onModuleInit(): Promise<void> {
         const { logging, maxQueryExecutionTime } = this.config
 
+        // this.$extends({
+        //     query: {
+        //         $allModels: {
+        //             // ----------------------------------------------------
+        //             // SOFT DELETE EXTENTION
+        //             // ----------------------------------------------------
+        //             async delete({ model, args, query }) {
+        //                 if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
+        //                     const clientModelName = PrismaService.instance._getClientModelName(model)
+
+        //                     return await PrismaService.instance[clientModelName].update({
+        //                         ...args,
+        //                         data: { isDeleted: true },
+        //                     })
+        //                 }
+
+        //                 return await query(args)
+        //             },
+        //             // ----------------------------------------------------
+        //             // SOFT DELETE EXTENTION
+        //             // ----------------------------------------------------
+        //             async deleteMany({ model, args, query }) {
+        //                 if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
+        //                     const clientModelName = PrismaService.instance._getClientModelName(model)
+
+        //                     return await PrismaService.instance[clientModelName].updateMany({
+        //                         ...args,
+        //                         data: { isDeleted: true },
+        //                     })
+        //                 }
+
+        //                 return await query(args)
+        //             },
+        //         }
+        //     }
+        // })
+
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-extra-semi
-            ;(this as any).$on('query', (e) => {
+            ;(this as any).$on('query', (e: any) => {
                 if (logging === 'all_queries') {
                     if (e.query !== 'SELECT 1') {
                         this.logger.log(
@@ -56,7 +110,10 @@ export class PrismaService
                     }
                 }
                 if (logging === 'long_queries') {
-                    if (e.duration >= maxQueryExecutionTime) {
+                    if (
+                        maxQueryExecutionTime &&
+                        e.duration >= maxQueryExecutionTime
+                    ) {
                         this.logger.warn(
                             `query is slow: ${e.query}, params: ${e.params}, execution time: ${e.duration}`,
                         )

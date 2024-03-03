@@ -1,95 +1,95 @@
 {
-  "name": "server",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/server/src",
-  "projectType": "application",
-  "targets": {
-    "build": {
-      "executor": "@nx/webpack:webpack",
-      "dependsOn": ["prisma:generate"],
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/packages/server",
-        "main": "packages/server/src/lib/main.ts",
-        "tsConfig": "packages/server/tsconfig.app.json",
-        "assets": ["packages/server/src/assets"],
-        "webpackConfig": "packages/server/webpack.config.js"
-      },
-      "configurations": {
-        "development": {},
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "watch": false
-        }
-      }
-    },
-    "serve": {
-      "dependsOn": ["prisma:migrate:deploy"],
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "server:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "server:build:development"
+    "name": "server",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/server/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/webpack:webpack",
+            "dependsOn": ["prisma:generate"],
+            "outputs": ["{options.outputPath}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/packages/server",
+                "main": "packages/server/src/lib/main.ts",
+                "tsConfig": "packages/server/tsconfig.app.json",
+                "assets": ["packages/server/src/assets"],
+                "webpackConfig": "packages/server/webpack.config.js"
+            },
+            "configurations": {
+                "development": {},
+                "production": {
+                    "optimization": true,
+                    "extractLicenses": true,
+                    "watch": false
+                }
+            }
         },
-        "production": {
-          "buildTarget": "server:build:production"
+        "serve": {
+            "dependsOn": ["prisma:migrate:deploy"],
+            "executor": "@nx/js:node",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "server:build"
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "server:build:development"
+                },
+                "production": {
+                    "buildTarget": "server:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "packages/server/jest.config.ts"
+            }
+        },
+        "prisma:generate": {
+            "executor": "@tinybudgie/schematics:prisma-generate",
+            "outputs": ["{workspaceRoot}/node_modules/generatedprisma"]
+        },
+        "prisma:pull": {
+            "executor": "@tinybudgie/schematics:prisma-pull"
+        },
+        "prisma:migrate:dev": {
+            "executor": "@tinybudgie/schematics:prisma-migrate-dev"
+        },
+        "prisma:migrate:deploy": {
+            "executor": "@tinybudgie/schematics:prisma-migrate-deploy"
+        },
+        "prisma:studio": {
+            "executor": "@tinybudgie/schematics:prisma-studio"
+        },
+        "graphql:prepare": {
+            "executor": "@nx/webpack:webpack",
+            "dependsOn": ["prisma:generate"],
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/packages/graphql-generate",
+                "main": "packages/server/src/lib/generate-graphql.ts",
+                "tsConfig": "packages/server/tsconfig.app.json",
+                "webpackConfig": "packages/server/webpack.config.js"
+            }
+        },
+        "graphql:generate": {
+            "executor": "@nx/js:node",
+            "options": {
+                "watch": false,
+                "buildTarget": "server:graphql:prepare"
+            }
         }
-      }
     },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "packages/server/jest.config.ts"
-      }
-    },
-    "prisma:generate": {
-      "executor": "@tinybudgie/schematics:prisma-generate",
-      "outputs": ["{workspaceRoot}/node_modules/generatedprisma"]
-    },
-    "prisma:pull": {
-      "executor": "@tinybudgie/schematics:prisma-pull"
-    },
-    "prisma:migrate:dev": {
-      "executor": "@tinybudgie/schematics:prisma-migrate-dev"
-    },
-    "prisma:migrate:deploy": {
-      "executor": "@tinybudgie/schematics:prisma-migrate-deploy"
-    },
-    "prisma:studio": {
-      "executor": "@tinybudgie/schematics:prisma-studio"
-    },
-    "graphql:prepare": {
-      "executor": "@nx/webpack:webpack",
-      "dependsOn": ["prisma:generate"],
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/packages/graphql-generate",
-        "main": "packages/server/src/lib/generate-graphql.ts",
-        "tsConfig": "packages/server/tsconfig.app.json",
-        "webpackConfig": "packages/server/webpack.config.js"
-      }
-    },
-    "graphql:generate": {
-      "executor": "@nx/js:node",
-      "options": {
-        "watch": false,
-        "buildTarget": "server:graphql:prepare"
-      }
-    }
-  },
-  "tags": []
+    "tags": []
 }

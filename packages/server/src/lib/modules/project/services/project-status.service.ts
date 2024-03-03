@@ -1,13 +1,13 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common'
 
-import { PrismaService } from "../../../shared/prisma";
-import { ProjectStatusDeleteInUseError } from "../errors/project-status-delete-in-use.error";
+import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
+import { Prisma, PrismaService } from '../../../shared/prisma'
+import { parseMetaArgs } from '../../../shared/utils'
+import { ProjectStatusDeleteInUseError } from '../errors/project-status-delete-in-use.error'
 
 @Injectable()
 export class ProjectStatusService {
-    constructor(
-        private readonly _prisma: PrismaService,
-    ) {}
+    constructor(private readonly _prisma: PrismaService) {}
 
     async createOne(dto: {
         name: string
@@ -16,7 +16,9 @@ export class ProjectStatusService {
     }): Promise<string> {
         const { name, code, description } = dto
 
-        const { _max: { position: maxPosition } } = await this._prisma.projectStatus.aggregate({
+        const {
+            _max: { position: maxPosition },
+        } = await this._prisma.projectStatus.aggregate({
             _max: { position: true },
         })
 
@@ -25,7 +27,7 @@ export class ProjectStatusService {
                 code,
                 name,
                 description,
-                position: maxPosition || 0,
+                position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
             },
             select: { id: true },
         })
@@ -43,11 +45,12 @@ export class ProjectStatusService {
         const { id, name, code, description, position: newPosition } = dto
 
         // We must shift positions of entities between old and new position of status
-        if (newPosition) {
-            const { position: oldPosition } = await this._prisma.projectStatus.findUniqueOrThrow({
-                where: { id },
-                select: { position: true },
-            })
+        if (typeof newPosition === 'number') {
+            const { position: oldPosition } =
+                await this._prisma.projectStatus.findUniqueOrThrow({
+                    where: { id },
+                    select: { position: true },
+                })
 
             if (newPosition > oldPosition) {
                 await this._prisma.projectStatus.updateMany({
@@ -86,19 +89,18 @@ export class ProjectStatusService {
         return updatedId
     }
 
-    async deleteOne(dto: {
-        id: string
-    }): Promise<string> {
+    async deleteOne(dto: { id: string }): Promise<string> {
         const { id } = dto
 
-        const statusOrmEntity = await this._prisma.projectStatus.findUnique({
-            where: { id },
-            include: { projects: true },
-        })
+        const statusOrmEntity =
+            await this._prisma.projectStatus.findUniqueOrThrow({
+                where: { id },
+                include: { projects: true },
+            })
 
         if (statusOrmEntity.projects.length) {
             throw new ProjectStatusDeleteInUseError({
-                usedByProjects: statusOrmEntity.projects.map(i => i.name),
+                usedByProjects: statusOrmEntity.projects.map((i) => i.name),
             })
         }
 
@@ -111,7 +113,80 @@ export class ProjectStatusService {
         return deletedId
     }
 
-    async findMany(): Promise<Awaited<ReturnType<typeof this._prisma.projectStatus.findMany>>> {
-        return await this._prisma.projectStatus.findMany()
+    async findMany(
+        dto: {
+            curPage?: number
+            perPage?: number
+
+            filterByName?: string
+            filterByCreatedAt?: {
+                from?: Date
+                to?: Date
+            }
+
+            orderBy?: {
+                field: 'position'
+                order: OrderEnum
+            }
+        } = {},
+    ): Promise<{
+        data: Awaited<
+            ReturnType<typeof PrismaService.instance.projectStatus.findMany>
+        >
+        meta: {
+            curPage: number
+            perPage: number
+            total: number
+        }
+    }> {
+        const { curPage, perPage, take, skip } = parseMetaArgs({
+            curPage: dto.curPage,
+            perPage: dto.perPage,
+        })
+
+        const delegateWhere: Prisma.ProjectStatusWhereInput = {
+            name: undefined,
+            createdAt: undefined,
+            isDeleted: false,
+        }
+
+        const delegateOrderBy: Prisma.ProjectStatusOrderByWithRelationAndSearchRelevanceInput =
+            dto.orderBy
+                ? { [dto.orderBy.field]: dto.orderBy.order }
+                : { position: 'asc' }
+
+        if (dto.filterByName) {
+            delegateWhere.name = {
+                contains: dto.filterByName,
+                mode: 'insensitive',
+            }
+        }
+
+        if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
+            delegateWhere.createdAt = {
+                gte: dto.filterByCreatedAt?.from ?? undefined,
+                lte: dto.filterByCreatedAt?.to ?? undefined,
+            }
+        }
+
+        const count = await this._prisma.projectStatus.count({
+            where: delegateWhere,
+        })
+
+        const data = await this._prisma.projectStatus.findMany({
+            where: delegateWhere,
+            orderBy: delegateOrderBy,
+            take,
+            skip,
+        })
+
+        return {
+            data,
+            meta: {
+                curPage,
+                perPage,
+                total: count,
+            },
+        }
     }
 }

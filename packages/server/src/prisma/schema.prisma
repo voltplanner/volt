@@ -2,6 +2,7 @@ generator client {
   provider      = "prisma-client-js"
   output        = "../../../../node_modules/generatedprisma"
   binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x"]
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -120,7 +121,6 @@ model Notification {
 model Project {
   id                   String                @id @default(uuid()) @db.Uuid
   name                 String                @db.VarChar(512)
-  number               Int
   description          String?
   createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt            DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -143,7 +143,7 @@ model Project {
 
 model ProjectStatus {
   id          String    @id @default(uuid()) @db.Uuid
-  code        String    @db.VarChar(36)
+  code        String    @unique @db.VarChar(36)
   name        String    @db.VarChar(64)
   position    Int       @default(autoincrement()) @db.SmallInt
   description String?
@@ -154,6 +154,7 @@ model ProjectStatus {
   projects    Project[]
 
   @@map("project_status")
+  @@unique([name, isDeleted])
 }
 
 model ProjectOnUser {
@@ -169,7 +170,7 @@ model ProjectOnUser {
 model Task {
   id                 String           @id @default(uuid()) @db.Uuid
   name               String           @db.VarChar(512)
-  number             Int
+  number             Int              @db.Integer @default(autoincrement())
   description        String?
   estimatedDateStart DateTime?        @map("estimated_date_start") @db.Timestamp(6)
   estimatedDateEnd   DateTime?        @map("estimated_date_end") @db.Timestamp(6)
@@ -223,7 +224,7 @@ model TaskEffort {
 
 model TaskType {
   id                String            @id @default(uuid()) @db.Uuid
-  code              String            @db.VarChar(36)
+  code              String            @unique @db.VarChar(36)
   name              String            @db.VarChar(64)
   position          Int               @default(autoincrement()) @db.SmallInt
   description       String?
@@ -241,7 +242,7 @@ model TaskType {
 
 model TaskStatus {
   id          String    @id @default(uuid()) @db.Uuid
-  code        String    @db.VarChar(36)
+  code        String    @unique @db.VarChar(36)
   name        String    @db.VarChar(64)
   position    Int       @default(autoincrement()) @db.SmallInt
   description String?
@@ -258,7 +259,7 @@ model TaskStatus {
 
 model TaskTag {
   id          String          @id @default(uuid()) @db.Uuid
-  code        String          @db.VarChar(36)
+  code        String          @unique @db.VarChar(36)
   name        String          @db.VarChar(64)
   position    Int             @default(autoincrement()) @db.SmallInt
   description String?
@@ -353,7 +354,7 @@ model TaskRelation {
 
 model TaskRelationType {
   id               String         @id @default(uuid()) @db.Uuid
-  code             String         @db.VarChar(36)
+  code             String         @unique @db.VarChar(36)
   name_main        String         @db.VarChar(64)
   name_foreign     String         @db.VarChar(64)
   position         Int            @default(autoincrement()) @db.SmallInt
@@ -386,7 +387,7 @@ model TaskCustomField {
 
 model TaskCustomFieldType {
   id                String                   @id @default(uuid()) @db.Uuid
-  code              String                   @db.VarChar(36)
+  code              String                   @unique @db.VarChar(36)
   name              String                   @db.VarChar(64)
   position          Int                      @default(autoincrement()) @db.SmallInt
   isEditable        Boolean?                 @map("is_editable")
@@ -411,7 +412,7 @@ model TaskCustomFieldType {
 
 model TaskCustomFieldValueType {
   id                     String                @id @default(uuid()) @db.Uuid
-  code                   String                @db.VarChar(36)
+  code                   String                @unique @db.VarChar(36)
   name                   String                @db.VarChar(64)
   createdAt              DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt              DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)

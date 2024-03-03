@@ -67,7 +67,7 @@ export class AuthUserService {
 
         const queryOptions: {
             where?: Prisma.AuthUserWhereInput
-            orderBy?: Prisma.AuthUserOrderByWithRelationInput
+            orderBy?: Prisma.AuthUserOrderByWithRelationAndSearchRelevanceInput
         } = {
             where: {
                 email: undefined,

@@ -15,10 +15,10 @@ For major changes, please open an issue first to discuss what you would like to 
 
 Before submitting a pull request please discuss with the core team by creating or commenting in an issue on [GitHub](https://www.github.com/voltplanner/volt/issues) – feel free to create topics in the [discussions](https://www.github.com/voltplanner/volt/discussions). If you’re looking for ways to get started, here's a list of ways to help us improve Volt:
 
-- Issues with [`good first issue`](https://github.com/voltplanner/volt/labels/good%20first%20issue) label
-- Performance improvements, both on server and frontend
-- Developer happiness and documentation
-- Bugs and other issues listed on GitHub
+-   Issues with [`good first issue`](https://github.com/voltplanner/volt/labels/good%20first%20issue) label
+-   Performance improvements, both on server and frontend
+-   Developer happiness and documentation
+-   Bugs and other issues listed on GitHub
 
 ## License
 

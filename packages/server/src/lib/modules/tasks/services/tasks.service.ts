@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../../shared/prisma";
+import { Injectable } from '@nestjs/common'
+
+import { PrismaService } from '../../../shared/prisma'
 
 // https://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/
 // https://postgres.men/database/postgresql/nested-sets-introduction/
@@ -15,17 +16,14 @@ import { PrismaService } from "../../../shared/prisma";
 
 @Injectable()
 export class TasksService {
-    constructor(
-        private readonly _prisma: PrismaService,
-    ) {}
-
+    constructor(private readonly _prisma: PrismaService) {}
 
     async findMany() {
         const qwe = await this._prisma.task.findMany({
             where: {
                 name: {
-                    in: ['1', '31', '2', '3', '4']
-                }
+                    in: ['1', '31', '2', '3', '4'],
+                },
             },
             include: {
                 children: {
@@ -34,14 +32,14 @@ export class TasksService {
                             include: {
                                 children: {
                                     include: {
-                                        children: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                        children: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         })
 
         const asd = qwe.map((i) => ({
@@ -69,12 +67,11 @@ export class TasksService {
                             lft: i.lft,
                             rgt: i.rgt,
                             level: i.level,
-                        }))
-                    }))
-                }))
-            }))
+                        })),
+                    })),
+                })),
+            })),
         }))
-
 
         console.log(JSON.stringify(asd, null, 4))
     }
@@ -115,7 +112,7 @@ export class TasksService {
         // For parent/highter nodes we increase right key by appended nodes count * 2. But we always create only one node at same time, without childrens, so we can just increment by 2.
         await this._prisma.task.updateMany({
             data: {
-                rgt: { increment: 2 }
+                rgt: { increment: 2 },
             },
             where: {
                 rgt: { gte: newLft },
@@ -125,7 +122,7 @@ export class TasksService {
         // For highter nodes we must to increase left key as the right key.
         await this._prisma.task.updateMany({
             data: {
-                lft: { increment: 2 }
+                lft: { increment: 2 },
             },
             where: {
                 lft: { gt: newLft },
@@ -151,7 +148,7 @@ export class TasksService {
                 projectId,
                 createdById,
                 parentId,
-            }
+            },
         })
 
         return result.id
@@ -159,10 +156,7 @@ export class TasksService {
 
     // Nested Set Notes:
     // Method moves the node and all its children to the new parent if parentId is specified
-    async update(dto: {
-        id: string
-        parentId: string
-    }): Promise<string> {
+    async update(dto: { id: string; parentId: string }): Promise<string> {
         const { id, parentId } = dto
 
         const parent = await this._prisma.task.findUniqueOrThrow({
@@ -177,7 +171,9 @@ export class TasksService {
         const keysToMoveCount = task.rgt - task.lft + 1
 
         // Hide replaced tree. Set negative keys to tree whitch we want to replace.
-        await this._prisma.$queryRawUnsafe(`UPDATE task SET lft = 0 - lft, rgt = 0 - rgt WHERE lft >= ${task.lft} AND rgt <= ${task.rgt};`)
+        await this._prisma.$queryRawUnsafe(
+            `UPDATE task SET lft = 0 - lft, rgt = 0 - rgt WHERE lft >= ${task.lft} AND rgt <= ${task.rgt};`,
+        )
 
         // Collapse place from where we cut the replaced tree
         await this._prisma.task.updateMany({
@@ -198,7 +194,8 @@ export class TasksService {
         })
 
         // Define expand size
-        const pr = parent.rgt > task.rgt ? parent.rgt - keysToMoveCount : parent.rgt
+        const pr =
+            parent.rgt > task.rgt ? parent.rgt - keysToMoveCount : parent.rgt
 
         // Expand place for the replaced tree
         await this._prisma.task.updateMany({
@@ -219,14 +216,19 @@ export class TasksService {
         })
 
         // Paste replaced tree
-        const pd = (parent.rgt > task.rgt) ? parent.rgt - task.rgt - 1 : parent.rgt - task.rgt - 1 + keysToMoveCount
+        const pd =
+            parent.rgt > task.rgt
+                ? parent.rgt - task.rgt - 1
+                : parent.rgt - task.rgt - 1 + keysToMoveCount
         const dl = parent.level + 1 - task.level
-        await this._prisma.$queryRawUnsafe(`UPDATE task SET lft = ${pd} - lft, rgt = ${pd} - rgt, level = level + ${dl} WHERE lft <= 0 - ${task.lft} AND rgt >= 0 - ${task.rgt};`)
+        await this._prisma.$queryRawUnsafe(
+            `UPDATE task SET lft = ${pd} - lft, rgt = ${pd} - rgt, level = level + ${dl} WHERE lft <= 0 - ${task.lft} AND rgt >= 0 - ${task.rgt};`,
+        )
 
         // Set new parent to replaced tree root task
         await this._prisma.task.update({
             where: { id },
-            data: { parentId }
+            data: { parentId },
         })
 
         return id
@@ -234,9 +236,7 @@ export class TasksService {
 
     // Nested Set Notes:
     // Method deletes node, but retains children. If deleted node had parent, then all closest children of the deleted node will become its children.
-    async delete(dto: {
-        id: string
-    }): Promise<string> {
+    async delete(dto: { id: string }): Promise<string> {
         const { id } = dto
 
         // Delete task
@@ -260,7 +260,7 @@ export class TasksService {
         await this._prisma.task.updateMany({
             data: {
                 lft: { decrement: 1 },
-                rgt: { decrement: 1 }
+                rgt: { decrement: 1 },
             },
             where: {
                 lft: { gt: task.lft },
@@ -283,7 +283,7 @@ export class TasksService {
         // For parent nodes - we need to decrease only right key by 2. Because the left side of the tree remains the same
         await this._prisma.task.updateMany({
             data: {
-                rgt: { decrement: 2 }
+                rgt: { decrement: 2 },
             },
             where: {
                 rgt: { gt: task.rgt },

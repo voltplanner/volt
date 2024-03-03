@@ -7,7 +7,12 @@ interface ParseMetaArgsPayload {
     }
 }
 
-export function parseMetaArgs(data: ParseMetaArgsPayload) {
+export function parseMetaArgs(data: ParseMetaArgsPayload): {
+    take: number
+    skip: number
+    curPage: number
+    perPage: number
+} {
     const { curPage, perPage } = data
 
     let { defaults } = data
@@ -26,7 +31,7 @@ export function parseMetaArgs(data: ParseMetaArgsPayload) {
             : parsedPerPage * parsedCurrentPage - parsedPerPage
 
     return {
-        take: perPage,
+        take: parsedPerPage,
         skip,
         curPage: parsedCurrentPage,
         perPage: parsedPerPage,
