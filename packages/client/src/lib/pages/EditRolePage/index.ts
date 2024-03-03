@@ -1,2 +1,2 @@
 import EditRolePage from './ui/EditRolePage'
-export default EditRolePage 
+export default EditRolePage

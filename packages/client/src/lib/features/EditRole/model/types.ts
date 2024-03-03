@@ -22,8 +22,8 @@ type TRole = {
 export type TChangedPermissions = Pick<TMethod, 'id' | 'allowed'>
 export interface RoleStore {
     role: TRole
-    methodsSeparated: TMethodGroup[],
-    methodsChanged: TChangedPermissions[],
+    methodsSeparated: TMethodGroup[]
+    methodsChanged: TChangedPermissions[]
     separateMethods: () => void
     setRole: (role: TRole) => void
     toggleMethod: (id: string) => void

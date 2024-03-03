@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from 'styled-components'
 
 export const WrapperStyled = styled.div`
     display: flex;
@@ -11,5 +11,5 @@ export const RulesStyled = styled.div`
     flex-wrap: wrap;
     gap: 20px 100px;
     align-content: start;
-    height: 160px;
+    max-height: 160px;
 `

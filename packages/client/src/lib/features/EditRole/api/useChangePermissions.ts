@@ -13,9 +13,12 @@ export const useChangePermissions = (payload: ChangePermissionsInput) => {
         },
     })
 
-    const [changePermissions, { data, loading, error }] = useMutation(gql(query), {
-        variables,
-    })
+    const [changePermissions, { data, loading, error }] = useMutation(
+        gql(query),
+        {
+            variables,
+        },
+    )
 
     return {
         changePermissions,

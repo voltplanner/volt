@@ -1,5 +1,4 @@
 import { Checkbox, Header } from 'shared'
-import styled from 'styled-components'
 import { RulesStyled, WrapperStyled } from './styles'
 
 type TGroup = {

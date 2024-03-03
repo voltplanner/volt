@@ -11,8 +11,8 @@ export const useRoles = (name: string) => {
                     curPage: 1,
                     perPage: 10,
                     filter: {
-                        name
-                    }
+                        name,
+                    },
                 },
             },
             data: {
@@ -26,12 +26,12 @@ export const useRoles = (name: string) => {
                     editable: true,
                     group: true,
                     id: true,
-                    name: true
-                }
+                    name: true,
+                },
             },
             meta: {
-                total: true
-            }
+                total: true,
+            },
         },
     })
 

@@ -17,7 +17,7 @@ export const useRoles = () => {
                 id: true,
                 name: true,
                 superuser: true,
-            }
+            },
         },
     })
 

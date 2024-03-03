@@ -1,8 +1,7 @@
-import styled from "styled-components"
+import styled from 'styled-components'
 
 export const PageContainerStyled = styled.div`
     width: 100%;
-    height: 100%;
     background-color: #f6f6f6;
     display: flex;
     flex-direction: column;
@@ -13,11 +12,15 @@ export const WrapperStyled = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 60px;
 `
 export const ContentStyled = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 30px;
+`
+export const ButtonsContainer = styled.div`
+    display: flex;
     width: 100%;
-    gap: 60px;
+    justify-content: start;
 `
