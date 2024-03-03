@@ -5,7 +5,7 @@ import { RoleGroup } from './RoleGroup'
 import { Skeleton } from 'shared'
 
 export const RoleList = () => {
-    const { data, loading, error } = useRoles()
+    const { data, loading } = useRoles()
     console.log(data)
     if (loading) {
         return (

@@ -8,14 +8,16 @@ export const useRoles = () => {
         getRoles: {
             __args: {
                 input: {
-                    userId: ''
+                    curPage: 1,
+                    perPage: 10,
                 },
             },
-            editable: true,
-            id: true,
-            name: true,
-            superuser: true,
-            
+            data: {
+                editable: true,
+                id: true,
+                name: true,
+                superuser: true,
+            }
         },
     })
 
@@ -23,7 +25,7 @@ export const useRoles = () => {
         variables,
     })
     return {
-        data: data?.getRoles,
+        data: data?.getRoles.data,
         loading,
         error,
     }

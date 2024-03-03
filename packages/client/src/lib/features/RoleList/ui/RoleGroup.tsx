@@ -8,10 +8,10 @@ import { RoleGroups } from '../model/types'
 import { useNavigate } from 'react-router-dom'
 
 export const RoleGroup = ({ group }: RoleGroups) => {
-    const { editable, id, methods, name, superuser } = group
+    const { editable, name, superuser } = group
     const navigate = useNavigate()
     const handleNavigate = () => {
-        navigate('/roles/' + id, { state: { methods: methods } })
+        navigate('/roles/' + name)
     }
     return (
         <WrapperStyled>
