@@ -1,12 +1,12 @@
 import { Test } from '@nestjs/testing'
 
 import { environment } from '../../environments/environment'
-import { ProjectStatusService } from '../modules/project/index'
+import { TaskProjectStatusRepository } from '../modules/task/repositories/task-project-status.repository'
 import { OrderEnum } from '../shared/interfaces/shared.interfaces'
 import { PrismaModule, PrismaService } from '../shared/prisma'
 
 describe('Project Status', () => {
-    let projectsStatusService: ProjectStatusService
+    let taskProjectStatusRepository: TaskProjectStatusRepository
     let prismaService: PrismaService
 
     beforeAll(async () => {
@@ -16,26 +16,26 @@ describe('Project Status', () => {
                     url: environment.databaseUrl,
                 }),
             ],
-            providers: [ProjectStatusService],
+            providers: [TaskProjectStatusRepository],
         }).compile()
 
-        projectsStatusService =
-            moduleRef.get<ProjectStatusService>(ProjectStatusService)
+        taskProjectStatusRepository =
+            moduleRef.get<TaskProjectStatusRepository>(TaskProjectStatusRepository)
         prismaService = moduleRef.get<PrismaService>(PrismaService)
     })
 
     afterEach(async () => {
-        await prismaService.projectStatus.deleteMany()
+        await prismaService.taskProjectStatus.deleteMany()
     })
 
     it('Should create statuses', async () => {
-        const id = await projectsStatusService.createOne({
+        const id = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
 
-        const ormEntity = await prismaService.projectStatus.findUnique({
+        const ormEntity = await prismaService.taskProjectStatus.findUnique({
             where: { id, isDeleted: false },
         })
 
@@ -47,21 +47,21 @@ describe('Project Status', () => {
     })
 
     it('Should create statuses with correct position', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
 
-        const ormEntity_1 = await prismaService.projectStatus.findUnique({
+        const ormEntity_1 = await prismaService.taskProjectStatus.findUnique({
             where: { id: id_1, isDeleted: false },
         })
-        const ormEntity_2 = await prismaService.projectStatus.findUnique({
+        const ormEntity_2 = await prismaService.taskProjectStatus.findUnique({
             where: { id: id_2, isDeleted: false },
         })
 
@@ -70,28 +70,28 @@ describe('Project Status', () => {
     })
 
     it('Should update statuses with position that highter then old', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        await projectsStatusService.updateOne({
+        await taskProjectStatusRepository.update({
             id: id_2,
             position: 2,
         })
 
-        const ormEntities = await prismaService.projectStatus.findMany({
+        const ormEntities = await prismaService.taskProjectStatus.findMany({
             where: { isDeleted: false },
         })
 
@@ -101,28 +101,28 @@ describe('Project Status', () => {
     })
 
     it('Should update statuses with position that lower then old', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        await projectsStatusService.updateOne({
+        await taskProjectStatusRepository.update({
             id: id_2,
             position: 0,
         })
 
-        const ormEntities = await prismaService.projectStatus.findMany({
+        const ormEntities = await prismaService.taskProjectStatus.findMany({
             where: { isDeleted: false },
         })
 
@@ -132,17 +132,17 @@ describe('Project Status', () => {
     })
 
     it('Should update status with isDeleted instead of deleting it', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
 
-        await projectsStatusService.deleteOne({
+        await taskProjectStatusRepository.delete({
             id: id_1,
         })
 
-        const ormEntity = await prismaService.projectStatus.findUnique({
+        const ormEntity = await prismaService.taskProjectStatus.findUnique({
             where: { id: id_1 },
         })
 
@@ -150,27 +150,27 @@ describe('Project Status', () => {
     })
 
     it('Should not return deleted statuses', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        await projectsStatusService.deleteOne({
+        await taskProjectStatusRepository.delete({
             id: id_2,
         })
 
-        const ormEntities = await projectsStatusService.findMany()
+        const ormEntities = await taskProjectStatusRepository.findMany()
 
         expect(ormEntities.data).toHaveLength(2)
         expect(ormEntities.data.find((i) => i.id === id_1)).toBeDefined()
@@ -179,23 +179,23 @@ describe('Project Status', () => {
     })
 
     it('Should return data filtered by name', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        const ormEntities = await projectsStatusService.findMany({
+        const ormEntities = await taskProjectStatusRepository.findMany({
             filterByName: 'name_1',
         })
 
@@ -206,39 +206,39 @@ describe('Project Status', () => {
     })
 
     it('Should return data filtered by created date', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
 
-        await new Promise(r => setTimeout(r, 100))
+        await new Promise((r) => setTimeout(r, 100))
         const createdFrom = new Date()
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
         const createdTo = new Date()
-        await new Promise(r => setTimeout(r, 100))
+        await new Promise((r) => setTimeout(r, 100))
 
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        const ormEntitiesFrom = await projectsStatusService.findMany({
+        const ormEntitiesFrom = await taskProjectStatusRepository.findMany({
             filterByCreatedAt: {
                 from: createdFrom,
             },
         })
-        const ormEntitiesTo = await projectsStatusService.findMany({
+        const ormEntitiesTo = await taskProjectStatusRepository.findMany({
             filterByCreatedAt: {
                 to: createdTo,
             },
         })
-        const ormEntitiesBoth = await projectsStatusService.findMany({
+        const ormEntitiesBoth = await taskProjectStatusRepository.findMany({
             filterByCreatedAt: {
                 from: createdFrom,
                 to: createdTo,
@@ -262,27 +262,27 @@ describe('Project Status', () => {
     })
 
     it('Should return paginated data', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        const ormEntities_1 = await projectsStatusService.findMany({
+        const ormEntities_1 = await taskProjectStatusRepository.findMany({
             perPage: 2,
             curPage: 1,
         })
-        const ormEntities_2 = await projectsStatusService.findMany({
+        const ormEntities_2 = await taskProjectStatusRepository.findMany({
             perPage: 2,
             curPage: 2,
         })
@@ -301,27 +301,27 @@ describe('Project Status', () => {
     })
 
     it('Should return ordered data', async () => {
-        const id_1 = await projectsStatusService.createOne({
+        const id_1 = await taskProjectStatusRepository.create({
             name: 'name_1',
             code: 'code_1',
             description: 'description_1',
         })
-        const id_2 = await projectsStatusService.createOne({
+        const id_2 = await taskProjectStatusRepository.create({
             name: 'name_2',
             code: 'code_2',
             description: 'description_2',
         })
-        const id_3 = await projectsStatusService.createOne({
+        const id_3 = await taskProjectStatusRepository.create({
             name: 'name_3',
             code: 'code_3',
             description: 'description_3',
         })
 
-        const ormEntities = await projectsStatusService.findMany({
+        const ormEntities = await taskProjectStatusRepository.findMany({
             orderBy: {
                 field: 'position',
                 order: OrderEnum.DESC,
-            }
+            },
         })
 
         expect(ormEntities.data[0].id).toEqual(id_3)

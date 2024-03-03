@@ -11,7 +11,7 @@ datasource db {
 }
 
 model AuthUser {
-  id           String  @id @default(uuid())
+  id           String  @id @default(uuid()) @db.Uuid
   email        String  @unique
   firstname    String
   lastname     String
@@ -19,15 +19,15 @@ model AuthUser {
   completeCode String?
 
   role   AuthRole @relation(fields: [roleId], references: [id])
-  roleId String
+  roleId String @db.Uuid
 
   status    AuthUserStatusEnum @default(WAITING_COMPLETE)
   createdAt DateTime           @default(now())
   deletedAt DateTime?
   tokens    AuthRefreshToken[]
 
-  projectsCreatedBy Project[]
-  projects          ProjectOnUser[]
+  projectsCreatedBy TaskProject[]
+  projects          TaskProjectOnUser[]
   tasksAssignedTo   Task[]             @relation("FK__TASK__ASSIGNED_TO")
   tasksCreatedBy    Task[]             @relation("FK__TASK__CREATED_BY")
   attachments       TaskAttachment[]
@@ -95,8 +95,8 @@ model SystemSettings {
 }
 
 model NotificationPreferences {
-  id              String         @id @default(uuid())
-  externalUserId  String         @unique
+  id              String         @id @default(uuid()) @db.Uuid
+  externalUserId  String         @unique @db.Uuid
   emailEnabled    Boolean
   email           String?
   webEnabled      Boolean
@@ -106,7 +106,7 @@ model NotificationPreferences {
 }
 
 model Notification {
-  id            String                   @id @default(uuid())
+  id            String                   @id @default(uuid()) @db.Uuid
   topic         String
   message       String
   link          String?
@@ -115,13 +115,14 @@ model Notification {
   sentAt        DateTime?
   error         String?
   Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
-  preferencesId String?
+  preferencesId String? @db.Uuid
 }
 
-model Project {
+model TaskProject {
   id                   String                @id @default(uuid()) @db.Uuid
   name                 String                @db.VarChar(512)
   description          String?
+  version              Int                   @db.Integer @default(0)
   createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt            DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
   deletedAt            DateTime?             @map("deleted_at") @db.Timestamp(6)
@@ -129,8 +130,8 @@ model Project {
   statusId             String                @map("status_id") @db.Uuid
   createdById          String                @map("created_by_id") @db.Uuid
   createdBy            AuthUser              @relation(fields: [createdById], references: [id], map: "FK__PROJECT__CREATED_BY")
-  status               ProjectStatus         @relation(fields: [statusId], references: [id], map: "FK__PROJECT__STATUS")
-  users                ProjectOnUser[]
+  status               TaskProjectStatus     @relation(fields: [statusId], references: [id], map: "FK__PROJECT__STATUS")
+  users                TaskProjectOnUser[]
   tasks                Task[]
   tasksCustomFields    TaskCustomFieldType[]
   tasksConnectionTypes TaskRelationType[]
@@ -138,33 +139,34 @@ model Project {
   tasksTags            TaskTag[]
   tasksTypes           TaskType[]
 
-  @@map("project")
+  @@map("task_project")
 }
 
-model ProjectStatus {
+model TaskProjectStatus {
   id          String    @id @default(uuid()) @db.Uuid
   code        String    @unique @db.VarChar(36)
   name        String    @db.VarChar(64)
-  position    Int       @default(autoincrement()) @db.SmallInt
+  position    Int       @db.SmallInt
   description String?
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
   deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
   isDeleted   Boolean   @default(false) @map("is_deleted")
-  projects    Project[]
+  projects    TaskProject[]
 
-  @@map("project_status")
+  @@map("task_project_status")
   @@unique([name, isDeleted])
+  @@unique([position, isDeleted])
 }
 
-model ProjectOnUser {
+model TaskProjectOnUser {
   projectId String   @map("project_id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
-  project   Project  @relation(fields: [projectId], references: [id], map: "FK__PROJECT_ON_USER__PROJECT")
+  project   TaskProject  @relation(fields: [projectId], references: [id], map: "FK__PROJECT_ON_USER__PROJECT")
   user      AuthUser @relation(fields: [userId], references: [id], map: "FK__PROJECT_ON_USER__USER")
 
+  @@map("task_project_on_user")
   @@id([projectId, userId], map: "PK__PROJECT_ON_USER")
-  @@map("project_on_user")
 }
 
 model Task {
@@ -190,7 +192,7 @@ model Task {
   parentId           String?          @map("parent_id") @db.Uuid
   assignedTo         AuthUser?        @relation("FK__TASK__ASSIGNED_TO", fields: [assignedToId], references: [id], map: "FK__TASK__ASSIGNED_TO")
   createdBy          AuthUser         @relation("FK__TASK__CREATED_BY", fields: [createdById], references: [id], map: "FK__TASK__CREATED_BY")
-  project            Project          @relation(fields: [projectId], references: [id], map: "FK__TASK__PROJECT")
+  project            TaskProject          @relation(fields: [projectId], references: [id], map: "FK__TASK__PROJECT")
   status             TaskStatus       @relation(fields: [statusId], references: [id], map: "FK__TASK__STATUS")
   type               TaskType         @relation(fields: [typeId], references: [id], map: "FK__TASK__TYPE")
   parent             Task?            @relation("FK__TASK__PARENT", fields: [parentId], references: [id])
@@ -226,7 +228,7 @@ model TaskType {
   id                String            @id @default(uuid()) @db.Uuid
   code              String            @unique @db.VarChar(36)
   name              String            @db.VarChar(64)
-  position          Int               @default(autoincrement()) @db.SmallInt
+  position          Int               @db.SmallInt
   description       String?
   createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt         DateTime          @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -235,16 +237,17 @@ model TaskType {
   projectId         String            @map("project_id") @db.Uuid
   tasks             Task[]
   tasksCustomFields TaskCustomField[]
-  project           Project           @relation(fields: [projectId], references: [id], map: "FK__TASK_TYPE__PROJECT")
+  project           TaskProject           @relation(fields: [projectId], references: [id], map: "FK__TASK_TYPE__PROJECT")
 
   @@map("task_type")
+  @@unique([position, isDeleted])
 }
 
 model TaskStatus {
   id          String    @id @default(uuid()) @db.Uuid
   code        String    @unique @db.VarChar(36)
   name        String    @db.VarChar(64)
-  position    Int       @default(autoincrement()) @db.SmallInt
+  position    Int       @db.SmallInt
   description String?
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -252,16 +255,17 @@ model TaskStatus {
   isDeleted   Boolean   @default(false) @map("is_deleted")
   projectId   String    @map("project_id") @db.Uuid
   tasks       Task[]
-  project     Project   @relation(fields: [projectId], references: [id], map: "FK__TASK_STATUS__PROJECT")
+  project     TaskProject   @relation(fields: [projectId], references: [id], map: "FK__TASK_STATUS__PROJECT")
 
   @@map("task_status")
+  @@unique([position, isDeleted])
 }
 
 model TaskTag {
   id          String          @id @default(uuid()) @db.Uuid
   code        String          @unique @db.VarChar(36)
   name        String          @db.VarChar(64)
-  position    Int             @default(autoincrement()) @db.SmallInt
+  position    Int             @db.SmallInt
   description String?
   createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime        @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -269,9 +273,10 @@ model TaskTag {
   isDeleted   Boolean         @default(false) @map("is_deleted")
   projectId   String          @map("project_id") @db.Uuid
   tasks       TaskOnTaskTag[]
-  project     Project         @relation(fields: [projectId], references: [id], map: "FK__TASK_TAG__PROJECT")
+  project     TaskProject         @relation(fields: [projectId], references: [id], map: "FK__TASK_TAG__PROJECT")
 
   @@map("task_tag")
+  @@unique([position, isDeleted])
 }
 
 model TaskOnTaskTag {
@@ -357,7 +362,7 @@ model TaskRelationType {
   code             String         @unique @db.VarChar(36)
   name_main        String         @db.VarChar(64)
   name_foreign     String         @db.VarChar(64)
-  position         Int            @default(autoincrement()) @db.SmallInt
+  position         Int            @db.SmallInt
   description      String?
   createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt        DateTime       @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -365,9 +370,10 @@ model TaskRelationType {
   isDeleted        Boolean        @default(false) @map("is_deleted")
   projectId        String         @map("project_id") @db.Uuid
   tasksConnections TaskRelation[]
-  project          Project        @relation(fields: [projectId], references: [id], map: "FK__TASK_RELATION_TYPE__PROJECT")
+  project          TaskProject        @relation(fields: [projectId], references: [id], map: "FK__TASK_RELATION_TYPE__PROJECT")
 
   @@map("task_relation_type")
+  @@unique([position, isDeleted])
 }
 
 model TaskCustomField {
@@ -389,7 +395,7 @@ model TaskCustomFieldType {
   id                String                   @id @default(uuid()) @db.Uuid
   code              String                   @unique @db.VarChar(36)
   name              String                   @db.VarChar(64)
-  position          Int                      @default(autoincrement()) @db.SmallInt
+  position          Int                      @db.SmallInt
   isEditable        Boolean?                 @map("is_editable")
   isRequired        Boolean?                 @map("is_required")
   isSearchable      Boolean?                 @map("is_searchable")
@@ -404,10 +410,11 @@ model TaskCustomFieldType {
   valueTypeId       String                   @map("value_type_id") @db.Uuid
   projectId         String                   @map("project_id") @db.Uuid
   tasksCustomFields TaskCustomField[]
-  project           Project                  @relation(fields: [projectId], references: [id], map: "FK__TASK_CUSTOM_FIELD_TYPE__PROJECT")
+  project           TaskProject                  @relation(fields: [projectId], references: [id], map: "FK__TASK_CUSTOM_FIELD_TYPE__PROJECT")
   valueType         TaskCustomFieldValueType @relation(fields: [valueTypeId], references: [id], map: "FK__TASK_CUSTOM_FIELD_TYPE__VALUE_TYPE")
 
   @@map("task_custom_field_type")
+  @@unique([position, isDeleted])
 }
 
 model TaskCustomFieldValueType {
