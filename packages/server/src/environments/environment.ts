@@ -19,12 +19,16 @@ export const environment = {
             .asInt(),
         secret: get('JWT_SECRET').required().asString(),
     },
-    mailer: {
+    notifications: {
         transport: parseSmtpConnectionUrl(
             get('SMTP_URL').required().asUrlString(),
         ),
         defaults: {
-            from: get('SMTP_NO_REPLY_EMAIL'),
+            from: get('SMTP_NO_REPLY_EMAIL').required().asString(),
+        },
+        telegram: {
+            botToken: get('TELEGRAM_BOT_TOKEN').asString(),
+            rootUrl: get('ROOT_URL').required().asUrlString(),
         },
     },
 }

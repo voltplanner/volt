@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt'
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken'
 
 import { PrismaService } from '../../../shared/prisma'
-import { AUTH_CONFIG, AuthConfig } from '../auth.config'
+import { AUTH_CONFIG, AuthConfig } from '../configs/auth-module.config'
 import { RefreshTokenPayload } from '../interfaces/auth.interfaces'
 
 @Injectable()

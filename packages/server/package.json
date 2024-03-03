@@ -20,6 +20,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "env-var": "^7.4.1",
+    "grammy": "^1.21.1",
     "graphql": "^16.8.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",

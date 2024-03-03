@@ -8,7 +8,7 @@ import {
 import { PaginatedResponse } from '../../../shared/interfaces/shared.interfaces'
 import { Prisma, PrismaService } from '../../../shared/prisma'
 import { parseMetaArgs } from '../../../shared/utils'
-import { AUTH_CONFIG, AuthConfig } from '../auth.config'
+import { AUTH_CONFIG, AuthConfig } from '../configs/auth-module.config'
 import {
     ChangePermissionPayload,
     CreateRole,

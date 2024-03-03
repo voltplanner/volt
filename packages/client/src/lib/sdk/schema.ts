@@ -37,6 +37,12 @@ export interface RoleType {
     __typename: 'RoleType'
 }
 
+export interface PaginatedRoles {
+    data: RoleType[]
+    meta: PaginatedMetaType
+    __typename: 'PaginatedRoles'
+}
+
 export interface UserType {
     id: Scalars['ID']
     firstname: Scalars['String']
@@ -66,8 +72,8 @@ export interface AuthorizationResponse {
 
 export interface Query {
     getUsers: PaginatedUsers
-    getRoles: RoleType[]
-    getRole: RoleType
+    getRoles: PaginatedRoles
+    getMyRole: RoleType
     getUser: UserType
     __typename: 'Query'
 }
@@ -118,6 +124,13 @@ export interface RoleTypeGenqlSelection {
     __scalar?: boolean | number
 }
 
+export interface PaginatedRolesGenqlSelection {
+    data?: RoleTypeGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface UserTypeGenqlSelection {
     id?: boolean | number
     firstname?: boolean | number
@@ -150,8 +163,10 @@ export interface QueryGenqlSelection {
     getUsers?: PaginatedUsersGenqlSelection & {
         __args: { input: GetUsersInput }
     }
-    getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
+    getRoles?: PaginatedRolesGenqlSelection & {
+        __args: { input: GetRolesInput }
+    }
+    getMyRole?: RoleTypeGenqlSelection
     getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -178,7 +193,12 @@ export interface GetUsersFilterInput {
 }
 
 export interface GetRolesInput {
-    userId: Scalars['ID']
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+    filter?: GetRolesFilterInput | null
+}
+
+export interface GetRolesFilterInput {
     name?: Scalars['String'] | null
 }
 
@@ -299,6 +319,15 @@ export const isRoleType = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isRoleType"')
     return RoleType_possibleTypes.includes(obj.__typename)
+}
+
+const PaginatedRoles_possibleTypes: string[] = ['PaginatedRoles']
+export const isPaginatedRoles = (
+    obj?: { __typename?: any } | null,
+): obj is PaginatedRoles => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isPaginatedRoles"')
+    return PaginatedRoles_possibleTypes.includes(obj.__typename)
 }
 
 const UserType_possibleTypes: string[] = ['UserType']

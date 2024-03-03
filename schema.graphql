@@ -25,6 +25,11 @@ type RoleType {
   methods: [MethodsType!]!
 }
 
+type PaginatedRoles {
+  data: [RoleType!]!
+  meta: PaginatedMetaType!
+}
+
 type UserType {
   id: ID!
   firstname: String!
@@ -60,8 +65,8 @@ type AuthorizationResponse {
 
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
-  getRoles(input: GetRolesInput!): [RoleType!]!
-  getRole(input: GetRolesInput!): RoleType!
+  getRoles(input: GetRolesInput!): PaginatedRoles!
+  getMyRole: RoleType!
   getUser(input: GetUserInput!): UserType!
 }
 
@@ -91,7 +96,12 @@ input GetUsersFilterInput {
 }
 
 input GetRolesInput {
-  userId: ID!
+  curPage: Float
+  perPage: Float
+  filter: GetRolesFilterInput
+}
+
+input GetRolesFilterInput {
   name: String
 }
 

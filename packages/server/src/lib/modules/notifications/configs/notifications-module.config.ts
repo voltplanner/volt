@@ -3,6 +3,10 @@ import { MailerOptions } from '@nestjs-modules/mailer'
 import { merge } from 'lodash'
 
 export type NotificationsConfig = MailerOptions & {
+    telegram?: {
+        botToken?: string
+        rootUrl: string
+    }
     temp?: boolean
 }
 

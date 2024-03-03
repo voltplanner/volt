@@ -14,14 +14,18 @@ import {
     PrismaService,
 } from '../../../shared/prisma'
 import { parseMetaArgs } from '../../../shared/utils'
-import { AUTH_CONFIG, AuthConfig } from '../auth.config'
+import {
+    AUTH_EVENTS,
+    AuthEventPattern,
+    AuthEventServiceInterface,
+} from '../configs/auth-events.config'
+import { AUTH_CONFIG, AuthConfig } from '../configs/auth-module.config'
 import {
     ChangeUserRolePayload,
     CreateUser,
     GetUsers,
     UpdateUser,
 } from '../interfaces/auth.interfaces'
-import { AuthEventPattern, AuthEventsService } from './auth-events.service'
 
 @Injectable()
 export class AuthUserService {
@@ -30,8 +34,9 @@ export class AuthUserService {
     constructor(
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
+        @Inject(AUTH_EVENTS)
+        private readonly events: AuthEventServiceInterface,
         private readonly prisma: PrismaService,
-        private readonly events: AuthEventsService,
     ) {}
 
     async getUser(userId: string) {
@@ -225,7 +230,7 @@ export class AuthUserService {
                 lastname,
                 role: {
                     connect: {
-                        name: roleName,
+                        name: roleName.toLowerCase(),
                     },
                 },
                 completeCode: hashedCode,
@@ -238,6 +243,7 @@ export class AuthUserService {
             data: {
                 userId: user.id,
                 code: code,
+                email: user.email,
             },
         })
 
