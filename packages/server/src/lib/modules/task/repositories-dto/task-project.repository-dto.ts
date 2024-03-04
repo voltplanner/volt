@@ -24,7 +24,7 @@ export class TaskProjectFindManyRepositoryDto {
     perPage?: number
 
     filterByName?: string
-    filterByStatus?: string
+    filterByStatusId?: string
     filterByCreatedAt?: {
         from?: Date
         to?: Date

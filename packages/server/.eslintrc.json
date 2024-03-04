@@ -9,7 +9,7 @@
                 "simple-import-sort/imports": "warn",
                 "simple-import-sort/exports": "warn",
                 "@typescript-eslint/no-explicit-any": "off",
-                "max-len": ["error", { "code": 120, "ignoreComments": true, "ignoreTrailingComments": true, "ignoreUrls": true, "ignoreRegExpLiterals": true }]
+                "max-len": ["error", { "code": 120, "ignoreTemplateLiterals": true, "ignoreStrings": true, "ignoreComments": true, "ignoreTrailingComments": true, "ignoreUrls": true, "ignoreRegExpLiterals": true }]
             }
         },
         {

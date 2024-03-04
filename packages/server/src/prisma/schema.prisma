@@ -383,8 +383,8 @@ model TaskRelation {
 model TaskRelationType {
     id               String         @id @default(uuid()) @db.Uuid
     code             String         @unique @db.VarChar(36)
-    name_main        String         @db.VarChar(64)
-    name_foreign     String         @db.VarChar(64)
+    nameMain        String         @db.VarChar(64) @map("name_main")
+    nameForeign     String         @db.VarChar(64) @map("name_foreign")
     position         Int            @db.SmallInt
     description      String?
     createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamp(6)

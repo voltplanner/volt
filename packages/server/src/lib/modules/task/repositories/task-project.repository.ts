@@ -83,16 +83,6 @@ export class TaskProjectRepository {
 
             const { id } = dto
 
-            const ormEntity =
-                await client.taskProject.findUniqueOrThrow({
-                    where: { id },
-                    include: { tasks: true },
-                })
-
-            if (ormEntity.tasks.length) {
-                throw new TaskProjectDeleteContainsRelatedTasksError()
-            }
-
             const { id: deletedId } = await client.taskProject.update({
                 where: { id },
                 data: {
@@ -145,8 +135,8 @@ export class TaskProjectRepository {
                 }
             }
 
-            if (dto.filterByStatus) {
-                delegateWhere.statusId = dto.filterByStatus
+            if (dto.filterByStatusId) {
+                delegateWhere.statusId = dto.filterByStatusId
             }
 
             if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
