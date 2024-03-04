@@ -35,3 +35,13 @@ export class TaskProjectFindManyRepositoryDto {
         order: OrderEnum
     }
 }
+
+export class TaskProjectConnectUserRepositoryDto {
+    userId: string
+    projectId: string
+}
+
+export class TaskProjectDisconnectUserRepositoryDto {
+    userId: string
+    projectId: string
+}

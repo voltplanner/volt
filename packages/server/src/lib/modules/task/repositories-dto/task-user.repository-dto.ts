@@ -1,7 +1,11 @@
 export class TaskUserCreateRepositoryDto {
-    externalId: string
+    externalUserId: string
 }
 
 export class TaskUserDeleteRepositoryDto {
-    externalId: string
+    externalUserId: string
+}
+
+export class TaskUserGetOneByExternalUserIdRepositoryDto {
+    externalUserId: string
 }

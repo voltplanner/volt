@@ -7,8 +7,10 @@ import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
 import { TaskProjectDeleteContainsRelatedTasksError } from '../errors/task-project-delete-contains-related-tasks.error'
 import {
+    TaskProjectConnectUserRepositoryDto,
     TaskProjectCreateRepositoryDto,
     TaskProjectDeleteRepositoryDto,
+    TaskProjectDisconnectUserRepositoryDto,
     TaskProjectFindManyRepositoryDto,
     TaskProjectUpdateRepositoryDto
 } from '../repositories-dto/task-project.repository-dto'
@@ -173,6 +175,78 @@ export class TaskProjectRepository {
                     total: count,
                 },
             }
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async connectUser(
+        dto: TaskProjectConnectUserRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { userId, projectId } = dto
+
+            await client.taskProject.update({
+                where: {
+                    id: projectId,
+                },
+                data: {
+                    users: {
+                        connect: {
+                            projectId_userId: {
+                                projectId,
+                                userId,
+                            },
+                        },
+                    },
+                },
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async disconnectUser(
+        dto: TaskProjectDisconnectUserRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { userId, projectId } = dto
+
+            await client.taskProject.update({
+                where: {
+                    id: projectId,
+                },
+                data: {
+                    users: {
+                        disconnect: {
+                            projectId_userId: {
+                                projectId,
+                                userId,
+                            },
+                        },
+                    },
+                },
+            })
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

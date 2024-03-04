@@ -3,7 +3,11 @@ import { Injectable } from '@nestjs/common'
 import { DefaultError } from '../../../shared/errors/default.error'
 import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TaskUserCreateRepositoryDto, TaskUserDeleteRepositoryDto } from '../repositories-dto/task-user.repository-dto'
+import {
+    TaskUserCreateRepositoryDto,
+    TaskUserDeleteRepositoryDto,
+    TaskUserGetOneByExternalUserIdRepositoryDto
+} from '../repositories-dto/task-user.repository-dto'
 
 @Injectable()
 export class TaskUserRepository {
@@ -13,10 +17,10 @@ export class TaskUserRepository {
         try {
             const client = prisma || this._prisma
 
-            const { externalId } = dto
+            const { externalUserId } = dto
 
             const { id } = await client.taskUser.create({
-                data: { externalId },
+                data: { externalId: externalUserId },
                 select: { id: true },
             })
 
@@ -37,12 +41,12 @@ export class TaskUserRepository {
         try {
             const client = prisma || this._prisma
 
-            const { externalId } = dto
+            const { externalUserId } = dto
 
             const { id: deletedId } = await client.taskUser.update({
                 where: {
                     externalId_isDeleted: {
-                        externalId,
+                        externalId: externalUserId,
                         isDeleted: false,
                     },
                 },
@@ -53,6 +57,37 @@ export class TaskUserRepository {
             })
 
             return deletedId
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async getOneByExternalUserId(
+        dto: TaskUserGetOneByExternalUserIdRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUser.findUniqueOrThrow>>> {
+        try {
+            const client = prisma || this._prisma
+
+            const { externalUserId } = dto
+
+            const userOrmEntity = await client.taskUser.findUniqueOrThrow({
+                where: {
+                    externalId_isDeleted: {
+                        externalId: externalUserId,
+                        isDeleted: false,
+                    },
+                },
+            })
+
+            return userOrmEntity
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e
