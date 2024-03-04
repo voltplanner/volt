@@ -104,6 +104,18 @@ CREATE TABLE "Notification" (
 );
 
 -- CreateTable
+CREATE TABLE "task_user" (
+    "id" UUID NOT NULL,
+    "externalId" VARCHAR(512) NOT NULL,
+    "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" TIMESTAMP(6),
+    "is_deleted" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "task_user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "task_project" (
     "id" UUID NOT NULL,
     "name" VARCHAR(512) NOT NULL,
@@ -381,6 +393,9 @@ CREATE UNIQUE INDEX "auth_method_name_key" ON "auth_method"("name");
 CREATE UNIQUE INDEX "NotificationPreferences_externalUserId_key" ON "NotificationPreferences"("externalUserId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "task_user_externalId_is_deleted_key" ON "task_user"("externalId", "is_deleted");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "task_project_status_code_key" ON "task_project_status"("code");
 
 -- CreateIndex
@@ -438,7 +453,7 @@ ALTER TABLE "auth_role_permission" ADD CONSTRAINT "FK__AUTH_ROLE_PERMISSION__ROL
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_preferencesId_fkey" FOREIGN KEY ("preferencesId") REFERENCES "NotificationPreferences"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_project" ADD CONSTRAINT "FK__PROJECT__CREATED_BY" FOREIGN KEY ("created_by_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_project" ADD CONSTRAINT "FK__PROJECT__CREATED_BY" FOREIGN KEY ("created_by_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task_project" ADD CONSTRAINT "FK__PROJECT__STATUS" FOREIGN KEY ("status_id") REFERENCES "task_project_status"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -447,13 +462,13 @@ ALTER TABLE "task_project" ADD CONSTRAINT "FK__PROJECT__STATUS" FOREIGN KEY ("st
 ALTER TABLE "task_project_on_user" ADD CONSTRAINT "FK__PROJECT_ON_USER__PROJECT" FOREIGN KEY ("project_id") REFERENCES "task_project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_project_on_user" ADD CONSTRAINT "FK__PROJECT_ON_USER__USER" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_project_on_user" ADD CONSTRAINT "FK__PROJECT_ON_USER__USER" FOREIGN KEY ("user_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task" ADD CONSTRAINT "FK__TASK__ASSIGNED_TO" FOREIGN KEY ("assigned_to_id") REFERENCES "auth_user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "task" ADD CONSTRAINT "FK__TASK__ASSIGNED_TO" FOREIGN KEY ("assigned_to_id") REFERENCES "task_user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task" ADD CONSTRAINT "FK__TASK__CREATED_BY" FOREIGN KEY ("created_by_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task" ADD CONSTRAINT "FK__TASK__CREATED_BY" FOREIGN KEY ("created_by_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task" ADD CONSTRAINT "FK__TASK__PROJECT" FOREIGN KEY ("project_id") REFERENCES "task_project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -471,7 +486,7 @@ ALTER TABLE "task" ADD CONSTRAINT "task_parent_id_fkey" FOREIGN KEY ("parent_id"
 ALTER TABLE "task_effort" ADD CONSTRAINT "FK__TASK_EFFORT__TASK" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_effort" ADD CONSTRAINT "FK__TASK_EFFORT__USER" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_effort" ADD CONSTRAINT "FK__TASK_EFFORT__USER" FOREIGN KEY ("user_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task_type" ADD CONSTRAINT "FK__TASK_TYPE__PROJECT" FOREIGN KEY ("project_id") REFERENCES "task_project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -492,19 +507,19 @@ ALTER TABLE "task_on_task_tag" ADD CONSTRAINT "FK__TASK_ON_TASK_TAG__TASK_TAG" F
 ALTER TABLE "task_attachment" ADD CONSTRAINT "FK__TASK_ATTACHMENT__TASK" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_attachment" ADD CONSTRAINT "FK__TASK_ATTACHMENT__USER" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_attachment" ADD CONSTRAINT "FK__TASK_ATTACHMENT__USER" FOREIGN KEY ("user_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task_comment" ADD CONSTRAINT "FK__TASK_COMMENT__TASK" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_comment" ADD CONSTRAINT "FK__TASK_COMMENT__USER" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_comment" ADD CONSTRAINT "FK__TASK_COMMENT__USER" FOREIGN KEY ("user_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task_change" ADD CONSTRAINT "FK__TASK_CHANGE__TASK" FOREIGN KEY ("task_id") REFERENCES "task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_change" ADD CONSTRAINT "FK__TASK_CHANGE__USER" FOREIGN KEY ("user_id") REFERENCES "auth_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_change" ADD CONSTRAINT "FK__TASK_CHANGE__USER" FOREIGN KEY ("user_id") REFERENCES "task_user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task_relation" ADD CONSTRAINT "FK__TASK_RELATION__TASK_RELATION_TYPE" FOREIGN KEY ("task_relation_type_id") REFERENCES "task_relation_type"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

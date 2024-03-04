@@ -6,10 +6,12 @@ import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../sha
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
 import { ProjectStatusDeleteUsedByProjectsError } from '../errors/task-project-status-delete-used-by-projects.error'
-import { TaskProjectStatusCreateRepositoryDto } from '../repositories-dto/task-project-status-create.dto'
-import { TaskProjectStatusDeleteRepositoryDto } from '../repositories-dto/task-project-status-delete.dto'
-import { TaskProjectStatusFindManyRepositoryDto } from '../repositories-dto/task-project-status-find-many.dto'
-import { TaskProjectStatusUpdateRepositoryDto } from '../repositories-dto/task-project-status-update.dto'
+import {
+    TaskProjectStatusCreateRepositoryDto,
+    TaskProjectStatusDeleteRepositoryDto,
+    TaskProjectStatusFindManyRepositoryDto,
+    TaskProjectStatusUpdateRepositoryDto
+} from '../repositories-dto/task-project-status.repository-dto'
 
 @Injectable()
 export class TaskProjectStatusRepository {
