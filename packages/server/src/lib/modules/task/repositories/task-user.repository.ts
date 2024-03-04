@@ -4,6 +4,8 @@ import { DefaultError } from '../../../shared/errors/default.error'
 import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
 import {
+    TaskProjectConnectProjectRepositoryDto,
+    TaskProjectDisconnectProjectRepositoryDto,
     TaskUserCreateRepositoryDto,
     TaskUserDeleteRepositoryDto,
     TaskUserGetOneByExternalUserIdRepositoryDto
@@ -57,6 +59,78 @@ export class TaskUserRepository {
             })
 
             return deletedId
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async connectProject(
+        dto: TaskProjectConnectProjectRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { userId, projectId } = dto
+
+            await client.taskUser.update({
+                where: {
+                    id: projectId,
+                },
+                data: {
+                    projects: {
+                        connect: {
+                            projectId_userId: {
+                                projectId,
+                                userId,
+                            },
+                        },
+                    },
+                },
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async disconnectProject(
+        dto: TaskProjectDisconnectProjectRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { userId, projectId } = dto
+
+            await client.taskUser.update({
+                where: {
+                    id: projectId,
+                },
+                data: {
+                    projects: {
+                        disconnect: {
+                            projectId_userId: {
+                                projectId,
+                                userId,
+                            },
+                        },
+                    },
+                },
+            })
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

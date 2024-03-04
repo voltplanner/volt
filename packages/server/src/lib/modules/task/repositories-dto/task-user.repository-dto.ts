@@ -9,3 +9,13 @@ export class TaskUserDeleteRepositoryDto {
 export class TaskUserGetOneByExternalUserIdRepositoryDto {
     externalUserId: string
 }
+
+export class TaskProjectConnectProjectRepositoryDto {
+    userId: string
+    projectId: string
+}
+
+export class TaskProjectDisconnectProjectRepositoryDto {
+    userId: string
+    projectId: string
+}
