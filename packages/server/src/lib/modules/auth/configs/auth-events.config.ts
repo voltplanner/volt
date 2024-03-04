@@ -1,9 +1,15 @@
+import { FactoryProvider } from '@nestjs/common'
 import {
     EventsServiceInterface,
     EventsServiceInterfaceConstructor,
-} from '../../../shared/events/interfaces/events.interfaces'
+} from '@shelfjs/events'
 
 export const AUTH_EVENTS = 'AUTH_EVENTS'
+
+export type AuthEventServiceProvider = Omit<
+    FactoryProvider<AuthEventServiceInterface>,
+    'provide'
+>
 
 export type AuthEventServiceInterface = EventsServiceInterface<
     AuthEventPattern,

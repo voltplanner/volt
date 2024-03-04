@@ -27,7 +27,7 @@ export class AuthModule extends AuthConfigurableModuleClass {
             },
             {
                 provide: AUTH_EVENTS,
-                useClass: options.eventsProvider,
+                ...options.eventsProvider,
             },
             AuthAuthService,
             AuthTokensService,

@@ -238,7 +238,7 @@ export class AuthUserService {
             },
         })
 
-        this.events.send({
+        await this.events.send({
             pattern: AuthEventPattern.COMPLETE_SIGNIN,
             data: {
                 userId: user.id,

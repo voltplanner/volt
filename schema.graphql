@@ -1,3 +1,7 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
 type PaginatedMetaType {
   curPage: Float!
   perPage: Float!
@@ -59,11 +63,20 @@ type AuthorizationResponse {
   expiresAt: Float!
 }
 
+type GetNotificationPreferences {
+  emailEnabled: Boolean!
+  email: String
+  webEnabled: Boolean!
+  telegramEnabled: Boolean!
+  telegramAccount: Float
+}
+
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
   getRoles(input: GetRolesInput!): PaginatedRoles!
   getMyRole: RoleType!
   getUser(input: GetUserInput!): UserType!
+  getMyNotificationPreferences: GetNotificationPreferences!
 }
 
 input GetUsersInput {
@@ -117,6 +130,9 @@ type Mutation {
   createUser(input: CreateUserInput!): UserType!
   deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+  changeMyNotificationPreferences(
+    input: ChangeMyNotificationPreferences!
+  ): Boolean!
 }
 
 input UpdateRoleInput {
@@ -183,4 +199,12 @@ input CompleteSignInInput {
   userId: ID!
   code: String!
   password: String!
+}
+
+input ChangeMyNotificationPreferences {
+  emailEnabled: Boolean
+  email: String
+  webEnabled: Boolean
+  telegramEnabled: Boolean
+  telegramAccount: Float
 }

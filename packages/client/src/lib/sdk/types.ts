@@ -1,5 +1,5 @@
 export default {
-    scalars: [1, 3, 4, 5, 9, 10, 16],
+    scalars: [1, 3, 4, 5, 9, 10, 17],
     types: {
         PaginatedMetaType: {
             curPage: [1],
@@ -57,38 +57,47 @@ export default {
             expiresAt: [1],
             __typename: [4],
         },
+        GetNotificationPreferences: {
+            emailEnabled: [5],
+            email: [4],
+            webEnabled: [5],
+            telegramEnabled: [5],
+            telegramAccount: [1],
+            __typename: [4],
+        },
         Query: {
             getUsers: [
                 11,
                 {
-                    input: [14, 'GetUsersInput!'],
+                    input: [15, 'GetUsersInput!'],
                 },
             ],
             getRoles: [
                 7,
                 {
-                    input: [18, 'GetRolesInput!'],
+                    input: [19, 'GetRolesInput!'],
                 },
             ],
             getMyRole: [6],
             getUser: [
                 8,
                 {
-                    input: [20, 'GetUserInput!'],
+                    input: [21, 'GetUserInput!'],
                 },
             ],
+            getMyNotificationPreferences: [13],
             __typename: [4],
         },
         GetUsersInput: {
             curPage: [1],
             perPage: [1],
-            orderBy: [15],
-            filter: [17],
+            orderBy: [16],
+            filter: [18],
             __typename: [4],
         },
         OrderByInput: {
             field: [4],
-            order: [16],
+            order: [17],
             __typename: [4],
         },
         OrderEnum: {},
@@ -103,7 +112,7 @@ export default {
         GetRolesInput: {
             curPage: [1],
             perPage: [1],
-            filter: [19],
+            filter: [20],
             __typename: [4],
         },
         GetRolesFilterInput: {
@@ -118,67 +127,73 @@ export default {
             updateRole: [
                 5,
                 {
-                    input: [22, 'UpdateRoleInput!'],
+                    input: [23, 'UpdateRoleInput!'],
                 },
             ],
             changeUserRole: [
                 5,
                 {
-                    input: [23, 'ChangeUserRoleInput!'],
+                    input: [24, 'ChangeUserRoleInput!'],
                 },
             ],
             createRole: [
                 5,
                 {
-                    input: [24, 'CreateRoleInput!'],
+                    input: [25, 'CreateRoleInput!'],
                 },
             ],
             deleteRole: [
                 5,
                 {
-                    input: [25, 'DeleteRoleInput!'],
+                    input: [26, 'DeleteRoleInput!'],
                 },
             ],
             changePermissions: [
                 5,
                 {
-                    input: [26, 'ChangePermissionsInput!'],
+                    input: [27, 'ChangePermissionsInput!'],
                 },
             ],
             updateUser: [
                 5,
                 {
-                    input: [28, 'UpdateUserInput!'],
+                    input: [29, 'UpdateUserInput!'],
                 },
             ],
             signIn: [
                 12,
                 {
-                    input: [29, 'SignInInput!'],
+                    input: [30, 'SignInInput!'],
                 },
             ],
             refreshToken: [
                 12,
                 {
-                    input: [30, 'RefreshTokenInput!'],
+                    input: [31, 'RefreshTokenInput!'],
                 },
             ],
             createUser: [
                 8,
                 {
-                    input: [31, 'CreateUserInput!'],
+                    input: [32, 'CreateUserInput!'],
                 },
             ],
             deleteUser: [
                 5,
                 {
-                    input: [32, 'DeleteUserInput!'],
+                    input: [33, 'DeleteUserInput!'],
                 },
             ],
             completeSignIn: [
                 12,
                 {
-                    input: [33, 'CompleteSignInInput!'],
+                    input: [34, 'CompleteSignInInput!'],
+                },
+            ],
+            changeMyNotificationPreferences: [
+                5,
+                {
+                    input: [35, 'ChangeMyNotificationPreferences!'],
                 },
             ],
             __typename: [4],
@@ -205,7 +220,7 @@ export default {
         },
         ChangePermissionsInput: {
             roleId: [3],
-            permissions: [27],
+            permissions: [28],
             __typename: [4],
         },
         PermissionInput: {
@@ -247,6 +262,14 @@ export default {
             userId: [3],
             code: [4],
             password: [4],
+            __typename: [4],
+        },
+        ChangeMyNotificationPreferences: {
+            emailEnabled: [5],
+            email: [4],
+            webEnabled: [5],
+            telegramEnabled: [5],
+            telegramAccount: [1],
             __typename: [4],
         },
     },

@@ -3,6 +3,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
 import { JwtModule } from '@nestjs/jwt'
+import { createRxJsEventsProvider } from '@shelfjs/events/src/lib/services/rxjs-events.service'
 import { join } from 'path'
 
 import { environment } from '../../environments/environment'
@@ -10,7 +11,6 @@ import { defaultAllowPermissions } from '../../environments/permissions'
 import { AuthIntegration } from '../integrations/auth.integration'
 import { AuthModule } from '../modules/auth/auth.module'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
-import { RxJsEventsService } from '../shared/events/rxjs-events.service'
 import { PrismaModule } from '../shared/prisma'
 
 @Module({
@@ -34,7 +34,7 @@ import { PrismaModule } from '../shared/prisma'
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
             defaultAllowPermissions,
-            eventsProvider: RxJsEventsService,
+            eventsProvider: createRxJsEventsProvider(),
         }),
         NotificationsModule.forRoot({
             defaults: environment.notifications.defaults,
