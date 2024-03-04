@@ -183,42 +183,89 @@ model TaskProjectOnUser {
 }
 
 model Task {
-    id                 String           @id @default(uuid()) @db.Uuid
-    name               String           @db.VarChar(512)
-    number             Int              @default(autoincrement()) @db.Integer
+    id                 String    @id @default(uuid()) @db.Uuid
+    name               String    @db.VarChar(512)
+    number             Int       @default(autoincrement()) @db.Integer
     description        String?
-    estimatedDateStart DateTime?        @map("estimated_date_start") @db.Timestamp(6)
-    estimatedDateEnd   DateTime?        @map("estimated_date_end") @db.Timestamp(6)
-    estimatedDuration  BigInt?          @map("estimated_duration")
-    createdAt          DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt          DateTime         @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt          DateTime?        @map("deleted_at") @db.Timestamp(6)
-    isDeleted          Boolean          @default(false) @map("is_deleted")
-    projectId          String           @map("project_id") @db.Uuid
-    typeId             String           @map("type_id") @db.Uuid
-    statusId           String           @map("status_id") @db.Uuid
-    createdById        String           @map("created_by_id") @db.Uuid
-    assignedToId       String?          @map("assigned_to_id") @db.Uuid
-    lft                Int
-    rgt                Int
-    level              Int
-    parentId           String?          @map("parent_id") @db.Uuid
-    assignedTo         TaskUser?        @relation("FK__TASK__ASSIGNED_TO", fields: [assignedToId], references: [id], map: "FK__TASK__ASSIGNED_TO")
-    createdBy          TaskUser         @relation("FK__TASK__CREATED_BY", fields: [createdById], references: [id], map: "FK__TASK__CREATED_BY")
-    project            TaskProject      @relation(fields: [projectId], references: [id], map: "FK__TASK__PROJECT")
-    status             TaskStatus       @relation(fields: [statusId], references: [id], map: "FK__TASK__STATUS")
-    type               TaskType         @relation(fields: [typeId], references: [id], map: "FK__TASK__TYPE")
-    parent             Task?            @relation("FK__TASK__PARENT", fields: [parentId], references: [id])
-    children           Task[]           @relation("FK__TASK__PARENT")
-    attachments        TaskAttachment[]
-    changes            TaskChange[]
-    comments           TaskComment[]
-    efforts            TaskEffort[]
-    tags               TaskOnTaskTag[]
-    connectedForeign   TaskRelation[]   @relation("FK__TASK_RELATION__TASK_FOREIGN")
-    connectedMain      TaskRelation[]   @relation("FK__TASK_RELATION__TASK_MAIN")
+    estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
+    estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
+    estimatedDuration  BigInt?   @map("estimated_duration")
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted Boolean   @default(false) @map("is_deleted")
+
+    projectId    String      @map("project_id") @db.Uuid
+    project      TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK__PROJECT")
+    typeId       String      @map("type_id") @db.Uuid
+    type         TaskType    @relation(fields: [typeId], references: [id], map: "FK__TASK__TYPE")
+    statusId     String      @map("status_id") @db.Uuid
+    status       TaskStatus  @relation(fields: [statusId], references: [id], map: "FK__TASK__STATUS")
+    createdById  String      @map("created_by_id") @db.Uuid
+    createdBy    TaskUser    @relation("FK__TASK__CREATED_BY", fields: [createdById], references: [id], map: "FK__TASK__CREATED_BY")
+    assignedToId String?     @map("assigned_to_id") @db.Uuid
+    assignedTo   TaskUser?   @relation("FK__TASK__ASSIGNED_TO", fields: [assignedToId], references: [id], map: "FK__TASK__ASSIGNED_TO")
+    parentId     String?     @map("parent_id") @db.Uuid
+    parent       Task?       @relation("FK__TASK__PARENT", fields: [parentId], references: [id])
+
+    children         Task[]         @relation("FK__TASK__PARENT")
+    connectedForeign TaskRelation[] @relation("FK__TASK_RELATION__TASK_FOREIGN")
+    connectedMain    TaskRelation[] @relation("FK__TASK_RELATION__TASK_MAIN")
+
+    lft         Int
+    rgt         Int
+    level       Int
+    changes     TaskChange[]
+    efforts     TaskEffort[]
+    comments    TaskComment[]
+    tags        TaskOnTaskTag[]
+    attachments TaskAttachment[]
 
     @@map("task")
+}
+
+model TaskType {
+    id          String  @id @default(uuid()) @db.Uuid
+    code        String  @unique @db.VarChar(36)
+    name        String  @db.VarChar(64)
+    position    Int     @db.SmallInt
+    description String?
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted Boolean   @default(false) @map("is_deleted")
+
+    projectId String      @map("project_id") @db.Uuid
+    project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_TYPE__PROJECT")
+
+    tasks             Task[]
+    tasksCustomFields TaskCustomField[]
+
+    @@unique([position, isDeleted])
+    @@map("task_type")
+}
+
+model TaskStatus {
+    id          String  @id @default(uuid()) @db.Uuid
+    code        String  @unique @db.VarChar(36)
+    name        String  @db.VarChar(64)
+    position    Int     @db.SmallInt
+    description String?
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted Boolean   @default(false) @map("is_deleted")
+
+    projectId String      @map("project_id") @db.Uuid
+    project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_STATUS__PROJECT")
+
+    tasks Task[]
+
+    @@unique([position, isDeleted])
+    @@map("task_status")
 }
 
 model TaskEffort {
@@ -235,43 +282,6 @@ model TaskEffort {
     user        TaskUser  @relation(fields: [userId], references: [id], map: "FK__TASK_EFFORT__USER")
 
     @@map("task_effort")
-}
-
-model TaskType {
-    id                String            @id @default(uuid()) @db.Uuid
-    code              String            @unique @db.VarChar(36)
-    name              String            @db.VarChar(64)
-    position          Int               @db.SmallInt
-    description       String?
-    createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt         DateTime          @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt         DateTime?         @map("deleted_at") @db.Timestamp(6)
-    isDeleted         Boolean           @default(false) @map("is_deleted")
-    projectId         String            @map("project_id") @db.Uuid
-    tasks             Task[]
-    tasksCustomFields TaskCustomField[]
-    project           TaskProject       @relation(fields: [projectId], references: [id], map: "FK__TASK_TYPE__PROJECT")
-
-    @@unique([position, isDeleted])
-    @@map("task_type")
-}
-
-model TaskStatus {
-    id          String      @id @default(uuid()) @db.Uuid
-    code        String      @unique @db.VarChar(36)
-    name        String      @db.VarChar(64)
-    position    Int         @db.SmallInt
-    description String?
-    createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt   DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt   DateTime?   @map("deleted_at") @db.Timestamp(6)
-    isDeleted   Boolean     @default(false) @map("is_deleted")
-    projectId   String      @map("project_id") @db.Uuid
-    tasks       Task[]
-    project     TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_STATUS__PROJECT")
-
-    @@unique([position, isDeleted])
-    @@map("task_status")
 }
 
 model TaskTag {
