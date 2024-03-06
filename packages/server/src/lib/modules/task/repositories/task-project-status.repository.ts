@@ -159,7 +159,6 @@ export class TaskProjectStatusRepository {
 
             const delegateWhere: Prisma.TaskProjectStatusWhereInput = {
                 name: undefined,
-                createdAt: undefined,
                 isDeleted: false,
             }
 

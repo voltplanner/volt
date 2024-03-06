@@ -169,7 +169,6 @@ export class TaskTypeRepository {
 
             const delegateWhere: Prisma.TaskTypeWhereInput = {
                 name: undefined,
-                createdAt: undefined,
                 isDeleted: false,
             }
 

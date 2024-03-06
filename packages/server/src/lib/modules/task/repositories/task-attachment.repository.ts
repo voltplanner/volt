@@ -5,37 +5,29 @@ import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskStatusCreateRepositoryDto,
-    TaskStatusDeleteRepositoryDto,
-    TaskStatusFindManyRepositoryDto,
-    TaskStatusUpdateRepositoryDto
-} from '../repositories-dto/task-status.repository-dto'
+import { TaskAttachmentCreateRepositoryDto, TaskAttachmentDeleteRepositoryDto, TaskAttachmentFindManyRepositoryDto, TaskAttachmentUpdateRepositoryDto } from '../repositories-dto/task-attachment.repository-dto'
 
 @Injectable()
-export class TaskStatusRepository {
+export class TaskAttachmentRepository {
     constructor(private readonly _prisma: PrismaService) {}
 
     async create(
-        dto: TaskStatusCreateRepositoryDto,
+        dto: TaskAttachmentCreateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { name, code, description, projectId } = dto
+            const { name, description, externalId, sizeKb, taskId, userId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
-                _max: { position: true },
-            })
-
-            const { id } = await client.taskStatus.create({
+            const { id } = await client.taskAttachment.create({
                 data: {
-                    code,
                     name,
+                    sizeKb,
+                    externalId,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
-                    projectId,
+                    taskId,
+                    userId,
                 },
                 select: { id: true },
             })
@@ -54,59 +46,19 @@ export class TaskStatusRepository {
     }
 
     async update(
-        dto: TaskStatusUpdateRepositoryDto,
+        dto: TaskAttachmentUpdateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { id, name, code, description, position: newPosition } = dto
+            const { id, name, description } = dto
 
-            // We must shift positions of entities between old and new position of status
-            if (typeof newPosition === 'number') {
-                const { position: oldPosition } =
-                    await client.taskStatus.findUniqueOrThrow({
-                        where: { id },
-                        select: { position: true },
-                    })
-
-                // We need to temporary remove record from position flow, for satisfy position unique index
-                // Maybe remove unique and just make it serial in db?
-                await client.taskStatus.update({
-                    where: { id },
-                    data: { position: -1 },
-                })
-
-                if (newPosition > oldPosition) {
-                    await client.taskStatus.updateMany({
-                        where: {
-                            position: { gt: oldPosition, lte: newPosition },
-                        },
-                        data: {
-                            position: { decrement: 1 },
-                        },
-                    })
-                }
-
-                if (newPosition < oldPosition) {
-                    await client.taskStatus.updateMany({
-                        where: {
-                            position: { gte: newPosition, lt: oldPosition },
-                        },
-                        data: {
-                            position: { increment: 1 },
-                        },
-                    })
-                }
-            }
-
-            const { id: updatedId } = await client.taskStatus.update({
+            const { id: updatedId } = await client.taskAttachment.update({
                 where: { id },
                 data: {
-                    code,
                     name,
                     description,
-                    position: newPosition,
                 },
                 select: { id: true },
             })
@@ -125,7 +77,7 @@ export class TaskStatusRepository {
     }
 
     async delete(
-        dto: TaskStatusDeleteRepositoryDto,
+        dto: TaskAttachmentDeleteRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
@@ -133,7 +85,7 @@ export class TaskStatusRepository {
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskStatus.update({
+            const { id: deletedId } = await client.taskAttachment.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -153,10 +105,10 @@ export class TaskStatusRepository {
     }
 
     async findMany(
-        dto: TaskStatusFindManyRepositoryDto = {},
+        dto: TaskAttachmentFindManyRepositoryDto = {},
         prisma?: PrismaTransactionClientType,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskAttachment.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
@@ -167,21 +119,31 @@ export class TaskStatusRepository {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskStatusWhereInput = {
+            const delegateWhere: Prisma.TaskAttachmentWhereInput = {
                 name: undefined,
+                taskId: undefined,
+                userId: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskAttachmentOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
-                    : { position: 'asc' }
+                    : { createdAt: 'desc' }
 
             if (dto.filterByName) {
                 delegateWhere.name = {
                     contains: dto.filterByName,
-                    mode: 'insensitive',
+                    mode: 'insensitive'
                 }
+            }
+
+            if (dto.filterByTaskId) {
+                delegateWhere.taskId = dto.filterByTaskId
+            }
+
+            if (dto.filterByUserId) {
+                delegateWhere.taskId = dto.filterByUserId
             }
 
             if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
@@ -191,11 +153,11 @@ export class TaskStatusRepository {
                 }
             }
 
-            const count = await client.taskStatus.count({
+            const count = await client.taskAttachment.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskStatus.findMany({
+            const data = await client.taskAttachment.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,

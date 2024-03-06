@@ -5,37 +5,52 @@ import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskStatusCreateRepositoryDto,
-    TaskStatusDeleteRepositoryDto,
-    TaskStatusFindManyRepositoryDto,
-    TaskStatusUpdateRepositoryDto
-} from '../repositories-dto/task-status.repository-dto'
+import { TaskCustomFieldTypeCreateRepositoryDto, TaskCustomFieldTypeDeleteRepositoryDto, TaskCustomFieldTypeFindManyRepositoryDto, TaskCustomFieldTypeUpdateRepositoryDto } from '../repositories-dto/task-custom-field-type.repository-dto'
 
 @Injectable()
-export class TaskStatusRepository {
+export class TaskCustomFieldTypeRepository {
     constructor(private readonly _prisma: PrismaService) {}
 
     async create(
-        dto: TaskStatusCreateRepositoryDto,
+        dto: TaskCustomFieldTypeCreateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { name, code, description, projectId } = dto
+            const {
+                code,
+                name,
+                projectId,
+                valueTypeId,
+                isEditable,
+                isRequired,
+                isSearchable,
+                isFilterable,
+                possibleValues,
+                defaultValue,
+                regexp,
+            } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskCustomFieldType.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskStatus.create({
+            // TODO: What to do if someone add a new required field and we already have existed tasks? Ask for default value for existed tasks?
+            const { id } = await client.taskCustomFieldType.create({
                 data: {
                     code,
                     name,
-                    description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                     projectId,
+                    valueTypeId,
+                    isEditable,
+                    isRequired,
+                    isSearchable,
+                    isFilterable,
+                    possibleValues,
+                    defaultValue,
+                    regexp,
+                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 select: { id: true },
             })
@@ -54,31 +69,43 @@ export class TaskStatusRepository {
     }
 
     async update(
-        dto: TaskStatusUpdateRepositoryDto,
+        dto: TaskCustomFieldTypeUpdateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { id, name, code, description, position: newPosition } = dto
+            const {
+                id,
+                code,
+                name,
+                isEditable,
+                isRequired,
+                isSearchable,
+                isFilterable,
+                possibleValues,
+                defaultValue,
+                regexp,
+                position: newPosition,
+            } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskStatus.findUniqueOrThrow({
+                    await client.taskCustomFieldType.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskStatus.update({
+                await client.taskCustomFieldType.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskStatus.updateMany({
+                    await client.taskCustomFieldType.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -89,7 +116,7 @@ export class TaskStatusRepository {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskStatus.updateMany({
+                    await client.taskCustomFieldType.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -100,12 +127,19 @@ export class TaskStatusRepository {
                 }
             }
 
-            const { id: updatedId } = await client.taskStatus.update({
+            // TODO: What to do if someone make field required and not all tasks has this field filled?
+            const { id: updatedId } = await client.taskCustomFieldType.update({
                 where: { id },
                 data: {
                     code,
                     name,
-                    description,
+                    isEditable,
+                    isRequired,
+                    isSearchable,
+                    isFilterable,
+                    possibleValues,
+                    defaultValue,
+                    regexp,
                     position: newPosition,
                 },
                 select: { id: true },
@@ -125,7 +159,7 @@ export class TaskStatusRepository {
     }
 
     async delete(
-        dto: TaskStatusDeleteRepositoryDto,
+        dto: TaskCustomFieldTypeDeleteRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
@@ -133,7 +167,7 @@ export class TaskStatusRepository {
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskStatus.update({
+            const { id: deletedId } = await client.taskCustomFieldType.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -153,10 +187,10 @@ export class TaskStatusRepository {
     }
 
     async findMany(
-        dto: TaskStatusFindManyRepositoryDto = {},
+        dto: TaskCustomFieldTypeFindManyRepositoryDto = {},
         prisma?: PrismaTransactionClientType,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskCustomFieldType.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
@@ -167,12 +201,12 @@ export class TaskStatusRepository {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskStatusWhereInput = {
+            const delegateWhere: Prisma.TaskCustomFieldTypeWhereInput = {
                 name: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskCustomFieldTypeOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { position: 'asc' }
@@ -184,18 +218,11 @@ export class TaskStatusRepository {
                 }
             }
 
-            if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
-                delegateWhere.createdAt = {
-                    gte: dto.filterByCreatedAt?.from ?? undefined,
-                    lte: dto.filterByCreatedAt?.to ?? undefined,
-                }
-            }
-
-            const count = await client.taskStatus.count({
+            const count = await client.taskCustomFieldType.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskStatus.findMany({
+            const data = await client.taskCustomFieldType.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,

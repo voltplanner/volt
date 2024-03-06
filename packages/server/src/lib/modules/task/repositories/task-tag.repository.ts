@@ -5,31 +5,26 @@ import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskStatusCreateRepositoryDto,
-    TaskStatusDeleteRepositoryDto,
-    TaskStatusFindManyRepositoryDto,
-    TaskStatusUpdateRepositoryDto
-} from '../repositories-dto/task-status.repository-dto'
+import { TaskTagConnectTaskRepositoryDto, TaskTagCreateRepositoryDto, TaskTagDeleteRepositoryDto, TaskTagDisconnectTaskRepositoryDto, TaskTagFindManyRepositoryDto, TaskTagUpdateRepositoryDto } from '../repositories-dto/task-tag.repository-dto'
 
 @Injectable()
-export class TaskStatusRepository {
+export class TaskTagRepository {
     constructor(private readonly _prisma: PrismaService) {}
 
     async create(
-        dto: TaskStatusCreateRepositoryDto,
+        dto: TaskTagCreateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { name, code, description, projectId } = dto
+            const { code, name, description, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskTag.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskStatus.create({
+            const { id } = await client.taskTag.create({
                 data: {
                     code,
                     name,
@@ -54,7 +49,7 @@ export class TaskStatusRepository {
     }
 
     async update(
-        dto: TaskStatusUpdateRepositoryDto,
+        dto: TaskTagUpdateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
@@ -65,20 +60,20 @@ export class TaskStatusRepository {
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskStatus.findUniqueOrThrow({
+                    await client.taskTag.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskStatus.update({
+                await client.taskTag.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskStatus.updateMany({
+                    await client.taskTag.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -89,7 +84,7 @@ export class TaskStatusRepository {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskStatus.updateMany({
+                    await client.taskTag.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -100,7 +95,7 @@ export class TaskStatusRepository {
                 }
             }
 
-            const { id: updatedId } = await client.taskStatus.update({
+            const { id: updatedId } = await client.taskTag.update({
                 where: { id },
                 data: {
                     code,
@@ -125,7 +120,7 @@ export class TaskStatusRepository {
     }
 
     async delete(
-        dto: TaskStatusDeleteRepositoryDto,
+        dto: TaskTagDeleteRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
@@ -133,7 +128,7 @@ export class TaskStatusRepository {
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskStatus.update({
+            const { id: deletedId } = await client.taskTag.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -153,10 +148,10 @@ export class TaskStatusRepository {
     }
 
     async findMany(
-        dto: TaskStatusFindManyRepositoryDto = {},
+        dto: TaskTagFindManyRepositoryDto = {},
         prisma?: PrismaTransactionClientType,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskTag.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
@@ -167,12 +162,12 @@ export class TaskStatusRepository {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskStatusWhereInput = {
+            const delegateWhere: Prisma.TaskTagWhereInput = {
                 name: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskTagOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { position: 'asc' }
@@ -191,11 +186,11 @@ export class TaskStatusRepository {
                 }
             }
 
-            const count = await client.taskStatus.count({
+            const count = await client.taskTag.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskStatus.findMany({
+            const data = await client.taskTag.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,
@@ -210,6 +205,78 @@ export class TaskStatusRepository {
                     total: count,
                 },
             }
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async connectTask(
+        dto: TaskTagConnectTaskRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { taskTagId, taskId } = dto
+
+            await client.taskTag.update({
+                where: {
+                    id: taskTagId,
+                },
+                data: {
+                    tasks: {
+                        connect: {
+                            taskId_taskTagId: {
+                                taskId,
+                                taskTagId,
+                            },
+                        },
+                    },
+                },
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async disconnectTask(
+        dto: TaskTagDisconnectTaskRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { taskTagId, taskId } = dto
+
+            await client.taskTag.update({
+                where: {
+                    id: taskTagId,
+                },
+                data: {
+                    tasks: {
+                        disconnect: {
+                            taskId_taskTagId: {
+                                taskId,
+                                taskTagId,
+                            },
+                        },
+                    },
+                },
+            })
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

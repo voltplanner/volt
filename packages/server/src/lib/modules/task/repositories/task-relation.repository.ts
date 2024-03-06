@@ -6,34 +6,37 @@ import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../sha
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
 import {
-    TaskRelationTypeCreateRepositoryDto,
-    TaskRelationTypeDeleteRepositoryDto,
-    TaskRelationTypeFindManyRepositoryDto,
-    TaskRelationTypeUpdateRepositoryDto
-} from '../repositories-dto/task-relation-type.repository-dto'
+    TaskRelationConnectTaskRepositoryDto,
+    TaskRelationCreateRepositoryDto,
+    TaskRelationDeleteRepositoryDto,
+    TaskRelationDisconnectTaskRepositoryDto,
+    TaskRelationFindManyRepositoryDto,
+    TaskRelationUpdateRepositoryDto
+} from '../repositories-dto/task-relation.repository-dto'
 
 @Injectable()
-export class TaskRelationTypeRepository {
+export class TaskRelationRepository {
     constructor(private readonly _prisma: PrismaService) {}
 
     async create(
-        dto: TaskRelationTypeCreateRepositoryDto,
+        dto: TaskRelationCreateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { code, name_main, name_foreign, projectId } = dto
+            const { code, nameMain, nameForeign, projectId, description } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskRelationType.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskRelation.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskRelationType.create({
+            const { id } = await client.taskRelation.create({
                 data: {
                     code,
-                    name_main,
-                    name_foreign,
+                    nameMain,
+                    nameForeign,
+                    description,
                     projectId,
                     position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
@@ -54,31 +57,31 @@ export class TaskRelationTypeRepository {
     }
 
     async update(
-        dto: TaskRelationTypeUpdateRepositoryDto,
+        dto: TaskRelationUpdateRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
             const client = prisma || this._prisma
 
-            const { id, code, name_main, name_foreign, position: newPosition } = dto
+            const { id, code, nameMain, nameForeign, position: newPosition, description } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskRelationType.findUniqueOrThrow({
+                    await client.taskRelation.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskRelationType.update({
+                await client.taskRelation.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskRelationType.updateMany({
+                    await client.taskRelation.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -89,7 +92,7 @@ export class TaskRelationTypeRepository {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskRelationType.updateMany({
+                    await client.taskRelation.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -100,12 +103,13 @@ export class TaskRelationTypeRepository {
                 }
             }
 
-            const { id: updatedId } = await client.taskRelationType.update({
+            const { id: updatedId } = await client.taskRelation.update({
                 where: { id },
                 data: {
                     code,
-                    name_main,
-                    name_foreign,
+                    nameMain,
+                    nameForeign,
+                    description,
                     position: newPosition,
                 },
                 select: { id: true },
@@ -125,7 +129,7 @@ export class TaskRelationTypeRepository {
     }
 
     async delete(
-        dto: TaskRelationTypeDeleteRepositoryDto,
+        dto: TaskRelationDeleteRepositoryDto,
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
         try {
@@ -133,7 +137,7 @@ export class TaskRelationTypeRepository {
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskRelationType.update({
+            const { id: deletedId } = await client.taskRelation.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -153,10 +157,10 @@ export class TaskRelationTypeRepository {
     }
 
     async findMany(
-        dto: TaskRelationTypeFindManyRepositoryDto = {},
+        dto: TaskRelationFindManyRepositoryDto = {},
         prisma?: PrismaTransactionClientType,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskRelationType.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskRelation.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
@@ -167,21 +171,27 @@ export class TaskRelationTypeRepository {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskRelationTypeWhereInput = {
-                name_main: undefined,
-                name_foreign: undefined,
-                createdAt: undefined,
+            const delegateWhere: Prisma.TaskRelationWhereInput = {
+                nameMain: undefined,
+                nameForeign: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskRelationTypeOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskRelationOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { position: 'asc' }
 
-            if (dto.filterByName) {
-                delegateWhere.name_main = delegateWhere.name_foreign = {
-                    contains: dto.filterByName,
+            if (dto.filterByNameMain) {
+                delegateWhere.nameMain = delegateWhere.nameForeign = {
+                    contains: dto.filterByNameMain,
+                    mode: 'insensitive',
+                }
+            }
+
+            if (dto.filterByNameForeign) {
+                delegateWhere.nameMain = delegateWhere.nameForeign = {
+                    contains: dto.filterByNameForeign,
                     mode: 'insensitive',
                 }
             }
@@ -193,11 +203,11 @@ export class TaskRelationTypeRepository {
                 }
             }
 
-            const count = await client.taskRelationType.count({
+            const count = await client.taskRelation.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskRelationType.findMany({
+            const data = await client.taskRelation.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,
@@ -212,6 +222,78 @@ export class TaskRelationTypeRepository {
                     total: count,
                 },
             }
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async connectTask(
+        dto: TaskRelationConnectTaskRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { taskMainId, taskForeignId, taskRelationId } = dto
+
+            await client.taskRelation.update({
+                where: {
+                    id: taskRelationId,
+                },
+                data: {
+                    tasks: {
+                        connect: {
+                            taskMainId_taskForeignId: {
+                                taskMainId,
+                                taskForeignId,
+                            },
+                        },
+                    },
+                },
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e.message,
+                metadata: dto,
+            })
+        }
+    }
+
+    async disconnectTask(
+        dto: TaskRelationDisconnectTaskRepositoryDto,
+        prisma?: PrismaTransactionClientType,
+    ): Promise<void> {
+        try {
+            const client = prisma || this._prisma
+
+            const { taskMainId, taskForeignId, taskRelationId } = dto
+
+            await client.taskRelation.update({
+                where: {
+                    id: taskRelationId,
+                },
+                data: {
+                    tasks: {
+                        disconnect: {
+                            taskMainId_taskForeignId: {
+                                taskMainId,
+                                taskForeignId,
+                            },
+                        },
+                    },
+                },
+            })
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

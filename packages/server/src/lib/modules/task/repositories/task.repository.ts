@@ -345,7 +345,6 @@ export class TaskRepository {
                 projectId: undefined,
                 createdById: undefined,
                 assignedToId: undefined,
-                createdAt: undefined,
                 isDeleted: false,
             }
 
