@@ -1,6 +1,6 @@
 import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
-export class TaskAttachmentCreateRepositoryDto {
+export type TaskAttachmentCreateRepositoryDto = {
     name: string
     sizeKb: number
     externalId: string
@@ -9,17 +9,17 @@ export class TaskAttachmentCreateRepositoryDto {
     description?: string
 }
 
-export class TaskAttachmentUpdateRepositoryDto {
+export type TaskAttachmentUpdateRepositoryDto = {
     id: string
     name?: string
     description?: string
 }
 
-export class TaskAttachmentDeleteRepositoryDto {
+export type TaskAttachmentDeleteRepositoryDto = {
     id: string
 }
 
-export class TaskAttachmentFindManyRepositoryDto {
+export type TaskAttachmentFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 

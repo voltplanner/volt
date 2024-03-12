@@ -1,23 +1,23 @@
 import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
-export class TaskEffortCreateRepositoryDto {
+export type TaskEffortCreateRepositoryDto = {
     value: number
     description: string
     taskId: string
     userId: string
 }
 
-export class TaskEffortUpdateRepositoryDto {
+export type TaskEffortUpdateRepositoryDto = {
     id: string
     value?: number
     description?: string
 }
 
-export class TaskEffortDeleteRepositoryDto {
+export type TaskEffortDeleteRepositoryDto = {
     id: string
 }
 
-export class TaskEffortFindManyRepositoryDto {
+export type TaskEffortFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 

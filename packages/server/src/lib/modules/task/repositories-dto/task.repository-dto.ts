@@ -1,6 +1,6 @@
 import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
-export class TaskCreateRepositoryDto {
+export type TaskCreateRepositoryDto = {
     name: string
     description?: string
     estimatedDateEnd?: string
@@ -16,7 +16,7 @@ export class TaskCreateRepositoryDto {
     assignedToId?: string
 }
 
-export class TaskUpdateRepositoryDto {
+export type TaskUpdateRepositoryDto = {
     id: string
 
     name?: string
@@ -31,11 +31,11 @@ export class TaskUpdateRepositoryDto {
     assignedToId?: string
 }
 
-export class TaskDeleteRepositoryDto {
+export type TaskDeleteRepositoryDto = {
     id: string
 }
 
-export class TaskFindManyRepositoryDto {
+export type TaskFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 
@@ -58,10 +58,10 @@ export class TaskFindManyRepositoryDto {
     }
 }
 
-export class TaskFindOneRepositoryDto {
+export type TaskFindOneRepositoryDto = {
     id: string
 }
 
-export class TaskFindSubtasksRepositoryDto {
+export type TaskFindSubtasksRepositoryDto = {
     parentId: string
 }

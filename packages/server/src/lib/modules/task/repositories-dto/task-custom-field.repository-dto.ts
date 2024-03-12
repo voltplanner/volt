@@ -1,21 +1,21 @@
 import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
-export class TaskCustomFieldCreateRepositoryDto {
+export type TaskCustomFieldCreateRepositoryDto = {
     value?: string
     taskId: string
     taskCustomFieldTypeId: string
 }
 
-export class TaskCustomFieldUpdateRepositoryDto {
+export type TaskCustomFieldUpdateRepositoryDto = {
     id: string
     value?: string
 }
 
-export class TaskCustomFieldDeleteRepositoryDto {
+export type TaskCustomFieldDeleteRepositoryDto = {
     id: string
 }
 
-export class TaskCustomFieldFindManyRepositoryDto {
+export type TaskCustomFieldFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 

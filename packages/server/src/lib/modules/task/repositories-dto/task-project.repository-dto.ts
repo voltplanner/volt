@@ -1,13 +1,13 @@
 import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
-export class TaskProjectCreateRepositoryDto {
+export type TaskProjectCreateRepositoryDto = {
     name: string
     userId: string
     statusId: string
     description: string
 }
 
-export class TaskProjectUpdateRepositoryDto {
+export type TaskProjectUpdateRepositoryDto = {
     id: string
     version: number
     name?: string
@@ -15,11 +15,11 @@ export class TaskProjectUpdateRepositoryDto {
     description?: string | null
 }
 
-export class TaskProjectDeleteRepositoryDto {
+export type TaskProjectDeleteRepositoryDto = {
     id: string
 }
 
-export class TaskProjectFindManyRepositoryDto {
+export type TaskProjectFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 
@@ -36,12 +36,12 @@ export class TaskProjectFindManyRepositoryDto {
     }
 }
 
-export class TaskProjectConnectUserRepositoryDto {
+export type TaskProjectConnectUserRepositoryDto = {
     userId: string
     projectId: string
 }
 
-export class TaskProjectDisconnectUserRepositoryDto {
+export type TaskProjectDisconnectUserRepositoryDto = {
     userId: string
     projectId: string
 }

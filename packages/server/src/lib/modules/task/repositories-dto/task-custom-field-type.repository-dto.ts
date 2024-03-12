@@ -1,6 +1,6 @@
 import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
-export class TaskCustomFieldTypeCreateRepositoryDto {
+export type TaskCustomFieldTypeCreateRepositoryDto = {
     code: string
     name: string
     projectId: string
@@ -14,7 +14,7 @@ export class TaskCustomFieldTypeCreateRepositoryDto {
     regexp?: string
 }
 
-export class TaskCustomFieldTypeUpdateRepositoryDto {
+export type TaskCustomFieldTypeUpdateRepositoryDto = {
     id: string
     code?: string
     name?: string
@@ -28,11 +28,11 @@ export class TaskCustomFieldTypeUpdateRepositoryDto {
     regexp?: string
 }
 
-export class TaskCustomFieldTypeDeleteRepositoryDto {
+export type TaskCustomFieldTypeDeleteRepositoryDto = {
     id: string
 }
 
-export class TaskCustomFieldTypeFindManyRepositoryDto {
+export type TaskCustomFieldTypeFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 

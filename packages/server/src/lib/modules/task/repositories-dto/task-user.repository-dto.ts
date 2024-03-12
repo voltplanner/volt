@@ -1,21 +1,21 @@
-export class TaskUserCreateRepositoryDto {
+export type TaskUserCreateRepositoryDto = {
     externalUserId: string
 }
 
-export class TaskUserDeleteRepositoryDto {
+export type TaskUserDeleteRepositoryDto = {
     externalUserId: string
 }
 
-export class TaskUserGetOneByExternalUserIdRepositoryDto {
+export type TaskUserGetOneByExternalUserIdRepositoryDto = {
     externalUserId: string
 }
 
-export class TaskProjectConnectProjectRepositoryDto {
+export type TaskProjectConnectProjectRepositoryDto = {
     userId: string
     projectId: string
 }
 
-export class TaskProjectDisconnectProjectRepositoryDto {
+export type TaskProjectDisconnectProjectRepositoryDto = {
     userId: string
     projectId: string
 }
