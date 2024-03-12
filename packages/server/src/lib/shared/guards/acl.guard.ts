@@ -29,13 +29,8 @@ export class ACLGuard extends AuthGuard('jwt') {
         try {
             const ctx = GqlExecutionContext.create(context)
             const req = ctx.getContext().req
-            const graphqlOperationName = req.body.operationName
 
-            if (!graphqlOperationName) {
-                throw new UnauthorizedException(
-                    `GraphQL operation name not found. Try to 'query operationName { ... }'`,
-                )
-            }
+            const graphqlOperationName = ctx.getInfo().fieldName
 
             const authorizationToken = this.extractTokenFromHeader(req)
 
