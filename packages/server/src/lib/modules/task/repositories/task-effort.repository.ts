@@ -37,7 +37,7 @@ export class TaskEffortRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -68,7 +68,7 @@ export class TaskEffortRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -96,7 +96,7 @@ export class TaskEffortRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -168,7 +168,7 @@ export class TaskEffortRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }

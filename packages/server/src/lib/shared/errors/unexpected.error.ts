@@ -5,8 +5,8 @@ export class UnexpectedError extends DefaultError {
     name = 'UNEXPECTED__ERROR'
 
     constructor(dto: string)
-    constructor(dto: { context?: string; message?: string; metadata?: string | object })
-    constructor(dto: { context?: string; message?: string; metadata?: string | object } | string) {
+    constructor(dto: { context?: string; message?: any; metadata?: string | object })
+    constructor(dto: { context?: string; message?: any; metadata?: string | object } | string) {
         super(typeof dto === 'string' ? { message: dto } : dto)
     }
 }

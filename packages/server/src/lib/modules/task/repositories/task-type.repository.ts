@@ -47,7 +47,7 @@ export class TaskTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -118,7 +118,7 @@ export class TaskTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -146,7 +146,7 @@ export class TaskTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -216,7 +216,7 @@ export class TaskTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }

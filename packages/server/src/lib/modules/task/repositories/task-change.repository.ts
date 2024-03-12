@@ -38,7 +38,7 @@ export class TaskChangeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -66,7 +66,7 @@ export class TaskChangeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -138,7 +138,7 @@ export class TaskChangeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }

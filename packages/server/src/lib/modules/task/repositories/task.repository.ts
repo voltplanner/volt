@@ -64,7 +64,7 @@ export class TaskRepository {
                     _max: { rgt: true },
                 })
 
-                newLft = result._max.rgt + 1
+                newLft = result._max.rgt ? result._max.rgt + 1 : 0
             }
 
             // For parent/highter nodes we increase right key by appended nodes count * 2. But we always create only one node at same time, without childrens, so we can just increment by 2.
@@ -116,7 +116,7 @@ export class TaskRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -239,7 +239,7 @@ export class TaskRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -315,7 +315,7 @@ export class TaskRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -418,7 +418,7 @@ export class TaskRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -444,7 +444,7 @@ export class TaskRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -460,7 +460,7 @@ export class TaskRepository {
 
             const { parentId } = dto
 
-            const parent = await client.task.findUnique({
+            const parent = await client.task.findUniqueOrThrow({
                 where: { id: parentId },
             })
 
@@ -481,7 +481,7 @@ export class TaskRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }

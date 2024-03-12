@@ -5,7 +5,6 @@ import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
-import { TaskProjectDeleteContainsRelatedTasksError } from '../errors/task-project-delete-contains-related-tasks.error'
 import {
     TaskProjectConnectUserRepositoryDto,
     TaskProjectCreateRepositoryDto,
@@ -42,7 +41,7 @@ export class TaskProjectRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -71,7 +70,7 @@ export class TaskProjectRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -98,7 +97,7 @@ export class TaskProjectRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -170,7 +169,7 @@ export class TaskProjectRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -206,7 +205,7 @@ export class TaskProjectRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -242,7 +241,7 @@ export class TaskProjectRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }

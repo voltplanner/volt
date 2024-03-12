@@ -40,7 +40,7 @@ export class TaskCustomFieldValueTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -110,7 +110,7 @@ export class TaskCustomFieldValueTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -138,7 +138,7 @@ export class TaskCustomFieldValueTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
@@ -201,7 +201,7 @@ export class TaskCustomFieldValueTypeRepository {
             }
 
             throw new UnexpectedError({
-                message: e.message,
+                message: e,
                 metadata: dto,
             })
         }
