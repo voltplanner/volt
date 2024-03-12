@@ -5,7 +5,6 @@ import { UnexpectedError } from '../../../shared/errors/unexpected.error'
 import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
 import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
 import { parseMetaArgs } from '../../../shared/utils'
-import { ProjectStatusDeleteUsedByProjectsError } from '../errors/task-project-status-delete-used-by-projects.error'
 import {
     TaskProjectStatusCreateRepositoryDto,
     TaskProjectStatusDeleteRepositoryDto,
@@ -208,6 +207,29 @@ export class TaskProjectStatusRepository {
             throw new UnexpectedError({
                 message: e,
                 metadata: dto,
+            })
+        }
+    }
+
+    async getDefault(
+        prisma?: PrismaTransactionClientType
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskProjectStatus.findFirstOrThrow>>> {
+        try {
+            const client = prisma || this._prisma
+
+            // Since prisma does not support partial unique indexes we use findFirstOrThrow instead of findUniqueOrThrow
+            return await client.taskProjectStatus.findFirstOrThrow({
+                where: {
+                    isDefault: true,
+                },
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
             })
         }
     }

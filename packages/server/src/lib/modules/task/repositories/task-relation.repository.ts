@@ -249,11 +249,9 @@ export class TaskRelationRepository {
                 },
                 data: {
                     tasks: {
-                        connect: {
-                            taskMainId_taskForeignId: {
-                                taskMainId,
-                                taskForeignId,
-                            },
+                        create: {
+                            taskMainId,
+                            taskForeignId,
                         },
                     },
                 },

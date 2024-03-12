@@ -161,13 +161,14 @@ model TaskProjectStatus {
     name        String        @db.VarChar(64)
     position    Int           @db.SmallInt
     description String?
+    isDefault   Boolean       @default(false) @map("is_default")
     createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt   DateTime      @default(now()) @map("updated_at") @db.Timestamp(6)
     deletedAt   DateTime?     @map("deleted_at") @db.Timestamp(6)
     isDeleted   Boolean       @default(false) @map("is_deleted")
     projects    TaskProject[]
 
-    @@unique([name, isDeleted])
+    @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_project_status")
 }
@@ -243,6 +244,7 @@ model TaskType {
 
     tasks Task[]
 
+    @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_type")
 }
@@ -264,6 +266,7 @@ model TaskStatus {
 
     tasks Task[]
 
+    @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_status")
 }
@@ -303,6 +306,7 @@ model TaskTag {
 
     tasks TaskOnTaskTag[]
 
+    @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_tag")
 }
@@ -414,6 +418,7 @@ model TaskRelation {
 
     tasks TaskOnTaskRelation[]
 
+    @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_relation")
 }
@@ -460,6 +465,7 @@ model TaskCustomFieldType {
 
     tasksCustomFields TaskCustomField[]
 
+    @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_custom_field_type")
 }
@@ -477,6 +483,8 @@ model TaskCustomFieldValueType {
 
     tasksCustomFieldsTypes TaskCustomFieldType[]
 
+    @@unique([code, isDeleted])
+    @@unique([position, isDeleted])
     @@map("task_custom_field_value_type")
 }
 

@@ -2,7 +2,7 @@ import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
 export type TaskProjectCreateRepositoryDto = {
     name: string
-    userId: string
+    internalUserId: string
     statusId: string
     description: string
 }
@@ -37,11 +37,11 @@ export type TaskProjectFindManyRepositoryDto = {
 }
 
 export type TaskProjectConnectUserRepositoryDto = {
-    userId: string
+    internalUserId: string
     projectId: string
 }
 
 export type TaskProjectDisconnectUserRepositoryDto = {
-    userId: string
+    internalUserId: string
     projectId: string
 }

@@ -22,7 +22,7 @@ export class TaskProjectRepository {
         try {
             const client = prisma || this._prisma
 
-            const { name, statusId, description, userId: createdById } = dto
+            const { name, statusId, description, internalUserId: createdById } = dto
 
             const { id } = await client.taskProject.create({
                 data: {
@@ -182,7 +182,7 @@ export class TaskProjectRepository {
         try {
             const client = prisma || this._prisma
 
-            const { userId, projectId } = dto
+            const { internalUserId, projectId } = dto
 
             await client.taskProject.update({
                 where: {
@@ -190,11 +190,8 @@ export class TaskProjectRepository {
                 },
                 data: {
                     users: {
-                        connect: {
-                            projectId_userId: {
-                                projectId,
-                                userId,
-                            },
+                        create: {
+                            userId: internalUserId,
                         },
                     },
                 },
@@ -218,7 +215,7 @@ export class TaskProjectRepository {
         try {
             const client = prisma || this._prisma
 
-            const { userId, projectId } = dto
+            const { internalUserId, projectId } = dto
 
             await client.taskProject.update({
                 where: {
@@ -229,7 +226,7 @@ export class TaskProjectRepository {
                         disconnect: {
                             projectId_userId: {
                                 projectId,
-                                userId,
+                                userId: internalUserId,
                             },
                         },
                     },

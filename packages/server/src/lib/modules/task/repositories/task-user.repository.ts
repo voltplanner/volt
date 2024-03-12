@@ -8,7 +8,8 @@ import {
     TaskProjectDisconnectProjectRepositoryDto,
     TaskUserCreateRepositoryDto,
     TaskUserDeleteRepositoryDto,
-    TaskUserGetOneByExternalUserIdRepositoryDto
+    TaskUserGetOneByExternalUserIdRepositoryDto,
+    TaskUserUpsertRepositoryDto
 } from '../repositories-dto/task-user.repository-dto'
 
 @Injectable()
@@ -19,10 +20,43 @@ export class TaskUserRepository {
         try {
             const client = prisma || this._prisma
 
-            const { externalUserId } = dto
+            const { userId } = dto
 
             const { id } = await client.taskUser.create({
-                data: { externalId: externalUserId },
+                data: { externalId: userId },
+                select: { id: true },
+            })
+
+            return id
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    }
+
+    async upsert(dto: TaskUserUpsertRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+        try {
+            const client = prisma || this._prisma
+
+            const { userId } = dto
+
+            const { id } = await client.taskUser.upsert({
+                where: {
+                    externalId_isDeleted: {
+                        externalId: userId,
+                        isDeleted: false,
+                    },
+                },
+                create: {
+                    externalId: userId,
+                },
+                update: {},
                 select: { id: true },
             })
 
@@ -43,12 +77,12 @@ export class TaskUserRepository {
         try {
             const client = prisma || this._prisma
 
-            const { externalUserId } = dto
+            const { userId } = dto
 
             const { id: deletedId } = await client.taskUser.update({
                 where: {
                     externalId_isDeleted: {
-                        externalId: externalUserId,
+                        externalId: userId,
                         isDeleted: false,
                     },
                 },
@@ -82,15 +116,12 @@ export class TaskUserRepository {
 
             await client.taskUser.update({
                 where: {
-                    id: projectId,
+                    id: userId,
                 },
                 data: {
                     projects: {
-                        connect: {
-                            projectId_userId: {
-                                projectId,
-                                userId,
-                            },
+                        create: {
+                            projectId,
                         },
                     },
                 },
@@ -150,12 +181,12 @@ export class TaskUserRepository {
         try {
             const client = prisma || this._prisma
 
-            const { externalUserId } = dto
+            const { userId } = dto
 
             const userOrmEntity = await client.taskUser.findUniqueOrThrow({
                 where: {
                     externalId_isDeleted: {
-                        externalId: externalUserId,
+                        externalId: userId,
                         isDeleted: false,
                     },
                 },

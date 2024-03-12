@@ -1,13 +1,17 @@
 export type TaskUserCreateRepositoryDto = {
-    externalUserId: string
+    userId: string
+}
+
+export type TaskUserUpsertRepositoryDto = {
+    userId: string
 }
 
 export type TaskUserDeleteRepositoryDto = {
-    externalUserId: string
+    userId: string
 }
 
 export type TaskUserGetOneByExternalUserIdRepositoryDto = {
-    externalUserId: string
+    userId: string
 }
 
 export type TaskProjectConnectProjectRepositoryDto = {

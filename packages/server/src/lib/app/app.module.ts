@@ -12,6 +12,7 @@ import { AuthModule } from '../modules/auth/auth.module'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
 import { RxJsEventsService } from '../shared/events/rxjs-events.service'
 import { PrismaModule } from '../shared/prisma'
+import { ProjectIntegrationModule } from '../integrations/project/project-integration.module'
 
 @Module({
     imports: [
@@ -41,6 +42,7 @@ import { PrismaModule } from '../shared/prisma'
             transport: environment.notifications.transport,
             telegram: environment.notifications.telegram,
         }),
+        ProjectIntegrationModule,
     ],
     controllers: [],
     providers: [AuthIntegration],

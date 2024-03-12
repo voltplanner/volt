@@ -232,11 +232,8 @@ export class TaskTagRepository {
                 },
                 data: {
                     tasks: {
-                        connect: {
-                            taskId_taskTagId: {
-                                taskId,
-                                taskTagId,
-                            },
+                        create: {
+                            taskId,
                         },
                     },
                 },
