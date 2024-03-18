@@ -28,6 +28,13 @@ import { PrismaModule } from '../shared/prisma'
             playground: false,
             introspection: true,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
+            subscriptions: {
+                'graphql-ws': {
+                    onConnect(ctx) {
+                        // todo: add acl guard
+                    },
+                },
+            },
         }),
         AuthModule.forRoot({
             adminEmail: environment.adminEmail,
