@@ -1,26 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskProjectConnectUserRepositoryDto, TaskProjectCreateRepositoryDto, TaskProjectDeleteRepositoryDto, TaskProjectDisconnectUserRepositoryDto, TaskProjectFindManyRepositoryDto, TaskProjectUpdateRepositoryDto } from "../repositories-dto/task-project.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskProjectConnectUserRepositoryDto,
-    TaskProjectCreateRepositoryDto,
-    TaskProjectDeleteRepositoryDto,
-    TaskProjectDisconnectUserRepositoryDto,
-    TaskProjectFindManyRepositoryDto,
-    TaskProjectUpdateRepositoryDto
-} from '../repositories-dto/task-project.repository-dto'
-
-@Injectable()
-export class TaskProjectRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(dto: TaskProjectCreateRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+export const taskProjectModelExtentions = {
+    async extCreate(
+        dto: TaskProjectCreateRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { name, statusId, description, internalUserId: createdById } = dto
 
@@ -45,11 +38,11 @@ export class TaskProjectRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(dto: TaskProjectUpdateRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+    async extUpdate(dto: TaskProjectUpdateRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id, version, name, statusId, description } = dto
 
@@ -74,11 +67,11 @@ export class TaskProjectRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(dto: TaskProjectDeleteRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+    async extDelete(dto: TaskProjectDeleteRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -101,14 +94,14 @@ export class TaskProjectRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(dto: TaskProjectFindManyRepositoryDto = {}, prisma?: PrismaTransactionClientType): Promise<{
+    async extFindMany(dto: TaskProjectFindManyRepositoryDto = {}, prisma?: any): Promise<{
         data: Awaited<ReturnType<typeof PrismaService.instance.taskProject.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -173,14 +166,14 @@ export class TaskProjectRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async connectUser(
+    async extConnectUser(
         dto: TaskProjectConnectUserRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<void> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { internalUserId, projectId } = dto
 
@@ -206,14 +199,14 @@ export class TaskProjectRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async disconnectUser(
+    async extDisconnectUser(
         dto: TaskProjectDisconnectUserRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<void> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { internalUserId, projectId } = dto
 
@@ -242,5 +235,5 @@ export class TaskProjectRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

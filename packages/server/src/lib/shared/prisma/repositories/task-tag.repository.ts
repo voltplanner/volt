@@ -1,44 +1,33 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskTagConnectTaskRepositoryDto, TaskTagCreateRepositoryDto, TaskTagDeleteRepositoryDto, TaskTagDisconnectTaskRepositoryDto, TaskTagFindManyRepositoryDto, TaskTagUpdateRepositoryDto } from "../repositories-dto/task-tag.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskRelationConnectTaskRepositoryDto,
-    TaskRelationCreateRepositoryDto,
-    TaskRelationDeleteRepositoryDto,
-    TaskRelationDisconnectTaskRepositoryDto,
-    TaskRelationFindManyRepositoryDto,
-    TaskRelationUpdateRepositoryDto
-} from '../repositories-dto/task-relation.repository-dto'
-
-@Injectable()
-export class TaskRelationRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(
-        dto: TaskRelationCreateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+export const taskTagModelExtentions = {
+    async extCreate(
+        dto: TaskTagCreateRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { code, nameMain, nameForeign, projectId, description } = dto
+            const { code, name, description, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskRelation.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskTag.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskRelation.create({
+            const { id } = await client.taskTag.create({
                 data: {
                     code,
-                    nameMain,
-                    nameForeign,
+                    name,
                     description,
-                    projectId,
                     position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    projectId,
                 },
                 select: { id: true },
             })
@@ -54,34 +43,34 @@ export class TaskRelationRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(
-        dto: TaskRelationUpdateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extUpdate(
+        dto: TaskTagUpdateRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { id, code, nameMain, nameForeign, position: newPosition, description } = dto
+            const { id, name, code, description, position: newPosition } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskRelation.findUniqueOrThrow({
+                    await client.taskTag.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskRelation.update({
+                await client.taskTag.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskRelation.updateMany({
+                    await client.taskTag.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -92,7 +81,7 @@ export class TaskRelationRepository {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskRelation.updateMany({
+                    await client.taskTag.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -103,12 +92,11 @@ export class TaskRelationRepository {
                 }
             }
 
-            const { id: updatedId } = await client.taskRelation.update({
+            const { id: updatedId } = await client.taskTag.update({
                 where: { id },
                 data: {
                     code,
-                    nameMain,
-                    nameForeign,
+                    name,
                     description,
                     position: newPosition,
                 },
@@ -126,18 +114,18 @@ export class TaskRelationRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(
-        dto: TaskRelationDeleteRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extDelete(
+        dto: TaskTagDeleteRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskRelation.update({
+            const { id: deletedId } = await client.taskTag.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -154,44 +142,36 @@ export class TaskRelationRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(
-        dto: TaskRelationFindManyRepositoryDto = {},
-        prisma?: PrismaTransactionClientType,
+    async extFindMany(
+        dto: TaskTagFindManyRepositoryDto = {},
+        prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskRelation.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskTag.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskRelationWhereInput = {
-                nameMain: undefined,
-                nameForeign: undefined,
+            const delegateWhere: Prisma.TaskTagWhereInput = {
+                name: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskRelationOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskTagOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { position: 'asc' }
 
-            if (dto.filterByNameMain) {
-                delegateWhere.nameMain = delegateWhere.nameForeign = {
-                    contains: dto.filterByNameMain,
-                    mode: 'insensitive',
-                }
-            }
-
-            if (dto.filterByNameForeign) {
-                delegateWhere.nameMain = delegateWhere.nameForeign = {
-                    contains: dto.filterByNameForeign,
+            if (dto.filterByName) {
+                delegateWhere.name = {
+                    contains: dto.filterByName,
                     mode: 'insensitive',
                 }
             }
@@ -203,11 +183,11 @@ export class TaskRelationRepository {
                 }
             }
 
-            const count = await client.taskRelation.count({
+            const count = await client.taskTag.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskRelation.findMany({
+            const data = await client.taskTag.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,
@@ -232,26 +212,25 @@ export class TaskRelationRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async connectTask(
-        dto: TaskRelationConnectTaskRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extConnectTask(
+        dto: TaskTagConnectTaskRepositoryDto,
+        prisma?: any,
     ): Promise<void> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { taskMainId, taskForeignId, taskRelationId } = dto
+            const { taskTagId, taskId } = dto
 
-            await client.taskRelation.update({
+            await client.taskTag.update({
                 where: {
-                    id: taskRelationId,
+                    id: taskTagId,
                 },
                 data: {
                     tasks: {
                         create: {
-                            taskMainId,
-                            taskForeignId,
+                            taskId,
                         },
                     },
                 },
@@ -266,27 +245,27 @@ export class TaskRelationRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async disconnectTask(
-        dto: TaskRelationDisconnectTaskRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extDisconnectTask(
+        dto: TaskTagDisconnectTaskRepositoryDto,
+        prisma?: any,
     ): Promise<void> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { taskMainId, taskForeignId, taskRelationId } = dto
+            const { taskTagId, taskId } = dto
 
-            await client.taskRelation.update({
+            await client.taskTag.update({
                 where: {
-                    id: taskRelationId,
+                    id: taskTagId,
                 },
                 data: {
                     tasks: {
                         disconnect: {
-                            taskMainId_taskForeignId: {
-                                taskMainId,
-                                taskForeignId,
+                            taskId_taskTagId: {
+                                taskId,
+                                taskTagId,
                             },
                         },
                     },
@@ -302,5 +281,5 @@ export class TaskRelationRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

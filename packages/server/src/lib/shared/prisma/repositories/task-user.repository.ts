@@ -1,24 +1,13 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { PrismaService } from "../prisma.service"
+import { TaskProjectConnectProjectRepositoryDto, TaskProjectDisconnectProjectRepositoryDto, TaskUserCreateRepositoryDto, TaskUserDeleteRepositoryDto, TaskUserGetOneByExternalUserIdRepositoryDto, TaskUserUpsertRepositoryDto } from "../repositories-dto/task-user.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import {
-    TaskProjectConnectProjectRepositoryDto,
-    TaskProjectDisconnectProjectRepositoryDto,
-    TaskUserCreateRepositoryDto,
-    TaskUserDeleteRepositoryDto,
-    TaskUserGetOneByExternalUserIdRepositoryDto,
-    TaskUserUpsertRepositoryDto
-} from '../repositories-dto/task-user.repository-dto'
-
-@Injectable()
-export class TaskUserRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(dto: TaskUserCreateRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+export const taskUserModelExtentions = {
+    async extCreate(dto: TaskUserCreateRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { userId } = dto
 
@@ -38,11 +27,11 @@ export class TaskUserRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async upsert(dto: TaskUserUpsertRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+    async extUpsert(dto: TaskUserUpsertRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { userId } = dto
 
@@ -71,11 +60,11 @@ export class TaskUserRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(dto: TaskUserDeleteRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+    async extDelete(dto: TaskUserDeleteRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { userId } = dto
 
@@ -103,14 +92,14 @@ export class TaskUserRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async connectProject(
+    async extConnectProject(
         dto: TaskProjectConnectProjectRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<void> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { userId, projectId } = dto
 
@@ -136,14 +125,14 @@ export class TaskUserRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async disconnectProject(
+    async extDisconnectProject(
         dto: TaskProjectDisconnectProjectRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<void> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { userId, projectId } = dto
 
@@ -172,14 +161,14 @@ export class TaskUserRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async getOneByExternalUserId(
+    async extGetOneByExternalUserId(
         dto: TaskUserGetOneByExternalUserIdRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUser.findUniqueOrThrow>>> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { userId } = dto
 
@@ -203,5 +192,5 @@ export class TaskUserRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

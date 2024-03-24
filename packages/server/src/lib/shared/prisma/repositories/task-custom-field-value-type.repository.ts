@@ -1,41 +1,31 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskCustomFieldValueTypeCreateRepositoryDto, TaskCustomFieldValueTypeDeleteRepositoryDto, TaskCustomFieldValueTypeFindManyRepositoryDto, TaskCustomFieldValueTypeUpdateRepositoryDto } from "../repositories-dto/task-custom-field-value-type.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskStatusCreateRepositoryDto,
-    TaskStatusDeleteRepositoryDto,
-    TaskStatusFindManyRepositoryDto,
-    TaskStatusUpdateRepositoryDto
-} from '../repositories-dto/task-status.repository-dto'
-
-@Injectable()
-export class TaskStatusRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(
-        dto: TaskStatusCreateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+export const taskCustomFieldValueTypeModelExtentions = {
+    async extCreate(
+        dto: TaskCustomFieldValueTypeCreateRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { name, code, description, projectId } = dto
+            const { code, name } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskCustomFieldValueType.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskStatus.create({
+            const { id } = await client.taskCustomFieldValueType.create({
                 data: {
                     code,
                     name,
-                    description,
                     position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
-                    projectId,
                 },
                 select: { id: true },
             })
@@ -51,34 +41,34 @@ export class TaskStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(
-        dto: TaskStatusUpdateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extUpdate(
+        dto: TaskCustomFieldValueTypeUpdateRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { id, name, code, description, position: newPosition } = dto
+            const { id, name, code, position: newPosition } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskStatus.findUniqueOrThrow({
+                    await client.taskCustomFieldValueType.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskStatus.update({
+                await client.taskCustomFieldValueType.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskStatus.updateMany({
+                    await client.taskCustomFieldValueType.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -89,7 +79,7 @@ export class TaskStatusRepository {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskStatus.updateMany({
+                    await client.taskCustomFieldValueType.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -100,12 +90,11 @@ export class TaskStatusRepository {
                 }
             }
 
-            const { id: updatedId } = await client.taskStatus.update({
+            const { id: updatedId } = await client.taskCustomFieldValueType.update({
                 where: { id },
                 data: {
                     code,
                     name,
-                    description,
                     position: newPosition,
                 },
                 select: { id: true },
@@ -122,18 +111,18 @@ export class TaskStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(
-        dto: TaskStatusDeleteRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extDelete(
+        dto: TaskCustomFieldValueTypeDeleteRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskStatus.update({
+            const { id: deletedId } = await client.taskCustomFieldValueType.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -150,29 +139,29 @@ export class TaskStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(
-        dto: TaskStatusFindManyRepositoryDto = {},
-        prisma?: PrismaTransactionClientType,
+    async extFindMany(
+        dto: TaskCustomFieldValueTypeFindManyRepositoryDto = {},
+        prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskCustomFieldValueType.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskStatusWhereInput = {
+            const delegateWhere: Prisma.TaskCustomFieldValueTypeWhereInput = {
                 name: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskCustomFieldValueTypeOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { position: 'asc' }
@@ -184,18 +173,11 @@ export class TaskStatusRepository {
                 }
             }
 
-            if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
-                delegateWhere.createdAt = {
-                    gte: dto.filterByCreatedAt?.from ?? undefined,
-                    lte: dto.filterByCreatedAt?.to ?? undefined,
-                }
-            }
-
-            const count = await client.taskStatus.count({
+            const count = await client.taskCustomFieldValueType.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskStatus.findMany({
+            const data = await client.taskCustomFieldValueType.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,
@@ -220,5 +202,5 @@ export class TaskStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

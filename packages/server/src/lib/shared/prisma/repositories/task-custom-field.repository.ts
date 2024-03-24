@@ -1,22 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskCustomFieldCreateRepositoryDto, TaskCustomFieldDeleteRepositoryDto, TaskCustomFieldFindManyRepositoryDto, TaskCustomFieldUpdateRepositoryDto } from "../repositories-dto/task-custom-field.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import { TaskCustomFieldCreateRepositoryDto, TaskCustomFieldDeleteRepositoryDto, TaskCustomFieldFindManyRepositoryDto, TaskCustomFieldUpdateRepositoryDto } from '../repositories-dto/task-custom-field.repository-dto'
-
-@Injectable()
-export class TaskCustomFieldRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(
+export const taskCustomFieldModelExtentions = {
+    async extCreate(
         dto: TaskCustomFieldCreateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { value, taskId, taskCustomFieldTypeId } = dto
 
@@ -40,14 +37,14 @@ export class TaskCustomFieldRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(
+    async extUpdate(
         dto: TaskCustomFieldUpdateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id, value } = dto
 
@@ -70,14 +67,14 @@ export class TaskCustomFieldRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(
+    async extDelete(
         dto: TaskCustomFieldDeleteRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -98,17 +95,17 @@ export class TaskCustomFieldRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(
+    async extFindMany(
         dto: TaskCustomFieldFindManyRepositoryDto = {},
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<{
         data: Awaited<ReturnType<typeof PrismaService.instance.taskCustomField.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -158,5 +155,5 @@ export class TaskCustomFieldRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

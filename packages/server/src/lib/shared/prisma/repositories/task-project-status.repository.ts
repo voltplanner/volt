@@ -1,24 +1,16 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskProjectStatusCreateRepositoryDto, TaskProjectStatusDeleteRepositoryDto, TaskProjectStatusFindManyRepositoryDto, TaskProjectStatusUpdateRepositoryDto } from "../repositories-dto/task-project-status.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import {
-    TaskProjectStatusCreateRepositoryDto,
-    TaskProjectStatusDeleteRepositoryDto,
-    TaskProjectStatusFindManyRepositoryDto,
-    TaskProjectStatusUpdateRepositoryDto
-} from '../repositories-dto/task-project-status.repository-dto'
-
-@Injectable()
-export class TaskProjectStatusRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(dto: TaskProjectStatusCreateRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+export const taskProjectStatusModelExtentions = {
+    async extCreate(dto: TaskProjectStatusCreateRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { name, code, description } = dto
 
@@ -49,11 +41,11 @@ export class TaskProjectStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(dto: TaskProjectStatusUpdateRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+    async extUpdate(dto: TaskProjectStatusUpdateRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id, name, code, description, position: newPosition } = dto
 
@@ -117,11 +109,11 @@ export class TaskProjectStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(dto: TaskProjectStatusDeleteRepositoryDto, prisma?: PrismaTransactionClientType): Promise<string> {
+    async extDelete(dto: TaskProjectStatusDeleteRepositoryDto, prisma?: any): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -142,14 +134,14 @@ export class TaskProjectStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(dto: TaskProjectStatusFindManyRepositoryDto = {}, prisma?: PrismaTransactionClientType): Promise<{
+    async extFindMany(dto: TaskProjectStatusFindManyRepositoryDto = {}, prisma?: any): Promise<{
         data: Awaited<ReturnType<typeof PrismaService.instance.taskProjectStatus.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -209,13 +201,13 @@ export class TaskProjectStatusRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async getDefault(
-        prisma?: PrismaTransactionClientType
+    async extGetDefault(
+        prisma?: any
     ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskProjectStatus.findFirstOrThrow>>> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             // Since prisma does not support partial unique indexes we use findFirstOrThrow instead of findUniqueOrThrow
             return await client.taskProjectStatus.findFirstOrThrow({
@@ -232,5 +224,5 @@ export class TaskProjectStatusRepository {
                 message: e,
             })
         }
-    }
+    },
 }

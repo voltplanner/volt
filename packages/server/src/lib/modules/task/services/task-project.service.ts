@@ -1,17 +1,11 @@
 import { Injectable } from "@nestjs/common";
 
-import { PrismaService } from "../../../shared/prisma";
-import { TaskProjectRepository } from "../repositories/task-project.repository";
-import { TaskProjectStatusRepository } from "../repositories/task-project-status.repository";
-import { TaskUserRepository } from "../repositories/task-user.repository";
+import { PrismaServiceWithExtentionsType } from "../../../shared/prisma";
 
 @Injectable()
 export class TaskProjectService {
     constructor(
-        private readonly _prismaService: PrismaService,
-        private readonly _taskUserRepository: TaskUserRepository,
-        private readonly _taskProjectRepository: TaskProjectRepository,
-        private readonly _taskProjectStatusRepository: TaskProjectStatusRepository,
+        private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
     async createProject(dto: {
@@ -22,22 +16,22 @@ export class TaskProjectService {
         const { name, description, externalUserId } = dto
 
         return await this._prismaService.$transaction(async (client) => {
-            const internalUserId = await this._taskUserRepository.upsert({
+            const internalUserId = await this._prismaService.taskUser.extUpsert({
                 userId: externalUserId,
             }, client)
 
-            const defaultProjectStatus = await this._taskProjectStatusRepository.getDefault(
+            const defaultProjectStatus = await this._prismaService.taskProjectStatus.extGetDefault(
                 client,
             )
 
-            const projectId = await this._taskProjectRepository.create({
+            const projectId = await this._prismaService.taskProject.extCreate({
                 name,
                 description,
                 internalUserId,
                 statusId: defaultProjectStatus.id,
             }, client)
 
-            await this._taskProjectRepository.connectUser({
+            await this._prismaService.taskProject.extConnectUser({
                 internalUserId,
                 projectId,
             }, client)

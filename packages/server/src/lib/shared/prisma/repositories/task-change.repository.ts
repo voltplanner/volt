@@ -1,22 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskChangeCreateRepositoryDto, TaskChangeDeleteRepositoryDto, TaskChangeFindManyRepositoryDto } from "../repositories-dto/task-change.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import { TaskChangeCreateRepositoryDto, TaskChangeDeleteRepositoryDto, TaskChangeFindManyRepositoryDto } from '../repositories-dto/task-change.repository-dto'
-
-@Injectable()
-export class TaskChangeRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
+export const taskChangeModelExtentions = {
     async create(
         dto: TaskChangeCreateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { propertyName, valueNew, valueOld, taskId, userId } = dto
 
@@ -42,14 +39,14 @@ export class TaskChangeRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
     async delete(
         dto: TaskChangeDeleteRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -70,17 +67,17 @@ export class TaskChangeRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
     async findMany(
         dto: TaskChangeFindManyRepositoryDto = {},
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<{
         data: Awaited<ReturnType<typeof PrismaService.instance.taskChange.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -142,5 +139,5 @@ export class TaskChangeRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

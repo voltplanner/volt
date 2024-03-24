@@ -1,22 +1,19 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskCommentCreateRepositoryDto, TaskCommentDeleteRepositoryDto, TaskCommentFindManyRepositoryDto, TaskCommentUpdateRepositoryDto } from "../repositories-dto/task-comment.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import { TaskCommentCreateRepositoryDto, TaskCommentDeleteRepositoryDto, TaskCommentFindManyRepositoryDto, TaskCommentUpdateRepositoryDto } from '../repositories-dto/task-comment.repository-dto'
-
-@Injectable()
-export class TaskCommentRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(
+export const taskCommentModelExtentions = {
+    async extCreate(
         dto: TaskCommentCreateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { text, taskId, userId } = dto
 
@@ -40,14 +37,14 @@ export class TaskCommentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(
+    async extUpdate(
         dto: TaskCommentUpdateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id, text } = dto
 
@@ -70,14 +67,14 @@ export class TaskCommentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(
+    async extDelete(
         dto: TaskCommentDeleteRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -98,17 +95,17 @@ export class TaskCommentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(
+    async extFindMany(
         dto: TaskCommentFindManyRepositoryDto = {},
-        prisma?: PrismaTransactionClientType,
+        prisma?: any,
     ): Promise<{
         data: Awaited<ReturnType<typeof PrismaService.instance.taskComment.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -178,5 +175,5 @@ export class TaskCommentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

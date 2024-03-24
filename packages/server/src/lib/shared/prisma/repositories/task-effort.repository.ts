@@ -1,30 +1,25 @@
-import { Injectable } from '@nestjs/common'
+import { DefaultError } from "../../errors/default.error"
+import { UnexpectedError } from "../../errors/unexpected.error"
+import { TPaginatedMeta } from "../../types/paginated-meta.type"
+import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
+import { PrismaService } from "../prisma.service"
+import { TaskEffortCreateRepositoryDto, TaskEffortDeleteRepositoryDto, TaskEffortFindManyRepositoryDto, TaskEffortUpdateRepositoryDto } from "../repositories-dto/task-effort.repository-dto"
+import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-import { DefaultError } from '../../../shared/errors/default.error'
-import { UnexpectedError } from '../../../shared/errors/unexpected.error'
-import { Prisma, PrismaService, PrismaTransactionClientType } from '../../../shared/prisma'
-import { TPaginatedMeta } from '../../../shared/types/paginated-meta.type'
-import { parseMetaArgs } from '../../../shared/utils'
-import { TaskAttachmentCreateRepositoryDto, TaskAttachmentDeleteRepositoryDto, TaskAttachmentFindManyRepositoryDto, TaskAttachmentUpdateRepositoryDto } from '../repositories-dto/task-attachment.repository-dto'
-
-@Injectable()
-export class TaskAttachmentRepository {
-    constructor(private readonly _prisma: PrismaService) {}
-
-    async create(
-        dto: TaskAttachmentCreateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+export const taskEffortModelExtentions = {
+    async extCreate(
+        dto: TaskEffortCreateRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { name, description, externalId, sizeKb, taskId, userId } = dto
+            const { value, description, taskId, userId } = dto
 
-            const { id } = await client.taskAttachment.create({
+            const { id } = await client.taskEffort.create({
                 data: {
-                    name,
-                    sizeKb,
-                    externalId,
+                    value,
                     description,
                     taskId,
                     userId,
@@ -43,21 +38,21 @@ export class TaskAttachmentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async update(
-        dto: TaskAttachmentUpdateRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extUpdate(
+        dto: TaskEffortUpdateRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { id, name, description } = dto
+            const { id, value, description } = dto
 
-            const { id: updatedId } = await client.taskAttachment.update({
+            const { id: updatedId } = await client.taskEffort.update({
                 where: { id },
                 data: {
-                    name,
+                    value,
                     description,
                 },
                 select: { id: true },
@@ -74,18 +69,18 @@ export class TaskAttachmentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async delete(
-        dto: TaskAttachmentDeleteRepositoryDto,
-        prisma?: PrismaTransactionClientType,
+    async extDelete(
+        dto: TaskEffortDeleteRepositoryDto,
+        prisma?: any,
     ): Promise<string> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskAttachment.update({
+            const { id: deletedId } = await client.taskEffort.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -102,41 +97,33 @@ export class TaskAttachmentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 
-    async findMany(
-        dto: TaskAttachmentFindManyRepositoryDto = {},
-        prisma?: PrismaTransactionClientType,
+    async extFindMany(
+        dto: TaskEffortFindManyRepositoryDto = {},
+        prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskAttachment.findMany>>
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskEffort.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
-            const client = prisma || this._prisma
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskAttachmentWhereInput = {
-                name: undefined,
+            const delegateWhere: Prisma.TaskEffortWhereInput = {
                 taskId: undefined,
                 userId: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskAttachmentOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskEffortOrderByWithRelationAndSearchRelevanceInput =
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { createdAt: 'desc' }
-
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive'
-                }
-            }
 
             if (dto.filterByTaskId) {
                 delegateWhere.taskId = dto.filterByTaskId
@@ -153,11 +140,11 @@ export class TaskAttachmentRepository {
                 }
             }
 
-            const count = await client.taskAttachment.count({
+            const count = await client.taskEffort.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskAttachment.findMany({
+            const data = await client.taskEffort.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 take,
@@ -182,5 +169,5 @@ export class TaskAttachmentRepository {
                 metadata: dto,
             })
         }
-    }
+    },
 }

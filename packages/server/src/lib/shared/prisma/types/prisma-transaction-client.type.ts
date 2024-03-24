@@ -1,8 +1,6 @@
-import { DefaultArgs } from "@prisma/client/runtime/library";
-
-import { Prisma, PrismaClient } from "..";
+import { PrismaServiceWithExtentionsType } from "..";
 
 export type PrismaTransactionClientType = Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    PrismaServiceWithExtentionsType,
     "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
 >

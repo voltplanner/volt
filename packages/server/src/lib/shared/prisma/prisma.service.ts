@@ -7,8 +7,24 @@ import {
 } from '@nestjs/common'
 import { PrismaClient } from 'generatedprisma'
 
-import { Prisma } from '.'
 import { PRISMA_CONFIG, PrismaConfig } from './prisma.config'
+import { taskModelExtentions } from './repositories/task.repository'
+import { taskAttachmentModelExtentions } from './repositories/task-attachment.repository'
+import { taskChangeModelExtentions } from './repositories/task-change.repository'
+import { taskCommentModelExtentions } from './repositories/task-comment.repository'
+import { taskCustomFieldModelExtentions } from './repositories/task-custom-field.repository'
+import { taskCustomFieldTypeModelExtentions } from './repositories/task-custom-field-type.repository'
+import { taskCustomFieldValueTypeModelExtentions } from './repositories/task-custom-field-value-type.repository'
+import { taskEffortModelExtentions } from './repositories/task-effort.repository'
+import { taskProjectModelExtentions } from './repositories/task-project.repository'
+import { taskProjectStatusModelExtentions } from './repositories/task-project-status.repository'
+import { taskRelationModelExtentions } from './repositories/task-relation.repository'
+import { taskStatusModelExtentions } from './repositories/task-status.repository'
+import { taskTagModelExtentions } from './repositories/task-tag.repository'
+import { taskTypeModelExtentions } from './repositories/task-type.repository'
+import { taskUserModelExtentions } from './repositories/task-user.repository'
+
+export type PrismaServiceWithExtentionsType = ReturnType<PrismaService['withExtensions']>
 
 @Injectable()
 export class PrismaService
@@ -40,64 +56,34 @@ export class PrismaService
                 },
             ],
         })
+
         PrismaService.instance = this
     }
 
-    private _getClientModelName<T extends Prisma.ModelName>(
-        modelName: T,
-    ): Uncapitalize<T> {
-        return (modelName.charAt(0).toLowerCase() +
-            modelName.slice(1)) as Uncapitalize<T>
-    }
-
-    private _isModelHasSomeFields(
-        modelName: Prisma.ModelName,
-        fieldNames: string[],
-    ): boolean {
-        const clientModelName = this._getClientModelName(modelName)
-
-        return fieldNames.some((i) => i in this[clientModelName].fields)
+    withExtensions() {
+        return this.$extends({
+            model: {
+                task: { ...taskModelExtentions },
+                taskTag: { ...taskTagModelExtentions },
+                taskType: { ...taskTypeModelExtentions },
+                taskUser: { ...taskUserModelExtentions },
+                taskStatus: { ...taskStatusModelExtentions },
+                taskChange: { ...taskChangeModelExtentions },
+                taskEffort: { ...taskEffortModelExtentions },
+                taskProject: { ...taskProjectModelExtentions },
+                taskComment: { ...taskCommentModelExtentions },
+                taskRelation: { ...taskRelationModelExtentions },
+                taskAttachment: { ...taskAttachmentModelExtentions },
+                taskCustomField: { ...taskCustomFieldModelExtentions },
+                taskProjectStatus: { ...taskProjectStatusModelExtentions },
+                taskCustomFieldType: { ...taskCustomFieldTypeModelExtentions },
+                taskCustomFieldValueType: { ...taskCustomFieldValueTypeModelExtentions },
+            },
+        })
     }
 
     async onModuleInit(): Promise<void> {
         const { logging, maxQueryExecutionTime } = this.config
-
-        // this.$extends({
-        //     query: {
-        //         $allModels: {
-        //             // ----------------------------------------------------
-        //             // SOFT DELETE EXTENTION
-        //             // ----------------------------------------------------
-        //             async delete({ model, args, query }) {
-        //                 if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
-        //                     const clientModelName = PrismaService.instance._getClientModelName(model)
-
-        //                     return await PrismaService.instance[clientModelName].update({
-        //                         ...args,
-        //                         data: { isDeleted: true },
-        //                     })
-        //                 }
-
-        //                 return await query(args)
-        //             },
-        //             // ----------------------------------------------------
-        //             // SOFT DELETE EXTENTION
-        //             // ----------------------------------------------------
-        //             async deleteMany({ model, args, query }) {
-        //                 if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
-        //                     const clientModelName = PrismaService.instance._getClientModelName(model)
-
-        //                     return await PrismaService.instance[clientModelName].updateMany({
-        //                         ...args,
-        //                         data: { isDeleted: true },
-        //                     })
-        //                 }
-
-        //                 return await query(args)
-        //             },
-        //         }
-        //     }
-        // })
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-extra-semi
@@ -140,4 +126,59 @@ export class PrismaService
     async onModuleDestroy(): Promise<void> {
         await this.$disconnect()
     }
+
+    // private async _defineExtentionSoftDelete() {
+    //     this.$extends({
+    //         query: {
+    //             $allModels: {
+    //                 // ----------------------------------------------------
+    //                 // SOFT DELETE EXTENTION
+    //                 // ----------------------------------------------------
+    //                 async delete({ model, args, query }) {
+    //                     if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
+    //                         const clientModelName = PrismaService.instance._getClientModelName(model)
+
+    //                         return await PrismaService.instance[clientModelName].update({
+    //                             ...args,
+    //                             data: { isDeleted: true },
+    //                         })
+    //                     }
+
+    //                     return await query(args)
+    //                 },
+    //                 // ----------------------------------------------------
+    //                 // SOFT DELETE EXTENTION
+    //                 // ----------------------------------------------------
+    //                 async deleteMany({ model, args, query }) {
+    //                     if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
+    //                         const clientModelName = PrismaService.instance._getClientModelName(model)
+
+    //                         return await PrismaService.instance[clientModelName].updateMany({
+    //                             ...args,
+    //                             data: { isDeleted: true },
+    //                         })
+    //                     }
+
+    //                     return await query(args)
+    //                 },
+    //             }
+    //         }
+    //     })
+    // }
+
+    // private _getClientModelName<T extends Prisma.ModelName>(
+    //     modelName: T,
+    // ): Uncapitalize<T> {
+    //     return (modelName.charAt(0).toLowerCase() +
+    //         modelName.slice(1)) as Uncapitalize<T>
+    // }
+
+    // private _isModelHasSomeFields(
+    //     modelName: Prisma.ModelName,
+    //     fieldNames: string[],
+    // ): boolean {
+    //     const clientModelName = this._getClientModelName(modelName)
+
+    //     return fieldNames.some((i) => i in this[clientModelName].fields)
+    // }
 }

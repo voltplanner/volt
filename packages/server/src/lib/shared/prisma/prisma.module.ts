@@ -4,9 +4,10 @@ import {
     patchPrismaConfig,
     PRISMA_CONFIG,
     PRISMA_OPTIONS_TYPE,
+    PrismaConfig,
     PrismaConfigurableModuleClass,
 } from './prisma.config'
-import { PrismaService } from './prisma.service'
+import { PrismaService, PrismaServiceWithExtentionsType } from './prisma.service'
 
 @Module({})
 export class PrismaModule extends PrismaConfigurableModuleClass {
@@ -19,7 +20,10 @@ export class PrismaModule extends PrismaConfigurableModuleClass {
                   }
                 : {
                       provide: PrismaService,
-                      useClass: PrismaService,
+                      useFactory: (config: PrismaConfig): PrismaServiceWithExtentionsType => {
+                        return new PrismaService(config).withExtensions()
+                      },
+                      inject: [PRISMA_CONFIG],
                   },
             {
                 provide: PRISMA_CONFIG,
