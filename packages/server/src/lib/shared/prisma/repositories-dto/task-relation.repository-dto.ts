@@ -17,6 +17,14 @@ export type TaskRelationUpdateRepositoryDto = {
     description?: string
 }
 
+export type TaskRelationUpsertRepositoryDto = {
+    code: string
+    nameMain: string
+    nameForeign: string
+    projectId: string
+    description?: string | null
+}
+
 export type TaskRelationDeleteRepositoryDto = {
     id: string
 }

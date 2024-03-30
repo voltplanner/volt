@@ -1,31 +1,42 @@
+import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
-import { TaskProjectStatusCreateRepositoryDto, TaskProjectStatusDeleteRepositoryDto, TaskProjectStatusFindManyRepositoryDto, TaskProjectStatusUpdateRepositoryDto } from "../repositories-dto/task-project-status.repository-dto"
+import { TaskUserActionCreateRepositoryDto as TaskUserActionUpsertRepositoryDto, TaskUserActionDeleteRepositoryDto, TaskUserActionFindManyRepositoryDto, TaskUserActionGetOneByCodeRepositoryDto, TaskUserActionUpdateRepositoryDto } from "../repositories-dto/task-user-action.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-export const taskProjectStatusModelExtentions = {
-    async extCreate(dto: TaskProjectStatusCreateRepositoryDto, prisma?: any): Promise<string> {
+export const taskUserActionModelExtentions = {
+    async extUpsert(
+        dto: TaskUserActionUpsertRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { name, code, description } = dto
 
-            const {
-                _max: { position: maxPosition },
-            } = await client.taskProjectStatus.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskUserAction.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskProjectStatus.create({
-                data: {
+            const { id } = await client.taskUserAction.upsert({
+                where: {
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
+                    },
+                },
+                create: {
                     code,
                     name,
                     description,
                     position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                },
+                update: {
+                    name,
+                    description,
                 },
                 select: { id: true },
             })
@@ -43,7 +54,10 @@ export const taskProjectStatusModelExtentions = {
         }
     },
 
-    async extUpdate(dto: TaskProjectStatusUpdateRepositoryDto, prisma?: any): Promise<string> {
+    async extUpdate(
+        dto: TaskUserActionUpdateRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
@@ -52,20 +66,20 @@ export const taskProjectStatusModelExtentions = {
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskProjectStatus.findUniqueOrThrow({
+                    await client.taskStatus.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskProjectStatus.update({
+                await client.taskStatus.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskProjectStatus.updateMany({
+                    await client.taskStatus.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -76,7 +90,7 @@ export const taskProjectStatusModelExtentions = {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskProjectStatus.updateMany({
+                    await client.taskStatus.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -87,7 +101,7 @@ export const taskProjectStatusModelExtentions = {
                 }
             }
 
-            const { id: updatedId } = await client.taskProjectStatus.update({
+            const { id: updatedId } = await client.taskStatus.update({
                 where: { id },
                 data: {
                     code,
@@ -111,13 +125,16 @@ export const taskProjectStatusModelExtentions = {
         }
     },
 
-    async extDelete(dto: TaskProjectStatusDeleteRepositoryDto, prisma?: any): Promise<string> {
+    async extDelete(
+        dto: TaskUserActionDeleteRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskProjectStatus.update({
+            const { id: deletedId } = await client.taskStatus.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -136,8 +153,11 @@ export const taskProjectStatusModelExtentions = {
         }
     },
 
-    async extFindMany(dto: TaskProjectStatusFindManyRepositoryDto = {}, prisma?: any): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskProjectStatus.findMany>>
+    async extFindMany(
+        dto: TaskUserActionFindManyRepositoryDto = {},
+        prisma?: any,
+    ): Promise<{
+        data: Awaited<ReturnType<typeof PrismaService.instance.taskUserAction.findMany>>
         meta: TPaginatedMeta
     }> {
         try {
@@ -148,37 +168,16 @@ export const taskProjectStatusModelExtentions = {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskProjectStatusWhereInput = {
-                name: undefined,
+            const delegateWhere: Prisma.TaskUserActionWhereInput = {
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskProjectStatusOrderByWithRelationAndSearchRelevanceInput =
-                dto.orderBy
-                    ? { [dto.orderBy.field]: dto.orderBy.order }
-                    : { position: 'asc' }
-
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive',
-                }
-            }
-
-            if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
-                delegateWhere.createdAt = {
-                    gte: dto.filterByCreatedAt?.from ?? undefined,
-                    lte: dto.filterByCreatedAt?.to ?? undefined,
-                }
-            }
-
-            const count = await client.taskProjectStatus.count({
+            const count = await client.taskUserAction.count({
                 where: delegateWhere,
             })
 
-            const data = await client.taskProjectStatus.findMany({
+            const data = await client.taskUserAction.findMany({
                 where: delegateWhere,
-                orderBy: delegateOrderBy,
                 take,
                 skip,
             })
@@ -203,18 +202,25 @@ export const taskProjectStatusModelExtentions = {
         }
     },
 
-    async extGetDefault(
-        prisma?: any
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskProjectStatus.findFirstOrThrow>>> {
+    async extGetOneByCode(
+        dto: TaskUserActionGetOneByCodeRepositoryDto,
+        prisma?: any,
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserAction.findUniqueOrThrow>>> {
         try {
+            const { code } = dto
+
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            // Since prisma does not support partial unique indexes we use findFirstOrThrow instead of findUniqueOrThrow
-            return await client.taskProjectStatus.findFirstOrThrow({
+            const data = await client.taskUserAction.findUniqueOrThrow({
                 where: {
-                    isDefault: true,
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
+                    },
                 },
             })
+
+            return data
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e
@@ -222,6 +228,7 @@ export const taskProjectStatusModelExtentions = {
 
             throw new UnexpectedError({
                 message: e,
+                metadata: dto,
             })
         }
     },

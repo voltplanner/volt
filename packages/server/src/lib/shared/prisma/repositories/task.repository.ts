@@ -1,8 +1,8 @@
+import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
 import { TaskCreateRepositoryDto, TaskDeleteRepositoryDto, TaskFindManyRepositoryDto, TaskFindOneRepositoryDto, TaskFindSubtasksRepositoryDto, TaskUpdateRepositoryDto } from "../repositories-dto/task.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
@@ -22,13 +22,13 @@ export const taskModelExtentions = {
                 estimatedDateStart,
                 estimatedDuration,
 
-                typeId,
                 statusId,
                 projectId,
                 createdById,
 
                 parentId,
                 assignedToId,
+                tagsIds,
             } = dto
 
             // Default values, if we have empty DB
@@ -84,7 +84,6 @@ export const taskModelExtentions = {
                     estimatedDateStart,
                     estimatedDuration,
 
-                    typeId,
                     statusId,
                     projectId,
                     createdById,
@@ -93,6 +92,15 @@ export const taskModelExtentions = {
                     assignedToId,
                 },
             })
+
+            if (tagsIds?.length) {
+                await client.taskOnTaskTag.createMany({
+                    data: tagsIds.map(taskTagId => ({
+                        taskId: id,
+                        taskTagId,
+                    })),
+                })
+            }
 
             return id
         } catch (e) {
@@ -125,7 +133,6 @@ export const taskModelExtentions = {
                 estimatedDateStart,
                 estimatedDuration,
 
-                typeId,
                 parentId,
                 statusId,
                 assignedToId,
@@ -210,7 +217,6 @@ export const taskModelExtentions = {
                     estimatedDateStart,
                     estimatedDuration,
 
-                    typeId,
                     parentId,
                     statusId,
                     assignedToId,
@@ -324,7 +330,6 @@ export const taskModelExtentions = {
             const delegateWhere: Prisma.TaskWhereInput = {
                 name: undefined,
                 number: undefined,
-                typeId: undefined,
                 statusId: undefined,
                 parentId: undefined,
                 projectId: undefined,
@@ -345,10 +350,6 @@ export const taskModelExtentions = {
 
             if (dto.filterByNumber) {
                 delegateWhere.number = dto.filterByNumber
-            }
-
-            if (dto.filterByTypeId) {
-                delegateWhere.typeId = dto.filterByTypeId
             }
 
             if (dto.filterByStatusId) {

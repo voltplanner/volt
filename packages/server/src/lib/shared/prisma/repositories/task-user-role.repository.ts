@@ -2,30 +2,41 @@ import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { PrismaService } from "../prisma.service"
-import { TaskTagConnectTaskRepositoryDto, TaskTagCreateRepositoryDto, TaskTagDeleteRepositoryDto, TaskTagDisconnectTaskRepositoryDto, TaskTagFindManyRepositoryDto, TaskTagUpdateRepositoryDto, TaskTagUpsertRepositoryDto } from "../repositories-dto/task-tag.repository-dto"
+import { TaskUserRoleDeleteRepositoryDto, TaskUserRoleFindManyRepositoryDto, TaskUserRoleGetOneByCodeRepositoryDto, TaskUserRoleUpdateRepositoryDto, TaskUserRoleUpsertRepositoryDto } from "../repositories-dto/task-user-role.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
-export const taskTagModelExtentions = {
-    async extCreate(
-        dto: TaskTagCreateRepositoryDto,
+export const taskUserRoleModelExtentions = {
+    async extUpsert(
+        dto: TaskUserRoleUpsertRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { code, name, description, projectId } = dto
+            const { name, code, projectId, description } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskTag.aggregate({
+            const { _max: { position: maxPosition } } = await client.taskUserRole.aggregate({
                 _max: { position: true },
             })
 
-            const { id } = await client.taskTag.create({
-                data: {
+            const { id } = await client.taskUserRole.upsert({
+                where: {
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
+                    },
+                },
+                create: {
                     code,
                     name,
+                    projectId,
                     description,
                     position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                },
+                update: {
+                    name,
                     projectId,
+                    description,
                 },
                 select: { id: true },
             })
@@ -44,7 +55,7 @@ export const taskTagModelExtentions = {
     },
 
     async extUpdate(
-        dto: TaskTagUpdateRepositoryDto,
+        dto: TaskUserRoleUpdateRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -55,20 +66,20 @@ export const taskTagModelExtentions = {
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
                 const { position: oldPosition } =
-                    await client.taskTag.findUniqueOrThrow({
+                    await client.taskUserRole.findUniqueOrThrow({
                         where: { id },
                         select: { position: true },
                     })
 
                 // We need to temporary remove record from position flow, for satisfy position unique index
                 // Maybe remove unique and just make it serial in db?
-                await client.taskTag.update({
+                await client.taskUserRole.update({
                     where: { id },
                     data: { position: -1 },
                 })
 
                 if (newPosition > oldPosition) {
-                    await client.taskTag.updateMany({
+                    await client.taskUserRole.updateMany({
                         where: {
                             position: { gt: oldPosition, lte: newPosition },
                         },
@@ -79,7 +90,7 @@ export const taskTagModelExtentions = {
                 }
 
                 if (newPosition < oldPosition) {
-                    await client.taskTag.updateMany({
+                    await client.taskUserRole.updateMany({
                         where: {
                             position: { gte: newPosition, lt: oldPosition },
                         },
@@ -90,7 +101,7 @@ export const taskTagModelExtentions = {
                 }
             }
 
-            const { id: updatedId } = await client.taskTag.update({
+            const { id: updatedId } = await client.taskUserRole.update({
                 where: { id },
                 data: {
                     code,
@@ -114,61 +125,8 @@ export const taskTagModelExtentions = {
         }
     },
 
-    async extUpsert(
-        dto: TaskTagUpsertRepositoryDto,
-        prisma?: any,
-    ): Promise<string> {
-        try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
-
-            const { name, code, description, isDefault, projectId } = dto
-
-            const { _max: { position: maxPosition } } = await client.taskTag.aggregate({
-                _max: { position: true },
-            })
-
-            const { id } = await client.taskTag.upsert({
-                where: {
-                    code_isDeleted: {
-                        code,
-                        isDeleted: false,
-                    },
-                },
-                create: {
-                    code,
-                    name,
-                    projectId,
-                    description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
-                },
-                update: {
-                    code,
-                    name,
-                    projectId,
-                    description,
-                },
-                select: { id: true },
-            })
-
-            if (isDefault === true) {
-                await this.extSetDefault({ id }, client)
-            }
-
-            return id
-        } catch (e) {
-            if (e instanceof DefaultError) {
-                throw e
-            }
-
-            throw new UnexpectedError({
-                message: e,
-                metadata: dto,
-            })
-        }
-    },
-
     async extDelete(
-        dto: TaskTagDeleteRepositoryDto,
+        dto: TaskUserRoleDeleteRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -176,7 +134,7 @@ export const taskTagModelExtentions = {
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskTag.update({
+            const { id: deletedId } = await client.taskUserRole.update({
                 where: { id },
                 data: { isDeleted: true },
                 select: { id: true },
@@ -196,26 +154,21 @@ export const taskTagModelExtentions = {
     },
 
     async extFindMany(
-        dto: TaskTagFindManyRepositoryDto,
+        dto: TaskUserRoleFindManyRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskTag.findMany>>> {
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserRole.findMany>>> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
             const { projectId } = dto
 
-            const delegateWhere: Prisma.TaskTagWhereInput = {
+            const delegateWhere: Prisma.TaskUserRoleWhereInput = {
                 projectId,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskTagOrderByWithRelationAndSearchRelevanceInput = {
-                position: 'asc',
-            }
-
-            return await client.taskTag.findMany({
+            return await client.taskUserRole.findMany({
                 where: delegateWhere,
-                orderBy: delegateOrderBy,
             })
         } catch (e) {
             if (e instanceof DefaultError) {
@@ -229,63 +182,25 @@ export const taskTagModelExtentions = {
         }
     },
 
-    async extConnectTask(
-        dto: TaskTagConnectTaskRepositoryDto,
+    async extGetOneByCode(
+        dto: TaskUserRoleGetOneByCodeRepositoryDto,
         prisma?: any,
-    ): Promise<void> {
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserRole.findUniqueOrThrow>>> {
         try {
+            const { code } = dto
+
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { taskTagId, taskId } = dto
-
-            await client.taskTag.update({
+            const data = await client.taskUserRole.findUniqueOrThrow({
                 where: {
-                    id: taskTagId,
-                },
-                data: {
-                    tasks: {
-                        create: {
-                            taskId,
-                        },
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
                     },
                 },
             })
-        } catch (e) {
-            if (e instanceof DefaultError) {
-                throw e
-            }
 
-            throw new UnexpectedError({
-                message: e,
-                metadata: dto,
-            })
-        }
-    },
-
-    async extDisconnectTask(
-        dto: TaskTagDisconnectTaskRepositoryDto,
-        prisma?: any,
-    ): Promise<void> {
-        try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
-
-            const { taskTagId, taskId } = dto
-
-            await client.taskTag.update({
-                where: {
-                    id: taskTagId,
-                },
-                data: {
-                    tasks: {
-                        disconnect: {
-                            taskId_taskTagId: {
-                                taskId,
-                                taskTagId,
-                            },
-                        },
-                    },
-                },
-            })
+            return data
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

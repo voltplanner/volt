@@ -4,7 +4,7 @@ import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
 import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
-import { TaskRelationConnectTaskRepositoryDto, TaskRelationCreateRepositoryDto, TaskRelationDeleteRepositoryDto, TaskRelationDisconnectTaskRepositoryDto, TaskRelationFindManyRepositoryDto, TaskRelationUpdateRepositoryDto } from "../repositories-dto/task-relation.repository-dto"
+import { TaskRelationConnectTaskRepositoryDto, TaskRelationCreateRepositoryDto, TaskRelationDeleteRepositoryDto, TaskRelationDisconnectTaskRepositoryDto, TaskRelationFindManyRepositoryDto, TaskRelationUpdateRepositoryDto, TaskRelationUpsertRepositoryDto } from "../repositories-dto/task-relation.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
 export const taskRelationModelExtentions = {
@@ -106,6 +106,57 @@ export const taskRelationModelExtentions = {
             })
 
             return updatedId
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extUpsert(
+        dto: TaskRelationUpsertRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { code, nameMain, nameForeign, description, projectId } = dto
+
+            const { _max: { position: maxPosition } } = await client.taskRelation.aggregate({
+                _max: { position: true },
+            })
+
+            const { id } = await client.taskRelation.upsert({
+                where: {
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
+                    },
+                },
+                create: {
+                    code,
+                    nameMain,
+                    nameForeign,
+                    projectId,
+                    description,
+                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                },
+                update: {
+                    code,
+                    nameMain,
+                    nameForeign,
+                    projectId,
+                    description,
+                },
+                select: { id: true },
+            })
+
+            return id
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

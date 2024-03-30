@@ -1,7 +1,8 @@
+import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { PrismaService } from "../prisma.service"
-import { TaskProjectConnectProjectRepositoryDto, TaskProjectDisconnectProjectRepositoryDto, TaskUserCreateRepositoryDto, TaskUserDeleteRepositoryDto, TaskUserGetOneByExternalUserIdRepositoryDto, TaskUserUpsertRepositoryDto } from "../repositories-dto/task-user.repository-dto"
+import { TaskProjectConnectProjectRepositoryDto, TaskProjectDisconnectProjectRepositoryDto, TaskUserCreateRepositoryDto, TaskUserFindAllRepositoryDto } from "../repositories-dto/task-user.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
 export const taskUserModelExtentions = {
@@ -9,79 +10,85 @@ export const taskUserModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { userId } = dto
+            const { id, roleId } = dto
 
-            const { id } = await client.taskUser.create({
-                data: { externalId: userId },
-                select: { id: true },
-            })
-
-            return id
-        } catch (e) {
-            if (e instanceof DefaultError) {
-                throw e
-            }
-
-            throw new UnexpectedError({
-                message: e,
-                metadata: dto,
-            })
-        }
-    },
-
-    async extUpsert(dto: TaskUserUpsertRepositoryDto, prisma?: any): Promise<string> {
-        try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
-
-            const { userId } = dto
-
-            const { id } = await client.taskUser.upsert({
-                where: {
-                    externalId_isDeleted: {
-                        externalId: userId,
-                        isDeleted: false,
-                    },
-                },
-                create: {
-                    externalId: userId,
-                },
-                update: {},
-                select: { id: true },
-            })
-
-            return id
-        } catch (e) {
-            if (e instanceof DefaultError) {
-                throw e
-            }
-
-            throw new UnexpectedError({
-                message: e,
-                metadata: dto,
-            })
-        }
-    },
-
-    async extDelete(dto: TaskUserDeleteRepositoryDto, prisma?: any): Promise<string> {
-        try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
-
-            const { userId } = dto
-
-            const { id: deletedId } = await client.taskUser.update({
-                where: {
-                    externalId_isDeleted: {
-                        externalId: userId,
-                        isDeleted: false,
-                    },
-                },
+            await client.taskUser.create({
                 data: {
-                    isDeleted: true,
+                    id,
+                    roleId,
                 },
                 select: { id: true },
             })
 
-            return deletedId
+            return id
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extUpsert(dto: TaskUserCreateRepositoryDto, prisma?: any): Promise<string> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { id, roleId } = dto
+
+            await client.taskUser.upsert({
+                where: { id },
+                create: {
+                    id,
+                    roleId,
+                },
+                update: {
+                    roleId,
+                },
+                select: { id: true },
+            })
+
+            return id
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extFindAll(
+        dto: TaskUserFindAllRepositoryDto,
+        prisma?: any,
+    ): Promise<string[]> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { projectId } = dto
+
+            const delegateWhere: Prisma.TaskUserWhereInput = {
+                projects: {
+                    some: {
+                        projectId,
+                    },
+                },
+            }
+
+            const data = await client.taskUser.findMany({
+                where: delegateWhere,
+                select: {
+                    id: true,
+                },
+            })
+
+            return data.map(({ id }) => id)
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e
@@ -101,11 +108,11 @@ export const taskUserModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { userId, projectId } = dto
+            const { id, projectId } = dto
 
             await client.taskUser.update({
                 where: {
-                    id: userId,
+                    id,
                 },
                 data: {
                     projects: {
@@ -134,7 +141,7 @@ export const taskUserModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { userId, projectId } = dto
+            const { id, projectId } = dto
 
             await client.taskUser.update({
                 where: {
@@ -145,43 +152,12 @@ export const taskUserModelExtentions = {
                         disconnect: {
                             projectId_userId: {
                                 projectId,
-                                userId,
+                                userId: id,
                             },
                         },
                     },
                 },
             })
-        } catch (e) {
-            if (e instanceof DefaultError) {
-                throw e
-            }
-
-            throw new UnexpectedError({
-                message: e,
-                metadata: dto,
-            })
-        }
-    },
-
-    async extGetOneByExternalUserId(
-        dto: TaskUserGetOneByExternalUserIdRepositoryDto,
-        prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUser.findUniqueOrThrow>>> {
-        try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
-
-            const { userId } = dto
-
-            const userOrmEntity = await client.taskUser.findUniqueOrThrow({
-                where: {
-                    externalId_isDeleted: {
-                        externalId: userId,
-                        isDeleted: false,
-                    },
-                },
-            })
-
-            return userOrmEntity
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

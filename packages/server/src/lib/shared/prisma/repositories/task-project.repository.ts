@@ -1,10 +1,10 @@
+import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
-import { TaskProjectConnectUserRepositoryDto, TaskProjectCreateRepositoryDto, TaskProjectDeleteRepositoryDto, TaskProjectDisconnectUserRepositoryDto, TaskProjectFindManyRepositoryDto, TaskProjectUpdateRepositoryDto } from "../repositories-dto/task-project.repository-dto"
+import { TaskProjectConnectUsersRepositoryDto, TaskProjectCreateRepositoryDto, TaskProjectDeleteRepositoryDto, TaskProjectDisconnectUsersRepositoryDto, TaskProjectFindManyRepositoryDto, TaskProjectUpdateRepositoryDto } from "../repositories-dto/task-project.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
 export const taskProjectModelExtentions = {
@@ -15,13 +15,14 @@ export const taskProjectModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { name, statusId, description, internalUserId: createdById } = dto
+            const { name, budget, deadline, description } = dto
 
             const { id } = await client.taskProject.create({
                 data: {
                     name,
-                    statusId,
-                    createdById,
+                    budget,
+                    deadline,
+                    version: 0,
                     description,
                 },
                 select: { id: true },
@@ -44,13 +45,14 @@ export const taskProjectModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { id, version, name, statusId, description } = dto
+            const { id, version, name, budget, deadline, description } = dto
 
             const { id: updatedId } = await client.taskProject.update({
                 where: { id, version },
                 data: {
                     name,
-                    statusId,
+                    budget,
+                    deadline,
                     description,
                 },
                 select: { id: true },
@@ -110,7 +112,6 @@ export const taskProjectModelExtentions = {
 
             const delegateWhere: Prisma.TaskProjectWhereInput = {
                 name: undefined,
-                status: undefined,
                 isDeleted: false,
             }
 
@@ -124,10 +125,6 @@ export const taskProjectModelExtentions = {
                     contains: dto.filterByName,
                     mode: 'insensitive',
                 }
-            }
-
-            if (dto.filterByStatusId) {
-                delegateWhere.statusId = dto.filterByStatusId
             }
 
             if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
@@ -168,26 +165,21 @@ export const taskProjectModelExtentions = {
         }
     },
 
-    async extConnectUser(
-        dto: TaskProjectConnectUserRepositoryDto,
+    async extConnectUsers(
+        dto: TaskProjectConnectUsersRepositoryDto,
         prisma?: any,
     ): Promise<void> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { internalUserId, projectId } = dto
+            const { projectId, userIds } = dto
 
-            await client.taskProject.update({
-                where: {
-                    id: projectId,
-                },
-                data: {
-                    users: {
-                        create: {
-                            userId: internalUserId,
-                        },
-                    },
-                },
+            await client.taskProjectOnUser.createMany({
+                data: userIds.map(userId => ({
+                    projectId,
+                    userId,
+                })),
+                skipDuplicates: true,
             })
         } catch (e) {
             if (e instanceof DefaultError) {
@@ -201,28 +193,21 @@ export const taskProjectModelExtentions = {
         }
     },
 
-    async extDisconnectUser(
-        dto: TaskProjectDisconnectUserRepositoryDto,
+    async extDisconnectUsers(
+        dto: TaskProjectDisconnectUsersRepositoryDto,
         prisma?: any,
     ): Promise<void> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { internalUserId, projectId } = dto
+            const { projectId, userIds } = dto
 
-            await client.taskProject.update({
+            await client.taskProjectOnUser.deleteMany({
                 where: {
-                    id: projectId,
-                },
-                data: {
-                    users: {
-                        disconnect: {
-                            projectId_userId: {
-                                projectId,
-                                userId: internalUserId,
-                            },
-                        },
-                    },
+                    OR: userIds.map(userId => ({
+                        projectId,
+                        userId,
+                    })),
                 },
             })
         } catch (e) {

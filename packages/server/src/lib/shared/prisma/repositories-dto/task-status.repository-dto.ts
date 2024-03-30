@@ -3,8 +3,9 @@ import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 export type TaskStatusCreateRepositoryDto = {
     name: string
     code: string
-    description: string
     projectId: string
+    description: string
+    isDefault?: boolean
 }
 
 export type TaskStatusUpdateRepositoryDto = {
@@ -13,6 +14,15 @@ export type TaskStatusUpdateRepositoryDto = {
     code?: string
     position?: number
     description?: string | null
+    isDefault?: boolean
+}
+
+export type TaskStatusUpsertRepositoryDto = {
+    name: string
+    code: string
+    projectId: string
+    description?: string | null
+    isDefault?: boolean
 }
 
 export type TaskStatusDeleteRepositoryDto = {
@@ -20,17 +30,9 @@ export type TaskStatusDeleteRepositoryDto = {
 }
 
 export type TaskStatusFindManyRepositoryDto = {
-    curPage?: number
-    perPage?: number
+    projectId: string
+}
 
-    filterByName?: string
-    filterByCreatedAt?: {
-        from?: Date
-        to?: Date
-    }
-
-    orderBy?: {
-        field: 'position'
-        order: OrderEnum
-    }
+export type TaskStatusSetDefaultRepositoryDto = {
+    id: string
 }

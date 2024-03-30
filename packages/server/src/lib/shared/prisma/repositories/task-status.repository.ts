@@ -1,10 +1,8 @@
+import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
-import { TaskStatusCreateRepositoryDto, TaskStatusDeleteRepositoryDto, TaskStatusFindManyRepositoryDto, TaskStatusUpdateRepositoryDto } from "../repositories-dto/task-status.repository-dto"
+import { TaskStatusCreateRepositoryDto, TaskStatusDeleteRepositoryDto, TaskStatusFindManyRepositoryDto, TaskStatusSetDefaultRepositoryDto, TaskStatusUpdateRepositoryDto, TaskStatusUpsertRepositoryDto } from "../repositories-dto/task-status.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
 export const taskStatusModelExtentions = {
@@ -15,7 +13,7 @@ export const taskStatusModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { name, code, description, projectId } = dto
+            const { name, code, description, isDefault, projectId } = dto
 
             const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
                 _max: { position: true },
@@ -31,6 +29,10 @@ export const taskStatusModelExtentions = {
                 },
                 select: { id: true },
             })
+
+            if (isDefault === true) {
+                await this.extSetDefault({ id }, client)
+            }
 
             return id
         } catch (e) {
@@ -52,7 +54,7 @@ export const taskStatusModelExtentions = {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { id, name, code, description, position: newPosition } = dto
+            const { id, name, code, description, isDefault, position: newPosition } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
@@ -103,7 +105,64 @@ export const taskStatusModelExtentions = {
                 select: { id: true },
             })
 
+            if (isDefault === true) {
+                await this.extSetDefault({ id: updatedId }, client)
+            }
+
             return updatedId
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extUpsert(
+        dto: TaskStatusUpsertRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { name, code, description, isDefault, projectId } = dto
+
+            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
+                _max: { position: true },
+            })
+
+            const { id } = await client.taskStatus.upsert({
+                where: {
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
+                    },
+                },
+                create: {
+                    code,
+                    name,
+                    projectId,
+                    description,
+                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                },
+                update: {
+                    code,
+                    name,
+                    projectId,
+                    description,
+                },
+                select: { id: true },
+            })
+
+            if (isDefault === true) {
+                await this.extSetDefault({ id }, client)
+            }
+
+            return id
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e
@@ -145,63 +204,88 @@ export const taskStatusModelExtentions = {
     },
 
     async extFindMany(
-        dto: TaskStatusFindManyRepositoryDto = {},
+        dto: TaskStatusFindManyRepositoryDto,
         prisma?: any,
-    ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>
-        meta: TPaginatedMeta
-    }> {
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { curPage, perPage, take, skip } = parseMetaArgs({
-                curPage: dto.curPage,
-                perPage: dto.perPage,
-            })
+            const { projectId } = dto
 
             const delegateWhere: Prisma.TaskStatusWhereInput = {
-                name: undefined,
+                projectId,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput =
-                dto.orderBy
-                    ? { [dto.orderBy.field]: dto.orderBy.order }
-                    : { position: 'asc' }
-
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive',
-                }
+            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput = {
+                position: 'asc',
             }
 
-            if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
-                delegateWhere.createdAt = {
-                    gte: dto.filterByCreatedAt?.from ?? undefined,
-                    lte: dto.filterByCreatedAt?.to ?? undefined,
-                }
-            }
-
-            const count = await client.taskStatus.count({
-                where: delegateWhere,
-            })
-
-            const data = await client.taskStatus.findMany({
+            return await client.taskStatus.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
-                take,
-                skip,
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extGetDefault(
+        prisma?: any
+    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findFirstOrThrow>>> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            // Since prisma does not support partial unique indexes we use findFirstOrThrow instead of findUniqueOrThrow
+            return await client.taskStatus.findFirstOrThrow({
+                where: {
+                    isDefault: true,
+                },
+            })
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+            })
+        }
+    },
+
+    async extSetDefault(
+        dto: TaskStatusSetDefaultRepositoryDto,
+        prisma?: any,
+    ): Promise<void> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { id } = dto
+
+            const currentDefaultStatus = await client.taskStatus.findFirst({
+                where: {
+                    isDefault: true,
+                },
             })
 
-            return {
-                data,
-                meta: {
-                    curPage,
-                    perPage,
-                    total: count,
-                },
+            if (currentDefaultStatus) {
+                await client.taskStatus.update({
+                    where: { id: currentDefaultStatus.id },
+                    data: { isDefault: false },
+                })
             }
+
+            await client.taskStatus.update({
+                where: { id: id },
+                data: { isDefault: true },
+            })
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

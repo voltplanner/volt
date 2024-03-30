@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { PrismaServiceWithExtentionsType } from "../../../shared/prisma";
+import { PrismaServiceWithExtentionsType, PrismaTransactionClientType } from "../../../shared/prisma";
 
 @Injectable()
 export class TaskProjectService {
@@ -8,35 +8,39 @@ export class TaskProjectService {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
-    async createProject(dto: {
+    async projectCreate(dto: {
         readonly name: string
-        readonly description: string
-        readonly externalUserId: string
-    }) {
-        const { name, description, externalUserId } = dto
+        readonly budget?: number
+        readonly deadline?: Date
+        readonly description?: string
+    }, prisma?: PrismaTransactionClientType) {
+        const { name, budget, deadline, description } = dto
 
-        return await this._prismaService.$transaction(async (client) => {
-            const internalUserId = await this._prismaService.taskUser.extUpsert({
-                userId: externalUserId,
-            }, client)
+        const client = prisma || this._prismaService
 
-            const defaultProjectStatus = await this._prismaService.taskProjectStatus.extGetDefault(
-                client,
-            )
+        const projectId = await client.taskProject.extCreate({
+            name,
+            budget,
+            deadline,
+            description,
+        }, client)
 
-            const projectId = await this._prismaService.taskProject.extCreate({
-                name,
-                description,
-                internalUserId,
-                statusId: defaultProjectStatus.id,
-            }, client)
+        return projectId
+    }
 
-            await this._prismaService.taskProject.extConnectUser({
-                internalUserId,
+    async projectAddUsers(dto: {
+        readonly projectId: string
+        readonly userIds: string[]
+    }, prisma?: PrismaTransactionClientType) {
+        const { projectId, userIds } = dto
+
+        const client = prisma || this._prismaService
+
+        if (userIds.length) {
+            await client.taskProject.extConnectUsers({
                 projectId,
+                userIds,
             }, client)
-
-            return projectId
-        })
+        }
     }
 }

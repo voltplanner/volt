@@ -111,66 +111,102 @@ model Notification {
 
 model TaskUser {
     id         String @id @default(uuid()) @db.Uuid
-    externalId String @db.Uuid
+    roleId     String @map("role_id") @db.Uuid
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+
+    projects          TaskProjectOnUser[]
+    tasksAssignedTo   Task[]              @relation("FK__TASK__ASSIGNED_TO")
+    attachments       TaskAttachment[]
+    changes           TaskChange[]
+    comments          TaskComment[]
+    efforts           TaskEffort[]
+    role              TaskUserRole        @relation(fields: [roleId], references: [id], map: "FK__USER__ROLE")
+
+    @@map("task_user")
+}
+
+model TaskUserRole {
+    id          String  @id @default(uuid()) @db.Uuid
+    code        String  @unique @db.VarChar(36)
+    name        String  @db.VarChar(64)
+    position    Int     @db.SmallInt
+    description String?
 
     createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
     deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
     isDeleted Boolean   @default(false) @map("is_deleted")
 
-    projectsCreatedBy TaskProject[]
-    projects          TaskProjectOnUser[]
-    tasksAssignedTo   Task[]              @relation("FK__TASK__ASSIGNED_TO")
-    tasksCreatedBy    Task[]              @relation("FK__TASK__CREATED_BY")
-    attachments       TaskAttachment[]
-    changes           TaskChange[]
-    comments          TaskComment[]
-    efforts           TaskEffort[]
+    projectId String      @map("project_id") @db.Uuid
+    project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_USER_ROLE__PROJECT")
 
-    @@unique([externalId, isDeleted])
-    @@map("task_user")
+    users       TaskUser[]
+    permissions TaskUserPermission[]
+
+    @@unique([code, isDeleted])
+    @@map("task_user_role")
+}
+
+model TaskUserAction {
+    id String @id @default(uuid()) @db.Uuid
+
+    code        String  @unique @db.VarChar(128)
+    name        String  @db.VarChar(64)
+    position    Int     @db.SmallInt
+    description String?
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted Boolean   @default(false) @map("is_deleted")
+
+    permissions TaskUserPermission[]
+
+    @@unique([code, isDeleted])
+    @@map("task_user_action")
+}
+
+model TaskUserPermission {
+    id       String @id @default(uuid()) @db.Uuid
+    roleId   String @map("role_id") @db.Uuid
+    actionId String @map("action_id") @db.Uuid
+
+    isAllowed Boolean @default(false) @map("is_ allowed")
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted Boolean   @default(false) @map("is_deleted")
+
+    role   TaskUserRole   @relation(fields: [roleId], references: [id], map: "FK__USER_PERMISSION__ROLE", onDelete: Cascade)
+    action TaskUserAction @relation(fields: [actionId], references: [id], map: "FK__USER_PERMISSION__ACTION", onDelete: Cascade)
+
+    @@unique([roleId, actionId, isDeleted])
+    @@map("task_user_permission")
 }
 
 model TaskProject {
     id                   String                @id @default(uuid()) @db.Uuid
     name                 String                @db.VarChar(512)
     description          String?
-    version              Int                   @default(0) @db.Integer
+    deadline             DateTime?             @db.Timestamp(6)
+    budget               Int?                  @db.Integer
+    version              Int                   @db.Integer
     createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt            DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
     deletedAt            DateTime?             @map("deleted_at") @db.Timestamp(6)
     isDeleted            Boolean               @default(false) @map("is_deleted")
-    statusId             String                @map("status_id") @db.Uuid
-    createdById          String                @map("created_by_id") @db.Uuid
-    createdBy            TaskUser              @relation(fields: [createdById], references: [id], map: "FK__PROJECT__CREATED_BY")
-    status               TaskProjectStatus     @relation(fields: [statusId], references: [id], map: "FK__PROJECT__STATUS")
     users                TaskProjectOnUser[]
     tasks                Task[]
     tasksCustomFields    TaskCustomFieldType[]
     tasksConnectionTypes TaskRelation[]
     tasksStatuses        TaskStatus[]
     tasksTags            TaskTag[]
-    tasksTypes           TaskType[]
+    tasksUserRoles       TaskUserRole[]
 
     @@map("task_project")
-}
-
-model TaskProjectStatus {
-    id          String        @id @default(uuid()) @db.Uuid
-    code        String        @unique @db.VarChar(36)
-    name        String        @db.VarChar(64)
-    position    Int           @db.SmallInt
-    description String?
-    isDefault   Boolean       @default(false) @map("is_default")
-    createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt   DateTime      @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt   DateTime?     @map("deleted_at") @db.Timestamp(6)
-    isDeleted   Boolean       @default(false) @map("is_deleted")
-    projects    TaskProject[]
-
-    @@unique([code, isDeleted])
-    @@unique([position, isDeleted])
-    @@map("task_project_status")
 }
 
 model TaskProjectOnUser {
@@ -187,6 +223,7 @@ model Task {
     id                 String    @id @default(uuid()) @db.Uuid
     name               String    @db.VarChar(512)
     number             Int       @default(autoincrement()) @db.Integer
+    createdById        String    @map("created_by_id") @db.Uuid
     description        String?
     estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
     estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
@@ -199,12 +236,8 @@ model Task {
 
     projectId    String      @map("project_id") @db.Uuid
     project      TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK__PROJECT")
-    typeId       String      @map("type_id") @db.Uuid
-    type         TaskType    @relation(fields: [typeId], references: [id], map: "FK__TASK__TYPE")
     statusId     String      @map("status_id") @db.Uuid
     status       TaskStatus  @relation(fields: [statusId], references: [id], map: "FK__TASK__STATUS")
-    createdById  String      @map("created_by_id") @db.Uuid
-    createdBy    TaskUser    @relation("FK__TASK__CREATED_BY", fields: [createdById], references: [id], map: "FK__TASK__CREATED_BY")
     assignedToId String?     @map("assigned_to_id") @db.Uuid
     assignedTo   TaskUser?   @relation("FK__TASK__ASSIGNED_TO", fields: [assignedToId], references: [id], map: "FK__TASK__ASSIGNED_TO")
     parentId     String?     @map("parent_id") @db.Uuid
@@ -227,34 +260,13 @@ model Task {
     @@map("task")
 }
 
-model TaskType {
-    id          String  @id @default(uuid()) @db.Uuid
-    code        String  @unique @db.VarChar(36)
-    name        String  @db.VarChar(64)
-    position    Int     @db.SmallInt
-    description String?
-
-    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
-    isDeleted Boolean   @default(false) @map("is_deleted")
-
-    projectId String      @map("project_id") @db.Uuid
-    project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_TYPE__PROJECT")
-
-    tasks Task[]
-
-    @@unique([code, isDeleted])
-    @@unique([position, isDeleted])
-    @@map("task_type")
-}
-
 model TaskStatus {
     id          String  @id @default(uuid()) @db.Uuid
     code        String  @unique @db.VarChar(36)
     name        String  @db.VarChar(64)
     position    Int     @db.SmallInt
     description String?
+    isDefault   Boolean @default(false) @map("is_default")
 
     createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)

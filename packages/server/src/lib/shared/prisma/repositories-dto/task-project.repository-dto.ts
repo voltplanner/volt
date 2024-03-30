@@ -2,16 +2,17 @@ import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
 export type TaskProjectCreateRepositoryDto = {
     name: string
-    internalUserId: string
-    statusId: string
-    description: string
+    budget?: number
+    deadline?: Date
+    description?: string
 }
 
 export type TaskProjectUpdateRepositoryDto = {
     id: string
     version: number
     name?: string
-    statusId?: string
+    budget?: number | null
+    deadline?: Date | null
     description?: string | null
 }
 
@@ -24,7 +25,6 @@ export type TaskProjectFindManyRepositoryDto = {
     perPage?: number
 
     filterByName?: string
-    filterByStatusId?: string
     filterByCreatedAt?: {
         from?: Date
         to?: Date
@@ -36,12 +36,12 @@ export type TaskProjectFindManyRepositoryDto = {
     }
 }
 
-export type TaskProjectConnectUserRepositoryDto = {
-    internalUserId: string
+export type TaskProjectConnectUsersRepositoryDto = {
     projectId: string
+    userIds: string[]
 }
 
-export type TaskProjectDisconnectUserRepositoryDto = {
-    internalUserId: string
+export type TaskProjectDisconnectUsersRepositoryDto = {
     projectId: string
+    userIds: string[]
 }

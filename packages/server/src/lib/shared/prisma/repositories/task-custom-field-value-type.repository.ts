@@ -1,10 +1,10 @@
+import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
-import { TaskCustomFieldValueTypeCreateRepositoryDto, TaskCustomFieldValueTypeDeleteRepositoryDto, TaskCustomFieldValueTypeFindManyRepositoryDto, TaskCustomFieldValueTypeUpdateRepositoryDto } from "../repositories-dto/task-custom-field-value-type.repository-dto"
+import { TaskCustomFieldValueTypeCreateRepositoryDto, TaskCustomFieldValueTypeDeleteRepositoryDto, TaskCustomFieldValueTypeFindManyRepositoryDto, TaskCustomFieldValueTypeUpdateRepositoryDto, TaskCustomFieldValueTypeUpsertRepositoryDto } from "../repositories-dto/task-custom-field-value-type.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
 
 export const taskCustomFieldValueTypeModelExtentions = {
@@ -101,6 +101,51 @@ export const taskCustomFieldValueTypeModelExtentions = {
             })
 
             return updatedId
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extUpsert(
+        dto: TaskCustomFieldValueTypeUpsertRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { code, name } = dto
+
+            const { _max: { position: maxPosition } } = await client.taskCustomFieldValueType.aggregate({
+                _max: { position: true },
+            })
+
+            const { id } = await client.taskCustomFieldValueType.upsert({
+                where: {
+                    code_isDeleted: {
+                        code,
+                        isDeleted: false,
+                    },
+                },
+                create: {
+                    code,
+                    name,
+                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                },
+                update: {
+                    code,
+                    name,
+                },
+                select: { id: true },
+            })
+
+            return id
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

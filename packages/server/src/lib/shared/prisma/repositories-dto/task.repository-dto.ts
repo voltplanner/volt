@@ -3,17 +3,17 @@ import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 export type TaskCreateRepositoryDto = {
     name: string
     description?: string
-    estimatedDateEnd?: string
-    estimatedDateStart?: string
+    estimatedDateEnd?: Date
+    estimatedDateStart?: Date
     estimatedDuration?: number
 
-    typeId: string
     statusId: string
     projectId: string
     createdById: string
 
     parentId?: string
     assignedToId?: string
+    tagsIds?: string[]
 }
 
 export type TaskUpdateRepositoryDto = {
@@ -25,7 +25,6 @@ export type TaskUpdateRepositoryDto = {
     estimatedDateStart?: string
     estimatedDuration?: number
 
-    typeId?: string
     parentId?: string
     statusId?: string
     assignedToId?: string
@@ -41,7 +40,6 @@ export type TaskFindManyRepositoryDto = {
 
     filterByName?: string
     filterByNumber?: number
-    filterByTypeId?: string
     filterByStatusId?: string
     filterByParentId?: string
     filterByProjectId?: string

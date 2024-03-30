@@ -12,6 +12,11 @@ export type TaskCustomFieldValueTypeUpdateRepositoryDto = {
     position?: number
 }
 
+export type TaskCustomFieldValueTypeUpsertRepositoryDto = {
+    code: string
+    name: string
+}
+
 export type TaskCustomFieldValueTypeDeleteRepositoryDto = {
     id: string
 }

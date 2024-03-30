@@ -16,6 +16,15 @@ export class OrderByInput {
 }
 
 @ObjectType()
+export class PaginatedMetaInput {
+    @Field()
+    curPage?: number | null
+
+    @Field()
+    perPage?: number | null
+}
+
+@ObjectType()
 export class PaginatedMetaType implements TPaginatedMeta {
     @Field()
     curPage: number

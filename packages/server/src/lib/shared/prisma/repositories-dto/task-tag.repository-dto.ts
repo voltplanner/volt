@@ -1,4 +1,3 @@
-import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
 
 export type TaskTagCreateRepositoryDto = {
     code: string
@@ -15,24 +14,20 @@ export type TaskTagUpdateRepositoryDto = {
     description?: string | null
 }
 
+export type TaskTagUpsertRepositoryDto = {
+    name: string
+    code: string
+    projectId: string
+    description?: string | null
+    isDefault?: boolean
+}
+
 export type TaskTagDeleteRepositoryDto = {
     id: string
 }
 
 export type TaskTagFindManyRepositoryDto = {
-    curPage?: number
-    perPage?: number
-
-    filterByName?: string
-    filterByCreatedAt?: {
-        from?: Date
-        to?: Date
-    }
-
-    orderBy?: {
-        field: 'position'
-        order: OrderEnum
-    }
+    projectId: string
 }
 
 export type TaskTagConnectTaskRepositoryDto = {
