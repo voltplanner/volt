@@ -4,5 +4,5 @@ import { PasswordStep } from './PasswordStep'
 
 export const RegisterForm = () => {
     const { setData, data, step } = useFormStore()
-    return <div>{step === 1 ? <AboutStep /> : <PasswordStep />}</div>
+    return <div><PasswordStep /></div>
 }

@@ -1,8 +1,8 @@
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Button, Input } from 'shared'
 import { FormStyled } from './styles'
-import { useEffect } from 'react'
-import { useFormStore } from '../model/useFormStore'
+import { useCompleteSignIn } from '../api/useCompleteSignIn'
+import { useSearchParams } from 'react-router-dom'
 type FormData = {
     password: string
     passwordRepeat: string
@@ -10,6 +10,7 @@ type FormData = {
 export const PasswordStep = () => {
     const {
         register,
+        watch,
         handleSubmit,
         formState: { errors },
     } = useForm<FormData>({
@@ -18,16 +19,29 @@ export const PasswordStep = () => {
             passwordRepeat: '',
         },
     })
-    const { setData, data, setStep } = useFormStore()
-    const onSubmit: SubmitHandler<FormData> = (data) => {
-        setData(data)
+    const password = watch('password')
+    // const { data, setStep } = useFormStore()
+    const onSubmit: SubmitHandler<FormData> = async (data) => {
+        // setData(data)
+        try {
+            await completeSignIn()
+        } catch (e) {
+            console.log(e)
+        }
     }
-    useEffect(() => {
-        console.log('state', data)
-    }, [data])
-    const onBack = () => {
-        setStep(1)
-    }
+    const [searchParams] = useSearchParams()
+    console.log(searchParams.get('code')) // 'name'
+    const { completeSignIn } = useCompleteSignIn({
+        userId: searchParams.get('userId') ?? '',
+        code: searchParams.get('code') ?? '',
+        password: password,
+    })
+    // useEffect(() => {
+    //     console.log('state', data)
+    // }, [data])
+    // const onBack = () => {
+    //     setStep(1)
+    // }
     return (
         <FormStyled onSubmit={handleSubmit(onSubmit)}>
             <Input
@@ -35,6 +49,7 @@ export const PasswordStep = () => {
                 variant="primary"
                 placeholder="password"
                 register={register}
+                type='password'
                 validationSchema={{
                     name: 'password',
                     schema: {
@@ -50,6 +65,7 @@ export const PasswordStep = () => {
             <Input
                 label="Repeat password"
                 variant="primary"
+                type='password'
                 placeholder="repeat password"
                 register={register}
                 validationSchema={{
@@ -64,8 +80,8 @@ export const PasswordStep = () => {
                 }}
                 error={errors?.passwordRepeat?.message}
             />
-            <Button onClick={onBack}>Next</Button>
-            <Button type="submit">Next</Button>
+            {/* <Button onClick={onBack}>Back</Button> */}
+            <Button type="submit">Save password</Button>
         </FormStyled>
     )
 }
