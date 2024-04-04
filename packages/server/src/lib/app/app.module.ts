@@ -1,20 +1,28 @@
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 import { GraphQLModule } from '@nestjs/graphql'
 import { JwtModule } from '@nestjs/jwt'
-import { createRxJsEventsProvider } from '@shelfjs/events/src/lib/services/rxjs-events.service'
+import {
+    createEventEmitterListener,
+    createEventEmitterPublisher,
+} from '@shelfjs/events/src/lib/services/event-emitter-events.service'
 import { join } from 'path'
 
 import { environment } from '../../environments/environment'
 import { defaultAllowPermissions } from '../../environments/permissions'
-import { AuthIntegration } from '../integrations/auth.integration'
+import { NotificationsIntegration } from '../integrations/notifications.integration'
 import { AuthModule } from '../modules/auth/auth.module'
+import { AUTH_LISTENER } from '../modules/auth/configs/auth-events.config'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
 import { PrismaModule } from '../shared/prisma'
 
 @Module({
     imports: [
+        EventEmitterModule.forRoot({
+            global: true,
+        }),
         PrismaModule.forRoot({
             url: environment.databaseUrl,
         }),
@@ -34,7 +42,7 @@ import { PrismaModule } from '../shared/prisma'
             adminPassword: environment.adminPassword,
             jwt: environment.jwt,
             defaultAllowPermissions,
-            eventsProvider: createRxJsEventsProvider(),
+            eventsProvider: createEventEmitterPublisher(),
         }),
         NotificationsModule.forRoot({
             defaults: environment.notifications.defaults,
@@ -43,6 +51,11 @@ import { PrismaModule } from '../shared/prisma'
         }),
     ],
     controllers: [],
-    providers: [AuthIntegration],
+    providers: [
+        NotificationsIntegration,
+        createEventEmitterListener({
+            injectionToken: AUTH_LISTENER,
+        }),
+    ],
 })
 export class AppModule {}
