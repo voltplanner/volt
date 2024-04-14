@@ -12,6 +12,13 @@ export interface SendEmailPayload {
     link?: string
 }
 
+export interface SendWebPayload {
+    userId: string
+    topic: string
+    message: string
+    link?: string
+}
+
 export interface SendTelegramPayload {
     telegramAccount: number
     topic: string
