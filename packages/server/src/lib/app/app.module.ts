@@ -15,6 +15,7 @@ import { defaultAllowPermissions } from '../../environments/permissions'
 import { NotificationsIntegration } from '../integrations/notifications.integration'
 import { AuthModule } from '../modules/auth/auth.module'
 import { AUTH_LISTENER } from '../modules/auth/configs/auth-events.config'
+import { FilesModule } from '../modules/files/files.module'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
 import { PrismaModule } from '../shared/prisma'
 
@@ -56,6 +57,7 @@ import { PrismaModule } from '../shared/prisma'
             transport: environment.notifications.transport,
             telegram: environment.notifications.telegram,
         }),
+        FilesModule.forRoot(environment.s3Storage),
     ],
     controllers: [],
     providers: [
