@@ -57,7 +57,7 @@ import { PrismaModule } from '../shared/prisma'
             transport: environment.notifications.transport,
             telegram: environment.notifications.telegram,
         }),
-        FilesModule.forRoot(environment.awsS3Storage),
+        FilesModule.forRoot(environment.s3Storage),
     ],
     controllers: [],
     providers: [

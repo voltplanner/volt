@@ -28,11 +28,11 @@ export class FilesService implements OnApplicationBootstrap {
         const s3ClientConfig: AWS.S3ClientConfig = {
             endpoint: this.getEndpoint(),
             credentials: {
-                accessKeyId: this.config.awsS3AccessKeyId,
-                secretAccessKey: this.config.awsS3SecretAccessKey,
+                accessKeyId: this.config.s3AccessKeyId,
+                secretAccessKey: this.config.s3SecretAccessKey,
             },
-            region: this.config.awsS3Region,
-            forcePathStyle: this.config.awsS3ForcePathStyle,
+            region: this.config.s3Region,
+            forcePathStyle: this.config.s3ForcePathStyle,
         }
 
         this.s3Client = new AWS.S3(s3ClientConfig)
@@ -56,8 +56,8 @@ export class FilesService implements OnApplicationBootstrap {
             const body = await FilesService.streamToBuffer(createReadStream())
 
             const uploadResult = await this.s3Client.putObject({
-                ACL: this.config.awsS3Acl,
-                Bucket: this.config.awsS3BucketName,
+                ACL: this.config.s3Acl,
+                Bucket: this.config.s3BucketName,
                 Key: key,
                 ContentType: mimetype,
                 Body: body,
@@ -71,7 +71,7 @@ export class FilesService implements OnApplicationBootstrap {
                     originalName: filename,
                     mimeType: mimetype,
                     size: body.byteLength,
-                    bucket: this.config.awsS3BucketName,
+                    bucket: this.config.s3BucketName,
                     key,
                     eTag: uploadResult.ETag,
                     location: `${locationEndpoint}/${key}`,
@@ -93,8 +93,8 @@ export class FilesService implements OnApplicationBootstrap {
             const key = generateUuidV4()
 
             const uploadResult = await this.s3Client.putObject({
-                ACL: this.config.awsS3Acl,
-                Bucket: this.config.awsS3BucketName,
+                ACL: this.config.s3Acl,
+                Bucket: this.config.s3BucketName,
                 Key: key,
                 ContentType: file.mimetype,
                 Body: file.buffer,
@@ -108,7 +108,7 @@ export class FilesService implements OnApplicationBootstrap {
                     originalName: file.originalname,
                     mimeType: file.mimetype,
                     size: file.size,
-                    bucket: this.config.awsS3BucketName,
+                    bucket: this.config.s3BucketName,
                     key: key,
                     eTag: uploadResult.ETag,
                     location: `${locationEndpoint}/${key}`,
@@ -126,45 +126,45 @@ export class FilesService implements OnApplicationBootstrap {
     }
 
     private getEndpoint() {
-        if (this.config.awsS3AccelerateUrl) {
-            return this.config.awsS3AccelerateUrl
+        if (this.config.s3AccelerateUrl) {
+            return this.config.s3AccelerateUrl
         }
 
         // support old path-style S3 uploads and new virtual host uploads by
         // checking for the bucket name in the endpoint url.
-        if (this.config.awsS3BucketName) {
-            const url = new URL(this.config.awsS3UploadBucketUrl)
-            if (url.hostname.startsWith(this.config.awsS3BucketName + '.')) {
+        if (this.config.s3BucketName) {
+            const url = new URL(this.config.s3UploadBucketUrl)
+            if (url.hostname.startsWith(this.config.s3BucketName + '.')) {
                 return undefined
             }
         }
 
-        return this.config.awsS3UploadBucketUrl
+        return this.config.s3UploadBucketUrl
     }
 
     private getPublicEndpoint(isServerUpload?: boolean) {
-        if (this.config.awsS3AccelerateUrl) {
-            return this.config.awsS3AccelerateUrl
+        if (this.config.s3AccelerateUrl) {
+            return this.config.s3AccelerateUrl
         }
 
         // lose trailing slash if there is one and convert fake-s3 url to localhost
         // for access outside of docker containers in local development
-        const isDocker = this.config.awsS3UploadBucketUrl.match(/http:\/\/s3:/)
+        const isDocker = this.config.s3UploadBucketUrl.match(/http:\/\/s3:/)
 
-        const host = this.config.awsS3UploadBucketUrl
+        const host = this.config.s3UploadBucketUrl
             .replace('s3:', 'localhost:')
             .replace(/\/$/, '')
 
         // support old path-style S3 uploads and new virtual host uploads by checking
         // for the bucket name in the endpoint url before appending.
-        const isVirtualHost = host.includes(this.config.awsS3BucketName)
+        const isVirtualHost = host.includes(this.config.s3BucketName)
 
         if (isVirtualHost) {
             return host
         }
 
         return `${host}/${isServerUpload && isDocker ? 's3/' : ''}${
-            this.config.awsS3BucketName
+            this.config.s3BucketName
         }`
     }
 

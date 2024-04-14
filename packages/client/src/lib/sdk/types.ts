@@ -1,5 +1,5 @@
 export default {
-    scalars: [1, 3, 4, 5, 9, 10, 18],
+    scalars: [1, 3, 4, 5, 9, 10, 18, 37],
     types: {
         PaginatedMetaType: {
             curPage: [1],
@@ -80,19 +80,24 @@ export default {
                 },
             ],
             getRoles: [
-                7,
+                6,
                 {
                     input: [20, 'GetRolesInput!'],
                 },
             ],
-            getMyRole: [6],
-            getUser: [
-                8,
+            getMyRole: [
+                6,
                 {
-                    input: [22, 'GetUserInput!'],
+                    input: [20, 'GetRolesInput!'],
                 },
             ],
-            getMyNotificationPreferences: [13],
+            getMyUser: [8],
+            getFile: [
+                4,
+                {
+                    input: [22, 'GetFileInput!'],
+                },
+            ],
             __typename: [4],
         },
         GetUsersInput: {
@@ -126,8 +131,8 @@ export default {
             name: [4],
             __typename: [4],
         },
-        GetUserInput: {
-            userId: [3],
+        GetFileInput: {
+            id: [4],
             __typename: [4],
         },
         Mutation: {
@@ -197,10 +202,10 @@ export default {
                     input: [35, 'CompleteSignInInput!'],
                 },
             ],
-            changeMyNotificationPreferences: [
-                5,
+            uploadFile: [
+                4,
                 {
-                    input: [36, 'ChangeMyNotificationPreferences!'],
+                    input: [36, 'UploadFileInput!'],
                 },
             ],
             __typename: [4],
@@ -271,17 +276,10 @@ export default {
             password: [4],
             __typename: [4],
         },
-        ChangeMyNotificationPreferences: {
-            emailEnabled: [5],
-            email: [4],
-            webEnabled: [5],
-            telegramEnabled: [5],
-            telegramAccount: [1],
+        UploadFileInput: {
+            file: [37],
             __typename: [4],
         },
-        Subscription: {
-            getNotifications: [14],
-            __typename: [4],
-        },
+        Upload: {},
     },
 }

@@ -3,14 +3,14 @@ import { ConfigurableModuleBuilder } from '@nestjs/common'
 import { merge } from 'lodash'
 
 export interface FilesConfig {
-    awsS3Region: string
-    awsS3BucketName: string
-    awsS3AccessKeyId: string
-    awsS3SecretAccessKey: string
-    awsS3ForcePathStyle: boolean
-    awsS3AccelerateUrl?: string
-    awsS3UploadBucketUrl: string
-    awsS3Acl: AWS.ObjectCannedACL
+    s3Region: string
+    s3BucketName: string
+    s3AccessKeyId: string
+    s3SecretAccessKey: string
+    s3ForcePathStyle: boolean
+    s3AccelerateUrl?: string
+    s3UploadBucketUrl: string
+    s3Acl: AWS.ObjectCannedACL
 }
 
 export const DEFAULT_FILES_CONFIG = {}

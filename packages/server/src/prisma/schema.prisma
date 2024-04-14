@@ -117,6 +117,5 @@ model File {
   bucket       String
   key          String
   location     String
-  user         AuthUser             @relation(fields: [userId], references: [id])
   userId       String
 }
