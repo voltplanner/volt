@@ -1,5 +1,5 @@
 export default {
-    scalars: [1, 3, 4, 5, 9, 10, 18, 37],
+    scalars: [1, 3, 4, 5, 9, 10, 18, 39],
     types: {
         PaginatedMetaType: {
             curPage: [1],
@@ -80,22 +80,23 @@ export default {
                 },
             ],
             getRoles: [
-                6,
+                7,
                 {
                     input: [20, 'GetRolesInput!'],
                 },
             ],
-            getMyRole: [
-                6,
+            getMyRole: [6],
+            getUser: [
+                8,
                 {
-                    input: [20, 'GetRolesInput!'],
+                    input: [22, 'GetUserInput!'],
                 },
             ],
-            getMyUser: [8],
+            getMyNotificationPreferences: [13],
             getFile: [
                 4,
                 {
-                    input: [22, 'GetFileInput!'],
+                    input: [23, 'GetFileInput!'],
                 },
             ],
             __typename: [4],
@@ -131,6 +132,10 @@ export default {
             name: [4],
             __typename: [4],
         },
+        GetUserInput: {
+            userId: [3],
+            __typename: [4],
+        },
         GetFileInput: {
             id: [4],
             __typename: [4],
@@ -139,73 +144,79 @@ export default {
             updateRole: [
                 5,
                 {
-                    input: [24, 'UpdateRoleInput!'],
+                    input: [25, 'UpdateRoleInput!'],
                 },
             ],
             changeUserRole: [
                 5,
                 {
-                    input: [25, 'ChangeUserRoleInput!'],
+                    input: [26, 'ChangeUserRoleInput!'],
                 },
             ],
             createRole: [
                 5,
                 {
-                    input: [26, 'CreateRoleInput!'],
+                    input: [27, 'CreateRoleInput!'],
                 },
             ],
             deleteRole: [
                 5,
                 {
-                    input: [27, 'DeleteRoleInput!'],
+                    input: [28, 'DeleteRoleInput!'],
                 },
             ],
             changePermissions: [
                 5,
                 {
-                    input: [28, 'ChangePermissionsInput!'],
+                    input: [29, 'ChangePermissionsInput!'],
                 },
             ],
             updateUser: [
                 5,
                 {
-                    input: [30, 'UpdateUserInput!'],
+                    input: [31, 'UpdateUserInput!'],
                 },
             ],
             signIn: [
                 12,
                 {
-                    input: [31, 'SignInInput!'],
+                    input: [32, 'SignInInput!'],
                 },
             ],
             refreshToken: [
                 12,
                 {
-                    input: [32, 'RefreshTokenInput!'],
+                    input: [33, 'RefreshTokenInput!'],
                 },
             ],
             createUser: [
                 8,
                 {
-                    input: [33, 'CreateUserInput!'],
+                    input: [34, 'CreateUserInput!'],
                 },
             ],
             deleteUser: [
                 5,
                 {
-                    input: [34, 'DeleteUserInput!'],
+                    input: [35, 'DeleteUserInput!'],
                 },
             ],
             completeSignIn: [
                 12,
                 {
-                    input: [35, 'CompleteSignInInput!'],
+                    input: [36, 'CompleteSignInInput!'],
+                },
+            ],
+            changeMyNotificationPreferences: [
+                5,
+                {
+                    input: [37, 'ChangeMyNotificationPreferences!'],
                 },
             ],
             uploadFile: [
                 4,
                 {
-                    input: [36, 'UploadFileInput!'],
+                    input: [38, 'UploadFileInput!'],
                 },
             ],
             __typename: [4],
@@ -232,7 +243,7 @@ export default {
         },
         ChangePermissionsInput: {
             roleId: [3],
-            permissions: [29],
+            permissions: [30],
             __typename: [4],
         },
         PermissionInput: {
@@ -276,10 +287,22 @@ export default {
             password: [4],
             __typename: [4],
         },
+        ChangeMyNotificationPreferences: {
+            emailEnabled: [5],
+            email: [4],
+            webEnabled: [5],
+            telegramEnabled: [5],
+            telegramAccount: [1],
+            __typename: [4],
+        },
         UploadFileInput: {
-            file: [37],
+            file: [39],
             __typename: [4],
         },
         Upload: {},
+        Subscription: {
+            getNotifications: [14],
+            __typename: [4],
+        },
     },
 }

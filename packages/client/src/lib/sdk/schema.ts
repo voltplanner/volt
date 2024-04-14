@@ -90,9 +90,10 @@ export interface NotificationWebResponse {
 
 export interface Query {
     getUsers: PaginatedUsers
-    getRoles: RoleType[]
+    getRoles: PaginatedRoles
     getMyRole: RoleType
-    getMyUser: UserType
+    getUser: UserType
+    getMyNotificationPreferences: GetNotificationPreferences
     getFile: Scalars['String']
     __typename: 'Query'
 }
@@ -111,8 +112,14 @@ export interface Mutation {
     createUser: UserType
     deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
+    changeMyNotificationPreferences: Scalars['Boolean']
     uploadFile: Scalars['String']
     __typename: 'Mutation'
+}
+
+export interface Subscription {
+    getNotifications: NotificationWebResponse
+    __typename: 'Subscription'
 }
 
 export interface PaginatedMetaTypeGenqlSelection {
@@ -202,9 +209,12 @@ export interface QueryGenqlSelection {
     getUsers?: PaginatedUsersGenqlSelection & {
         __args: { input: GetUsersInput }
     }
-    getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyUser?: UserTypeGenqlSelection
+    getRoles?: PaginatedRolesGenqlSelection & {
+        __args: { input: GetRolesInput }
+    }
+    getMyRole?: RoleTypeGenqlSelection
+    getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
+    getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
     getFile?: { __args: { input: GetFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -240,6 +250,10 @@ export interface GetRolesFilterInput {
     name?: Scalars['String'] | null
 }
 
+export interface GetUserInput {
+    userId: Scalars['ID']
+}
+
 export interface GetFileInput {
     id: Scalars['String']
 }
@@ -261,6 +275,9 @@ export interface MutationGenqlSelection {
     deleteUser?: { __args: { input: DeleteUserInput } }
     completeSignIn?: AuthorizationResponseGenqlSelection & {
         __args: { input: CompleteSignInInput }
+    }
+    changeMyNotificationPreferences?: {
+        __args: { input: ChangeMyNotificationPreferences }
     }
     uploadFile?: { __args: { input: UploadFileInput } }
     __typename?: boolean | number
@@ -333,8 +350,22 @@ export interface CompleteSignInInput {
     password: Scalars['String']
 }
 
+export interface ChangeMyNotificationPreferences {
+    emailEnabled?: Scalars['Boolean'] | null
+    email?: Scalars['String'] | null
+    webEnabled?: Scalars['Boolean'] | null
+    telegramEnabled?: Scalars['Boolean'] | null
+    telegramAccount?: Scalars['Float'] | null
+}
+
 export interface UploadFileInput {
     file: Scalars['Upload']
+}
+
+export interface SubscriptionGenqlSelection {
+    getNotifications?: NotificationWebResponseGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
 }
 
 const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
@@ -437,6 +468,15 @@ export const isMutation = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isMutation"')
     return Mutation_possibleTypes.includes(obj.__typename)
+}
+
+const Subscription_possibleTypes: string[] = ['Subscription']
+export const isSubscription = (
+    obj?: { __typename?: any } | null,
+): obj is Subscription => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isSubscription"')
+    return Subscription_possibleTypes.includes(obj.__typename)
 }
 
 export const enumAuthUserStatusEnum = {
