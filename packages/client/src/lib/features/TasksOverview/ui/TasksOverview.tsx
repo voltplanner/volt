@@ -1,8 +1,5 @@
 import { CSSProperties } from 'react'
-import { Cell } from './Cell/Cell'
-import { THeadStyled, TableStyled, TBodyStyled, TitleStyled, WrapperStyled } from './styles'
-import { Row } from './Row/Row'
-import { Th } from './Th/Th'
+import { Table } from 'shared'
 type TColumn<T> = {
     title?: string
     dataIndex: string
@@ -19,38 +16,5 @@ interface TasksOverviewProps<T> {
 export const TasksOverview = (props: TasksOverviewProps<any>) => {
     const { columns, data, styles, width } = props
 
-    return (
-        <WrapperStyled style={styles}>
-            <TitleStyled>My tasks overview</TitleStyled>
-            <TableStyled>
-                <THeadStyled>
-                    {columns.map(({ title, key, width }) => (
-                        <Th width={width} key={key}>
-                            {title}
-                        </Th>
-                    ))}
-                </THeadStyled>
-                <TBodyStyled>
-                    {data.map((elem) => (
-                        <Row style={{ maxWidth: width }}>
-                            {columns.map(
-                                ({ dataIndex, key, width, render }) => (
-                                    <Cell width={width} key={key}>
-                                        {render
-                                            ? render(
-                                                  elem[
-                                                      dataIndex as keyof typeof data
-                                                  ],
-                                                  elem,
-                                              )
-                                            : elem[dataIndex]}
-                                    </Cell>
-                                ),
-                            )}
-                        </Row>
-                    ))}
-                </TBodyStyled>
-            </TableStyled>
-        </WrapperStyled>
-    )
+    return <Table styles={{ width: width }} columns={columns} data={data} />
 }

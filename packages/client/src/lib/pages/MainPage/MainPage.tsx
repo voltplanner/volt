@@ -37,14 +37,14 @@ const MainPage = () => {
             title: 'Progress',
             dataIndex: 'progress',
             key: 'progress',
-            width: '15%',
+            width: '10%',
         },
         {
             title: 'Type',
             dataIndex: 'type',
             key: 'type',
-            width: '5%',
-            render: (_: any, { type }: { type: string }) => <p>{type}</p>,
+            width: '10%',
+            render: (_: any, { type }: { type: string }) => <p style={{margin:0}}>{type}</p>,
         },
     ]
     const data = [
@@ -52,7 +52,7 @@ const MainPage = () => {
             project: 'Amogus Bank',
             id: 'AB-0001',
             name: 'Task name',
-            priority: 'high',
+            priority: '1',
             status: 'In progress',
             progress: '80',
             type: 'Bug',
@@ -61,7 +61,7 @@ const MainPage = () => {
             project: 'Amogus Bank',
             id: 'AB-0002',
             name: 'Task name',
-            priority: 'high',
+            priority: '1',
             status: 'In progress',
             progress: '80',
             type: 'Task',
@@ -70,7 +70,7 @@ const MainPage = () => {
             project: 'Amogus Bank',
             id: 'AB-0003',
             name: 'Task name',
-            priority: 'high',
+            priority: '2',
             status: 'In progress',
             progress: '80',
             type: 'Fix',
@@ -79,16 +79,43 @@ const MainPage = () => {
             project: 'Amogus Bank',
             id: 'AB-0004',
             name: 'Task name',
-            priority: 'high',
+            priority: '2',
             status: 'In progress',
             progress: '80',
-            type: 'Researcherererereererere',
+            type: 'Research',
         },
         {
             project: 'Amogus Bank',
             id: 'AB-0005',
             name: 'Task name',
-            priority: 'high',
+            priority: '2',
+            status: 'In progress',
+            progress: '80',
+            type: 'Docs',
+        },
+        {
+            project: 'Amogus Bank',
+            id: 'AB-0006',
+            name: 'Task name',
+            priority: '3',
+            status: 'In progress',
+            progress: '80',
+            type: 'Docs',
+        },
+        {
+            project: 'Amogus Bank',
+            id: 'AB-0007',
+            name: 'Task name',
+            priority: '3',
+            status: 'In progress',
+            progress: '80',
+            type: 'Docs',
+        },
+        {
+            project: 'Amogus Bank',
+            id: 'AB-0008',
+            name: 'Task name',
+            priority: '3',
             status: 'In progress',
             progress: '80',
             type: 'Docs',
@@ -98,7 +125,7 @@ const MainPage = () => {
         <WrapperStyled>
             <div>graph with hours</div>
             <TasksOverview
-                styles={{ width: 1353 }}
+                width={'1353px'}
                 columns={columns}
                 data={data}
             />
