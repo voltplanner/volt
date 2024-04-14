@@ -1,6 +1,14 @@
 import { TableStyled, TitleStyled, WrapperStyled } from './styles'
-
-export const TasksOverview = () => {
+type TColumn = {
+    title?: string
+    dataIndex: string
+    key: string
+}
+interface TasksOverviewProps {
+    columns: TColumn[]
+}
+export const TasksOverview = (props) => {
+    const { columns, data } = props
     const columns = [
         {
             title: 'Project',
