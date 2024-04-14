@@ -51,12 +51,12 @@ export class NotificationsResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Subscription(() => NotificationWebResponse, {})
+    @Subscription(() => NotificationWebResponse)
     @AccessControl({
         group: 'notifications',
         description: `Get web notifications`,
     })
-    async getNotifications() {
-        return this.webService.subscribe()
+    async getNotifications(@CurrentUser() user: CurrentUserPayload) {
+        return this.webService.subscribe(user.userId)
     }
 }

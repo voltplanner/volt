@@ -38,11 +38,7 @@ import { PrismaModule } from '../shared/prisma'
             introspection: true,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
             subscriptions: {
-                'graphql-ws': {
-                    onConnect(ctx) {
-                        // todo: add acl guard
-                    },
-                },
+                'graphql-ws': true,
             },
         }),
         AuthModule.forRoot({
