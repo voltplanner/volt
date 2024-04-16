@@ -70,11 +70,29 @@ export interface AuthorizationResponse {
     __typename: 'AuthorizationResponse'
 }
 
+export interface GetNotificationPreferences {
+    emailEnabled: Scalars['Boolean']
+    email: Scalars['String'] | null
+    webEnabled: Scalars['Boolean']
+    telegramEnabled: Scalars['Boolean']
+    telegramAccount: Scalars['Float'] | null
+    __typename: 'GetNotificationPreferences'
+}
+
+export interface NotificationWebResponse {
+    userId: Scalars['String']
+    topic: Scalars['String']
+    message: Scalars['String']
+    link: Scalars['String'] | null
+    __typename: 'NotificationWebResponse'
+}
+
 export interface Query {
     getUsers: PaginatedUsers
     getRoles: PaginatedRoles
     getMyRole: RoleType
     getUser: UserType
+    getMyNotificationPreferences: GetNotificationPreferences
     __typename: 'Query'
 }
 
@@ -92,7 +110,13 @@ export interface Mutation {
     createUser: UserType
     deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
+    changeMyNotificationPreferences: Scalars['Boolean']
     __typename: 'Mutation'
+}
+
+export interface Subscription {
+    getNotifications: NotificationWebResponse
+    __typename: 'Subscription'
 }
 
 export interface PaginatedMetaTypeGenqlSelection {
@@ -159,6 +183,25 @@ export interface AuthorizationResponseGenqlSelection {
     __scalar?: boolean | number
 }
 
+export interface GetNotificationPreferencesGenqlSelection {
+    emailEnabled?: boolean | number
+    email?: boolean | number
+    webEnabled?: boolean | number
+    telegramEnabled?: boolean | number
+    telegramAccount?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface NotificationWebResponseGenqlSelection {
+    userId?: boolean | number
+    topic?: boolean | number
+    message?: boolean | number
+    link?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface QueryGenqlSelection {
     getUsers?: PaginatedUsersGenqlSelection & {
         __args: { input: GetUsersInput }
@@ -168,6 +211,7 @@ export interface QueryGenqlSelection {
     }
     getMyRole?: RoleTypeGenqlSelection
     getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
+    getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -223,6 +267,9 @@ export interface MutationGenqlSelection {
     deleteUser?: { __args: { input: DeleteUserInput } }
     completeSignIn?: AuthorizationResponseGenqlSelection & {
         __args: { input: CompleteSignInInput }
+    }
+    changeMyNotificationPreferences?: {
+        __args: { input: ChangeMyNotificationPreferences }
     }
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -294,6 +341,20 @@ export interface CompleteSignInInput {
     password: Scalars['String']
 }
 
+export interface ChangeMyNotificationPreferences {
+    emailEnabled?: Scalars['Boolean'] | null
+    email?: Scalars['String'] | null
+    webEnabled?: Scalars['Boolean'] | null
+    telegramEnabled?: Scalars['Boolean'] | null
+    telegramAccount?: Scalars['Float'] | null
+}
+
+export interface SubscriptionGenqlSelection {
+    getNotifications?: NotificationWebResponseGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
 export const isPaginatedMetaType = (
     obj?: { __typename?: any } | null,
@@ -357,6 +418,30 @@ export const isAuthorizationResponse = (
     return AuthorizationResponse_possibleTypes.includes(obj.__typename)
 }
 
+const GetNotificationPreferences_possibleTypes: string[] = [
+    'GetNotificationPreferences',
+]
+export const isGetNotificationPreferences = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationPreferences => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isGetNotificationPreferences"',
+        )
+    return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
+}
+
+const NotificationWebResponse_possibleTypes: string[] = [
+    'NotificationWebResponse',
+]
+export const isNotificationWebResponse = (
+    obj?: { __typename?: any } | null,
+): obj is NotificationWebResponse => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isNotificationWebResponse"')
+    return NotificationWebResponse_possibleTypes.includes(obj.__typename)
+}
+
 const Query_possibleTypes: string[] = ['Query']
 export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
     if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
@@ -370,6 +455,15 @@ export const isMutation = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isMutation"')
     return Mutation_possibleTypes.includes(obj.__typename)
+}
+
+const Subscription_possibleTypes: string[] = ['Subscription']
+export const isSubscription = (
+    obj?: { __typename?: any } | null,
+): obj is Subscription => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isSubscription"')
+    return Subscription_possibleTypes.includes(obj.__typename)
 }
 
 export const enumAuthUserStatusEnum = {

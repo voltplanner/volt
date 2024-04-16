@@ -1,7 +1,7 @@
 import { DiscoveryModule } from '@golevelup/nestjs-discovery'
 import { DynamicModule, Module, Provider, Type } from '@nestjs/common'
 
-import { AUTH_EVENTS } from './configs/auth-events.config'
+import { AUTH_PUBLISHER } from './configs/auth-events.config'
 import {
     AUTH_CONFIG,
     AUTH_OPTIONS_TYPE,
@@ -26,7 +26,7 @@ export class AuthModule extends AuthConfigurableModuleClass {
                 useValue: patchAuthConfig(options),
             },
             {
-                provide: AUTH_EVENTS,
+                provide: AUTH_PUBLISHER,
                 ...options.eventsProvider,
             },
             AuthAuthService,
