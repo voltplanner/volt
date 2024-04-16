@@ -1,9 +1,17 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { Prisma, TaskRelation } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskRelationConnectTaskRepositoryDto, TaskRelationCreateRepositoryDto, TaskRelationDeleteRepositoryDto, TaskRelationDisconnectTaskRepositoryDto, TaskRelationFindManyRepositoryDto, TaskRelationUpdateRepositoryDto, TaskRelationUpsertRepositoryDto } from "../repositories-dto/task-relation.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { Prisma, TaskRelation } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskRelationConnectTaskRepositoryDto,
+    TaskRelationCreateRepositoryDto,
+    TaskRelationDeleteRepositoryDto,
+    TaskRelationDisconnectTaskRepositoryDto,
+    TaskRelationFindManyRepositoryDto,
+    TaskRelationUpdateRepositoryDto,
+    TaskRelationUpsertRepositoryDto,
+} from '../repositories-dto/task-relation.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskRelationModelExtentions = {
     async extCreate(
@@ -11,11 +19,14 @@ export const taskRelationModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { code, nameMain, nameForeign, projectId, description } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskRelation.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskRelation.aggregate({
                 _max: { position: true },
             })
 
@@ -26,7 +37,8 @@ export const taskRelationModelExtentions = {
                     nameForeign,
                     description,
                     projectId,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 select: { id: true },
             })
@@ -49,9 +61,17 @@ export const taskRelationModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
-            const { id, code, nameMain, nameForeign, position: newPosition, description } = dto
+            const {
+                id,
+                code,
+                nameMain,
+                nameForeign,
+                position: newPosition,
+                description,
+            } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
@@ -121,11 +141,14 @@ export const taskRelationModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { code, nameMain, nameForeign, description, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskRelation.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskRelation.aggregate({
                 _max: { position: true },
             })
 
@@ -142,7 +165,8 @@ export const taskRelationModelExtentions = {
                     nameForeign,
                     projectId,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 update: {
                     code,
@@ -172,7 +196,8 @@ export const taskRelationModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -202,7 +227,8 @@ export const taskRelationModelExtentions = {
         const { projectId } = dto
 
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const delegateWhere: Prisma.TaskRelationWhereInput = {
                 projectId,
@@ -258,7 +284,8 @@ export const taskRelationModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { taskMainId, taskForeignId, taskRelationId } = dto
 
@@ -292,7 +319,8 @@ export const taskRelationModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { taskMainId, taskForeignId, taskRelationId } = dto
 

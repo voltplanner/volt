@@ -1,9 +1,16 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { Prisma, TaskStatus } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskStatusCreateRepositoryDto, TaskStatusDeleteRepositoryDto, TaskStatusFindManyRepositoryDto, TaskStatusSetDefaultRepositoryDto, TaskStatusUpdateRepositoryDto, TaskStatusUpsertRepositoryDto } from "../repositories-dto/task-status.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { Prisma, TaskStatus } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskStatusCreateRepositoryDto,
+    TaskStatusDeleteRepositoryDto,
+    TaskStatusFindManyRepositoryDto,
+    TaskStatusSetDefaultRepositoryDto,
+    TaskStatusUpdateRepositoryDto,
+    TaskStatusUpsertRepositoryDto,
+} from '../repositories-dto/task-status.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskStatusModelExtentions = {
     async extCreate(
@@ -11,11 +18,14 @@ export const taskStatusModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { name, code, description, isDefault, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskStatus.aggregate({
                 _max: { position: true },
             })
 
@@ -24,7 +34,8 @@ export const taskStatusModelExtentions = {
                     code,
                     name,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                     projectId,
                 },
                 select: { id: true },
@@ -52,9 +63,17 @@ export const taskStatusModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
-            const { id, name, code, description, isDefault, position: newPosition } = dto
+            const {
+                id,
+                name,
+                code,
+                description,
+                isDefault,
+                position: newPosition,
+            } = dto
 
             // We must shift positions of entities between old and new position of status
             if (typeof newPosition === 'number') {
@@ -127,11 +146,14 @@ export const taskStatusModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { name, code, description, isDefault, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskStatus.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskStatus.aggregate({
                 _max: { position: true },
             })
 
@@ -147,7 +169,8 @@ export const taskStatusModelExtentions = {
                     name,
                     projectId,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 update: {
                     code,
@@ -180,7 +203,8 @@ export const taskStatusModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -208,7 +232,8 @@ export const taskStatusModelExtentions = {
         prisma?: any,
     ): Promise<TaskStatus[]> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { projectId } = dto
 
@@ -217,9 +242,10 @@ export const taskStatusModelExtentions = {
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput = {
-                position: 'asc',
-            }
+            const delegateOrderBy: Prisma.TaskStatusOrderByWithRelationAndSearchRelevanceInput =
+                {
+                    position: 'asc',
+                }
 
             return await client.taskStatus.findMany({
                 where: delegateWhere,
@@ -238,10 +264,17 @@ export const taskStatusModelExtentions = {
     },
 
     async extGetDefault(
-        prisma?: any
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findFirstOrThrow>>> {
+        prisma?: any,
+    ): Promise<
+        Awaited<
+            ReturnType<
+                typeof PrismaService.instance.taskStatus.findFirstOrThrow
+            >
+        >
+    > {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             // Since prisma does not support partial unique indexes we use findFirstOrThrow instead of findUniqueOrThrow
             return await client.taskStatus.findFirstOrThrow({
@@ -265,7 +298,8 @@ export const taskStatusModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 

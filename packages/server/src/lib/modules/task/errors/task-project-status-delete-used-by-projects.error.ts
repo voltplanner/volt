@@ -1,4 +1,4 @@
-import { DefaultError } from "../../../shared/errors/default.error"
+import { DefaultError } from '../../../shared/errors/default.error'
 
 export class ProjectStatusDeleteUsedByProjectsError extends DefaultError {
     code = 'TASK_PROJECT_STATUS__000'
@@ -6,7 +6,9 @@ export class ProjectStatusDeleteUsedByProjectsError extends DefaultError {
 
     constructor(dto: { usedByProjects: string[] }) {
         super({
-            message: `Failed to delete status used by projects: ${dto.usedByProjects.join('; ',)}`,
+            message: `Failed to delete status used by projects: ${dto.usedByProjects.join(
+                '; ',
+            )}`,
             metadata: dto,
         })
     }

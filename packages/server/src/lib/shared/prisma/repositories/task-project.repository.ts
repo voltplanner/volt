@@ -1,11 +1,18 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskProjectConnectUsersRepositoryDto, TaskProjectCreateRepositoryDto, TaskProjectDeleteRepositoryDto, TaskProjectDisconnectUsersRepositoryDto, TaskProjectFindManyRepositoryDto, TaskProjectUpdateRepositoryDto } from "../repositories-dto/task-project.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskProjectConnectUsersRepositoryDto,
+    TaskProjectCreateRepositoryDto,
+    TaskProjectDeleteRepositoryDto,
+    TaskProjectDisconnectUsersRepositoryDto,
+    TaskProjectFindManyRepositoryDto,
+    TaskProjectUpdateRepositoryDto,
+} from '../repositories-dto/task-project.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskProjectModelExtentions = {
     async extCreate(
@@ -13,7 +20,8 @@ export const taskProjectModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { name, budget, deadline, description } = dto
 
@@ -41,9 +49,13 @@ export const taskProjectModelExtentions = {
         }
     },
 
-    async extUpdate(dto: TaskProjectUpdateRepositoryDto, prisma?: any): Promise<string> {
+    async extUpdate(
+        dto: TaskProjectUpdateRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, version, name, budget, deadline, description } = dto
 
@@ -71,9 +83,13 @@ export const taskProjectModelExtentions = {
         }
     },
 
-    async extDelete(dto: TaskProjectDeleteRepositoryDto, prisma?: any): Promise<string> {
+    async extDelete(
+        dto: TaskProjectDeleteRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -98,12 +114,18 @@ export const taskProjectModelExtentions = {
         }
     },
 
-    async extFindMany(dto: TaskProjectFindManyRepositoryDto = {}, prisma?: any): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskProject.findMany>>
+    async extFindMany(
+        dto: TaskProjectFindManyRepositoryDto = {},
+        prisma?: any,
+    ): Promise<{
+        data: Awaited<
+            ReturnType<typeof PrismaService.instance.taskProject.findMany>
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -176,12 +198,13 @@ export const taskProjectModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { projectId, userIds } = dto
 
             await client.taskProjectOnUser.createMany({
-                data: userIds.map(userId => ({
+                data: userIds.map((userId) => ({
                     projectId,
                     userId,
                 })),
@@ -204,13 +227,14 @@ export const taskProjectModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { projectId, userIds } = dto
 
             await client.taskProjectOnUser.deleteMany({
                 where: {
-                    OR: userIds.map(userId => ({
+                    OR: userIds.map((userId) => ({
                         projectId,
                         userId,
                     })),

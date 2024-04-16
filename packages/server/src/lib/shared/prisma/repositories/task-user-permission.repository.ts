@@ -1,8 +1,12 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { PrismaService } from "../prisma.service"
-import { TaskUserPermissionCreateRepositoryDto, TaskUserPermissionDeleteRepositoryDto, TaskUserPermissionUpdateRepositoryDto } from "../repositories-dto/task-user-permission.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskUserPermissionCreateRepositoryDto,
+    TaskUserPermissionDeleteRepositoryDto,
+    TaskUserPermissionUpdateRepositoryDto,
+} from '../repositories-dto/task-user-permission.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskUserPermissionModelExtentions = {
     async extCreate(
@@ -10,7 +14,8 @@ export const taskUserPermissionModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { roleId, actionId, isAllowed } = dto
 
@@ -41,7 +46,8 @@ export const taskUserPermissionModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, isAllowed } = dto
 
@@ -71,7 +77,8 @@ export const taskUserPermissionModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -96,31 +103,40 @@ export const taskUserPermissionModelExtentions = {
 
     async extGetPermissionByUserAndAction(
         dto: {
-            externalUserId: string
+            userId: string
             actionCode: string
         },
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserPermission.findFirstOrThrow>>> {
+    ): Promise<
+        Awaited<
+            ReturnType<
+                typeof PrismaService.instance.taskUserPermission.findFirstOrThrow
+            >
+        >
+    > {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
-            const { externalUserId, actionCode } = dto
+            const { userId, actionCode } = dto
 
-            const permission = await client.taskUserPermission.findFirstOrThrow({
-                where: {
-                    action: {
-                        code: actionCode,
-                    },
-                    role: {
-                        users: {
-                            some: {
-                                externalId: externalUserId
+            const permission = await client.taskUserPermission.findFirstOrThrow(
+                {
+                    where: {
+                        action: {
+                            code: actionCode,
+                        },
+                        role: {
+                            users: {
+                                some: {
+                                    id: userId,
+                                },
                             },
                         },
+                        isDeleted: false,
                     },
-                    isDeleted: false,
                 },
-            })
+            )
 
             return permission
         } catch (e) {

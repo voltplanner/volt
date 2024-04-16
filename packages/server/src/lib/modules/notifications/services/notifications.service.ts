@@ -5,6 +5,7 @@ import { SendNotificationPayload } from '../interfaces/notifications.interfaces'
 import { NotificationsEmailService } from './email.service'
 import { NotificationsPreferencesService } from './preferences.service'
 import { NotificationsTelegramService } from './telegram.service'
+import { NotificationsWebService } from './web.service'
 
 @Injectable()
 export class NotificationsService {
@@ -14,6 +15,7 @@ export class NotificationsService {
         private readonly prisma: PrismaService,
         private readonly email: NotificationsEmailService,
         private readonly telegram: NotificationsTelegramService,
+        private readonly web: NotificationsWebService,
         private readonly preferences: NotificationsPreferencesService,
     ) {}
 
@@ -58,6 +60,7 @@ export class NotificationsService {
                         email: preferences.email,
                         topic,
                         message,
+                        link,
                     })
                 }
 
@@ -66,6 +69,16 @@ export class NotificationsService {
                         telegramAccount: preferences.telegramAccount,
                         topic,
                         message,
+                        link,
+                    })
+                }
+
+                if (type === NotificationTypeEnum.WEB) {
+                    await this.web.send({
+                        userId,
+                        topic,
+                        message,
+                        link,
                     })
                 }
             } catch (error) {

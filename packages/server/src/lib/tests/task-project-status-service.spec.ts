@@ -20,7 +20,9 @@ describe('Project Status', () => {
         }).compile()
 
         taskProjectStatusRepository =
-            moduleRef.get<TaskProjectStatusRepository>(TaskProjectStatusRepository)
+            moduleRef.get<TaskProjectStatusRepository>(
+                TaskProjectStatusRepository,
+            )
         prismaService = moduleRef.get<PrismaService>(PrismaService)
     })
 

@@ -17,17 +17,17 @@ import { taskCustomFieldTypeModelExtentions } from './repositories/task-custom-f
 import { taskCustomFieldValueTypeModelExtentions } from './repositories/task-custom-field-value-type.repository'
 import { taskEffortModelExtentions } from './repositories/task-effort.repository'
 import { taskProjectModelExtentions } from './repositories/task-project.repository'
-import { taskProjectStatusModelExtentions } from './repositories/task-project-status.repository'
 import { taskRelationModelExtentions } from './repositories/task-relation.repository'
 import { taskStatusModelExtentions } from './repositories/task-status.repository'
 import { taskTagModelExtentions } from './repositories/task-tag.repository'
-import { taskTypeModelExtentions } from './repositories/task-type.repository'
 import { taskUserModelExtentions } from './repositories/task-user.repository'
-import { taskUserRoleModelExtentions } from './repositories/task-user-role.repository'
 import { taskUserActionModelExtentions } from './repositories/task-user-action.repository'
 import { taskUserPermissionModelExtentions } from './repositories/task-user-permission.repository'
+import { taskUserRoleModelExtentions } from './repositories/task-user-role.repository'
 
-export type PrismaServiceWithExtentionsType = ReturnType<PrismaService['withExtensions']>
+export type PrismaServiceWithExtentionsType = ReturnType<
+    PrismaService['withExtensions']
+>
 
 @Injectable()
 export class PrismaService
@@ -68,7 +68,6 @@ export class PrismaService
             model: {
                 task: taskModelExtentions,
                 taskTag: taskTagModelExtentions,
-                taskType: taskTypeModelExtentions,
                 taskUser: taskUserModelExtentions,
                 taskStatus: taskStatusModelExtentions,
                 taskChange: taskChangeModelExtentions,
@@ -80,10 +79,10 @@ export class PrismaService
                 taskUserAction: taskUserActionModelExtentions,
                 taskAttachment: taskAttachmentModelExtentions,
                 taskCustomField: taskCustomFieldModelExtentions,
-                taskProjectStatus: taskProjectStatusModelExtentions,
                 taskUserPermission: taskUserPermissionModelExtentions,
                 taskCustomFieldType: taskCustomFieldTypeModelExtentions,
-                taskCustomFieldValueType: taskCustomFieldValueTypeModelExtentions,
+                taskCustomFieldValueType:
+                    taskCustomFieldValueTypeModelExtentions,
             },
         })
     }

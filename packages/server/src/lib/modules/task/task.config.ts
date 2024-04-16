@@ -27,10 +27,5 @@ export class TaskConfig<TRoleCode extends string = string> {
             name: string
             description: string
         }[],
-        readonly defaultTaskUserPermissions: {
-            [key in TRoleCode]: {
-                [key in USER_ACTIONS]: boolean
-            }
-        },
     ) {}
 }

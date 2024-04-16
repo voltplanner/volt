@@ -1,11 +1,16 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskCustomFieldTypeCreateRepositoryDto, TaskCustomFieldTypeDeleteRepositoryDto, TaskCustomFieldTypeFindManyRepositoryDto, TaskCustomFieldTypeUpdateRepositoryDto } from "../repositories-dto/task-custom-field-type.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskCustomFieldTypeCreateRepositoryDto,
+    TaskCustomFieldTypeDeleteRepositoryDto,
+    TaskCustomFieldTypeFindManyRepositoryDto,
+    TaskCustomFieldTypeUpdateRepositoryDto,
+} from '../repositories-dto/task-custom-field-type.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskCustomFieldTypeModelExtentions = {
     async extCreate(
@@ -13,7 +18,8 @@ export const taskCustomFieldTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const {
                 code,
@@ -29,7 +35,9 @@ export const taskCustomFieldTypeModelExtentions = {
                 regexp,
             } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskCustomFieldType.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskCustomFieldType.aggregate({
                 _max: { position: true },
             })
 
@@ -47,7 +55,8 @@ export const taskCustomFieldTypeModelExtentions = {
                     possibleValues,
                     defaultValue,
                     regexp,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 select: { id: true },
             })
@@ -70,7 +79,8 @@ export const taskCustomFieldTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const {
                 id,
@@ -160,7 +170,8 @@ export const taskCustomFieldTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -187,11 +198,16 @@ export const taskCustomFieldTypeModelExtentions = {
         dto: TaskCustomFieldTypeFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskCustomFieldType.findMany>>
+        data: Awaited<
+            ReturnType<
+                typeof PrismaService.instance.taskCustomFieldType.findMany
+            >
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,

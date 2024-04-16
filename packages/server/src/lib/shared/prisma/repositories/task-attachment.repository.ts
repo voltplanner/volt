@@ -1,11 +1,16 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskAttachmentCreateRepositoryDto, TaskAttachmentDeleteRepositoryDto, TaskAttachmentFindManyRepositoryDto, TaskAttachmentUpdateRepositoryDto } from "../repositories-dto/task-attachment.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskAttachmentCreateRepositoryDto,
+    TaskAttachmentDeleteRepositoryDto,
+    TaskAttachmentFindManyRepositoryDto,
+    TaskAttachmentUpdateRepositoryDto,
+} from '../repositories-dto/task-attachment.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskAttachmentModelExtentions = {
     async extCreate(
@@ -13,9 +18,11 @@ export const taskAttachmentModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
-            const { name, description, externalId, sizeKb, taskId, userId } = dto
+            const { name, description, externalId, sizeKb, taskId, userId } =
+                dto
 
             const { id } = await client.taskAttachment.create({
                 data: {
@@ -47,7 +54,8 @@ export const taskAttachmentModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, name, description } = dto
 
@@ -78,7 +86,8 @@ export const taskAttachmentModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -105,11 +114,14 @@ export const taskAttachmentModelExtentions = {
         dto: TaskAttachmentFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskAttachment.findMany>>
+        data: Awaited<
+            ReturnType<typeof PrismaService.instance.taskAttachment.findMany>
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -131,7 +143,7 @@ export const taskAttachmentModelExtentions = {
             if (dto.filterByName) {
                 delegateWhere.name = {
                     contains: dto.filterByName,
-                    mode: 'insensitive'
+                    mode: 'insensitive',
                 }
             }
 

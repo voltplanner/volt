@@ -1,11 +1,16 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskEffortCreateRepositoryDto, TaskEffortDeleteRepositoryDto, TaskEffortFindManyRepositoryDto, TaskEffortUpdateRepositoryDto } from "../repositories-dto/task-effort.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskEffortCreateRepositoryDto,
+    TaskEffortDeleteRepositoryDto,
+    TaskEffortFindManyRepositoryDto,
+    TaskEffortUpdateRepositoryDto,
+} from '../repositories-dto/task-effort.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskEffortModelExtentions = {
     async extCreate(
@@ -13,7 +18,8 @@ export const taskEffortModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { value, description, taskId, userId } = dto
 
@@ -45,7 +51,8 @@ export const taskEffortModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, value, description } = dto
 
@@ -76,7 +83,8 @@ export const taskEffortModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -103,11 +111,14 @@ export const taskEffortModelExtentions = {
         dto: TaskEffortFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskEffort.findMany>>
+        data: Awaited<
+            ReturnType<typeof PrismaService.instance.taskEffort.findMany>
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,

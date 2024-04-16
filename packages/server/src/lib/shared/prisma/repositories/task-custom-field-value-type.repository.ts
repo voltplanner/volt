@@ -1,11 +1,17 @@
-import { Prisma } from ".."
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { PrismaService } from "../prisma.service"
-import { TaskCustomFieldValueTypeCreateRepositoryDto, TaskCustomFieldValueTypeDeleteRepositoryDto, TaskCustomFieldValueTypeFindManyRepositoryDto, TaskCustomFieldValueTypeUpdateRepositoryDto, TaskCustomFieldValueTypeUpsertRepositoryDto } from "../repositories-dto/task-custom-field-value-type.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskCustomFieldValueTypeCreateRepositoryDto,
+    TaskCustomFieldValueTypeDeleteRepositoryDto,
+    TaskCustomFieldValueTypeFindManyRepositoryDto,
+    TaskCustomFieldValueTypeUpdateRepositoryDto,
+    TaskCustomFieldValueTypeUpsertRepositoryDto,
+} from '../repositories-dto/task-custom-field-value-type.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskCustomFieldValueTypeModelExtentions = {
     async extCreate(
@@ -13,11 +19,14 @@ export const taskCustomFieldValueTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { code, name } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskCustomFieldValueType.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskCustomFieldValueType.aggregate({
                 _max: { position: true },
             })
 
@@ -25,7 +34,8 @@ export const taskCustomFieldValueTypeModelExtentions = {
                 data: {
                     code,
                     name,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 select: { id: true },
             })
@@ -48,7 +58,8 @@ export const taskCustomFieldValueTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, name, code, position: newPosition } = dto
 
@@ -90,15 +101,16 @@ export const taskCustomFieldValueTypeModelExtentions = {
                 }
             }
 
-            const { id: updatedId } = await client.taskCustomFieldValueType.update({
-                where: { id },
-                data: {
-                    code,
-                    name,
-                    position: newPosition,
-                },
-                select: { id: true },
-            })
+            const { id: updatedId } =
+                await client.taskCustomFieldValueType.update({
+                    where: { id },
+                    data: {
+                        code,
+                        name,
+                        position: newPosition,
+                    },
+                    select: { id: true },
+                })
 
             return updatedId
         } catch (e) {
@@ -118,11 +130,14 @@ export const taskCustomFieldValueTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { code, name } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskCustomFieldValueType.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskCustomFieldValueType.aggregate({
                 _max: { position: true },
             })
 
@@ -136,7 +151,8 @@ export const taskCustomFieldValueTypeModelExtentions = {
                 create: {
                     code,
                     name,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 update: {
                     code,
@@ -163,15 +179,17 @@ export const taskCustomFieldValueTypeModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
-            const { id: deletedId } = await client.taskCustomFieldValueType.update({
-                where: { id },
-                data: { isDeleted: true },
-                select: { id: true },
-            })
+            const { id: deletedId } =
+                await client.taskCustomFieldValueType.update({
+                    where: { id },
+                    data: { isDeleted: true },
+                    select: { id: true },
+                })
 
             return deletedId
         } catch (e) {
@@ -190,11 +208,16 @@ export const taskCustomFieldValueTypeModelExtentions = {
         dto: TaskCustomFieldValueTypeFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskCustomFieldValueType.findMany>>
+        data: Awaited<
+            ReturnType<
+                typeof PrismaService.instance.taskCustomFieldValueType.findMany
+            >
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,

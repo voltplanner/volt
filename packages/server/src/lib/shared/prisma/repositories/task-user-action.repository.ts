@@ -1,11 +1,17 @@
-import { Prisma } from ".."
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { PrismaService } from "../prisma.service"
-import { TaskUserActionCreateRepositoryDto as TaskUserActionUpsertRepositoryDto, TaskUserActionDeleteRepositoryDto, TaskUserActionFindManyRepositoryDto, TaskUserActionGetOneByCodeRepositoryDto, TaskUserActionUpdateRepositoryDto } from "../repositories-dto/task-user-action.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskUserActionCreateRepositoryDto as TaskUserActionUpsertRepositoryDto,
+    TaskUserActionDeleteRepositoryDto,
+    TaskUserActionFindManyRepositoryDto,
+    TaskUserActionGetOneByCodeRepositoryDto,
+    TaskUserActionUpdateRepositoryDto,
+} from '../repositories-dto/task-user-action.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskUserActionModelExtentions = {
     async extUpsert(
@@ -13,11 +19,14 @@ export const taskUserActionModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { name, code, description } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskUserAction.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskUserAction.aggregate({
                 _max: { position: true },
             })
 
@@ -32,7 +41,8 @@ export const taskUserActionModelExtentions = {
                     code,
                     name,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 update: {
                     name,
@@ -59,7 +69,8 @@ export const taskUserActionModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, name, code, description, position: newPosition } = dto
 
@@ -130,7 +141,8 @@ export const taskUserActionModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -157,11 +169,14 @@ export const taskUserActionModelExtentions = {
         dto: TaskUserActionFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskUserAction.findMany>>
+        data: Awaited<
+            ReturnType<typeof PrismaService.instance.taskUserAction.findMany>
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -205,11 +220,18 @@ export const taskUserActionModelExtentions = {
     async extGetOneByCode(
         dto: TaskUserActionGetOneByCodeRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserAction.findUniqueOrThrow>>> {
+    ): Promise<
+        Awaited<
+            ReturnType<
+                typeof PrismaService.instance.taskUserAction.findUniqueOrThrow
+            >
+        >
+    > {
         try {
             const { code } = dto
 
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const data = await client.taskUserAction.findUniqueOrThrow({
                 where: {

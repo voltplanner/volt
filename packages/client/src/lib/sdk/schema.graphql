@@ -59,11 +59,28 @@ type AuthorizationResponse {
     expiresAt: Float!
 }
 
+type GetNotificationPreferences {
+    emailEnabled: Boolean!
+    email: String
+    webEnabled: Boolean!
+    telegramEnabled: Boolean!
+    telegramAccount: Float
+}
+
+type NotificationWebResponse {
+    userId: String!
+    topic: String!
+    message: String!
+    link: String
+}
+
 type Query {
     getUsers(input: GetUsersInput!): PaginatedUsers!
     getRoles(input: GetRolesInput!): PaginatedRoles!
     getMyRole: RoleType!
     getUser(input: GetUserInput!): UserType!
+    getMyNotificationPreferences: GetNotificationPreferences!
+    getFile(input: GetFileInput!): String!
 }
 
 input GetUsersInput {
@@ -105,6 +122,10 @@ input GetUserInput {
     userId: ID!
 }
 
+input GetFileInput {
+    id: String!
+}
+
 type Mutation {
     updateRole(input: UpdateRoleInput!): Boolean!
     changeUserRole(input: ChangeUserRoleInput!): Boolean!
@@ -117,6 +138,10 @@ type Mutation {
     createUser(input: CreateUserInput!): UserType!
     deleteUser(input: DeleteUserInput!): Boolean!
     completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+    changeMyNotificationPreferences(
+        input: ChangeMyNotificationPreferences!
+    ): Boolean!
+    uploadFile(input: UploadFileInput!): String!
 }
 
 input UpdateRoleInput {
@@ -183,4 +208,25 @@ input CompleteSignInInput {
     userId: ID!
     code: String!
     password: String!
+}
+
+input ChangeMyNotificationPreferences {
+    emailEnabled: Boolean
+    email: String
+    webEnabled: Boolean
+    telegramEnabled: Boolean
+    telegramAccount: Float
+}
+
+input UploadFileInput {
+    file: Upload!
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+type Subscription {
+    getNotifications: NotificationWebResponse!
 }

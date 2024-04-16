@@ -1,10 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from '@nestjs/common'
 
-import { PrismaServiceWithExtentionsType, PrismaTransactionClientType } from "../../../shared/prisma";
+import {
+    PrismaServiceWithExtentionsType,
+    PrismaTransactionClientType,
+} from '../../../shared/prisma'
 
 @Injectable()
 export class TaskService {
     constructor(
+        @Inject('PRISMA_CLIENT')
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
@@ -22,66 +26,75 @@ export class TaskService {
         })
     }
 
-    async update(dto: {
-        id: string
-        version: number
+    async update(
+        dto: {
+            id: string
+            version: number
 
-        name?: string
-        description?: string | null
-        estimatedDateEnd?: number | null
-        estimatedDateStart?: number | null
-        estimatedDuration?: number | null
+            name?: string
+            description?: string | null
+            estimatedDateEnd?: number | null
+            estimatedDateStart?: number | null
+            estimatedDuration?: number | null
 
-        parentId?: string
-        statusId?: string
-        assignedToId?: string | null
+            parentId?: string
+            statusId?: string
+            assignedToId?: string | null
 
-        taskTagIds?: string[]
-    }, prisma?: PrismaTransactionClientType) {
+            taskTagIds?: string[]
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const client = prisma || this._prismaService
 
         const { taskTagIds } = dto
 
-        await client.task.extUpdate({
-            ...dto,
-            estimatedDateEnd: typeof dto.estimatedDateEnd === 'number' ? new Date(dto.estimatedDateEnd) : dto.estimatedDateEnd,
-            estimatedDateStart: typeof dto.estimatedDateStart === 'number' ? new Date(dto.estimatedDateStart) : dto.estimatedDateStart,
-        }, client)
+        await client.task.extUpdate(
+            {
+                ...dto,
+                estimatedDateEnd:
+                    typeof dto.estimatedDateEnd === 'number'
+                        ? new Date(dto.estimatedDateEnd)
+                        : dto.estimatedDateEnd,
+                estimatedDateStart:
+                    typeof dto.estimatedDateStart === 'number'
+                        ? new Date(dto.estimatedDateStart)
+                        : dto.estimatedDateStart,
+            },
+            client,
+        )
 
         if (taskTagIds?.length) {
-            await client.task.extSetTags({
-                taskId: dto.id,
-                taskTagIds: taskTagIds,
-            }, client)
+            await client.task.extSetTags(
+                {
+                    taskId: dto.id,
+                    taskTagIds: taskTagIds,
+                },
+                client,
+            )
         }
 
         return dto.id
     }
 
+    async taskCreate(
+        dto: {
+            readonly name: string
+            readonly description?: string
+            readonly estimatedDateEnd?: Date
+            readonly estimatedDateStart?: Date
+            readonly estimatedDuration?: number
 
+            readonly statusId: string
+            readonly projectId: string
+            readonly createdById: string
 
-
-
-
-
-
-
-
-    async taskCreate(dto: {
-        readonly name: string
-        readonly description?: string
-        readonly estimatedDateEnd?: Date
-        readonly estimatedDateStart?: Date
-        readonly estimatedDuration?: number
-
-        readonly statusId: string
-        readonly projectId: string
-        readonly createdById: string
-
-        readonly parentId?: string
-        readonly assignedToId?: string
-        readonly tagsIds?: string[]
-    }, prisma?: PrismaTransactionClientType) {
+            readonly parentId?: string
+            readonly assignedToId?: string
+            readonly tagsIds?: string[]
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const client = prisma || this._prismaService
 
         const id = await client.task.extCreate(dto, client)
@@ -92,32 +105,44 @@ export class TaskService {
     /**
      * New default status will replace the current.
      */
-    async statusSetDefault(dto: {
-        readonly id: string
-    }, prisma?: PrismaTransactionClientType) {
+    async statusSetDefault(
+        dto: {
+            readonly id: string
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const { id } = dto
 
         const client = prisma || this._prismaService
 
-        await client.taskStatus.extSetDefault({
-            id,
-        }, client)
+        await client.taskStatus.extSetDefault(
+            {
+                id,
+            },
+            client,
+        )
 
         return id
     }
 
-    async customFieldValueTypeUpsert(dto: {
-        readonly code: string
-        readonly name: string
-    }, prisma?: PrismaTransactionClientType) {
+    async customFieldValueTypeUpsert(
+        dto: {
+            readonly code: string
+            readonly name: string
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const { code, name } = dto
 
         const client = prisma || this._prismaService
 
-        const id = await client.taskCustomFieldValueType.extUpsert({
-            code,
-            name,
-        }, client)
+        const id = await client.taskCustomFieldValueType.extUpsert(
+            {
+                code,
+                name,
+            },
+            client,
+        )
 
         return id
     }

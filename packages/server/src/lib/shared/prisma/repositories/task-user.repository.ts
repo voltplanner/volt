@@ -1,14 +1,23 @@
-import { Prisma } from ".."
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { PrismaService } from "../prisma.service"
-import { TaskProjectConnectProjectRepositoryDto, TaskProjectDisconnectProjectRepositoryDto, TaskUserCreateRepositoryDto, TaskUserFindAllRepositoryDto } from "../repositories-dto/task-user.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskProjectConnectProjectRepositoryDto,
+    TaskProjectDisconnectProjectRepositoryDto,
+    TaskUserCreateRepositoryDto,
+    TaskUserFindAllRepositoryDto,
+} from '../repositories-dto/task-user.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskUserModelExtentions = {
-    async extCreate(dto: TaskUserCreateRepositoryDto, prisma?: any): Promise<string> {
+    async extCreate(
+        dto: TaskUserCreateRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, roleId } = dto
 
@@ -33,9 +42,13 @@ export const taskUserModelExtentions = {
         }
     },
 
-    async extUpsert(dto: TaskUserCreateRepositoryDto, prisma?: any): Promise<string> {
+    async extUpsert(
+        dto: TaskUserCreateRepositoryDto,
+        prisma?: any,
+    ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, roleId } = dto
 
@@ -69,7 +82,8 @@ export const taskUserModelExtentions = {
         prisma?: any,
     ): Promise<string[]> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { projectId } = dto
 
@@ -106,7 +120,8 @@ export const taskUserModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, projectId } = dto
 
@@ -139,7 +154,8 @@ export const taskUserModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, projectId } = dto
 

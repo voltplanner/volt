@@ -6,7 +6,7 @@ export abstract class DefaultError extends Error {
     constructor(dto?: {
         context?: string
         message?: string | object
-        metadata?: string | object,
+        metadata?: string | object
     }) {
         let messageStr = ''
 
@@ -18,7 +18,8 @@ export abstract class DefaultError extends Error {
             messageStr = DefaultError._stringifyAny(dto?.message).trim()
         }
 
-        const contextStr = (dto?.context?.trim() && messageStr) ? `(${dto.context.trim()}) ` : ''
+        const contextStr =
+            dto?.context?.trim() && messageStr ? `(${dto.context.trim()}) ` : ''
 
         super(contextStr + messageStr)
 
@@ -50,18 +51,29 @@ export abstract class DefaultError extends Error {
             if (!result) {
                 result = JSON.stringify(obj)
             }
-        } catch {/*  */}
+        } catch {
+            /*  */
+        }
 
         try {
             if (!result) {
                 result = String(obj)
             }
-        } catch {/*  */}
+        } catch {
+            /*  */
+        }
 
         const [, elapsedNano] = process.hrtime(startTimeMark)
 
         if (elapsedNano >= 100 * 1000) {
-            console.warn(`${Math.ceil(elapsedNano / 1000)} milliseconds taken to stringify any in ${DefaultError.name}:`, obj)
+            console.warn(
+                `${Math.ceil(
+                    elapsedNano / 1000,
+                )} milliseconds taken to stringify any in ${
+                    DefaultError.name
+                }:`,
+                obj,
+            )
         }
 
         return result

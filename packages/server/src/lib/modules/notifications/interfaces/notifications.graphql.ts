@@ -35,3 +35,18 @@ export class GetNotificationPreferences {
     @Field({ nullable: true })
     telegramAccount: number
 }
+
+@ObjectType()
+export class NotificationWebResponse {
+    @Field()
+    userId: string
+
+    @Field()
+    topic: string
+
+    @Field()
+    message: string
+
+    @Field({ nullable: true })
+    link?: string
+}

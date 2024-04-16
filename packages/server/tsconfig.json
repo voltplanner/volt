@@ -13,8 +13,13 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "paths": {
-            "@shared/decorators": ["packages/server/src/lib/shared/decorators/index.ts"],
-            "@shared/interfaces": ["packages/server/src/lib/shared/interfaces/index.ts"]
+            "@shared/decorators": [
+                "packages/server/src/lib/shared/decorators/index.ts"
+            ],
+            "@shared/interfaces": [
+                "packages/server/src/lib/shared/interfaces/index.ts"
+            ],
+            "@shared/utils": ["packages/server/src/lib/shared/utils/index.ts"]
         }
     }
 }

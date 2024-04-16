@@ -2,12 +2,13 @@ generator client {
     provider        = "prisma-client-js"
     output          = "../../../../node_modules/generatedprisma"
     binaryTargets   = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x"]
-    previewFeatures = ["fullTextSearch"]
+    previewFeatures = ["multiSchema", "fullTextSearch"]
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    schemas  = ["auth", "notifications", "files", "tasks"]
 }
 
 model AuthUser {
@@ -26,63 +27,66 @@ model AuthUser {
     deletedAt DateTime?
     tokens    AuthRefreshToken[]
 
-    @@map("auth_user")
+    @@schema("auth")
 }
 
 model AuthRefreshToken {
     id        String   @id @default(uuid()) @db.Uuid
-    isRevoked Boolean  @default(false) @map("is_revoked")
-    expiresAt DateTime @map("expires_at") @db.Timestamp(6)
-    userId    String   @map("user_id") @db.Uuid
-    user      AuthUser @relation(fields: [userId], references: [id], map: "FK__AUTH_REFRESH_TOKEN__USER")
+    isRevoked Boolean  @default(false)
+    expiresAt DateTime
+    user      AuthUser @relation(fields: [userId], references: [id])
+    userId    String @db.Uuid
 
-    @@map("auth_refresh_token")
+    @@schema("auth")
 }
 
 model AuthRole {
     id          String               @id @default(uuid()) @db.Uuid
-    name        String               @unique @db.VarChar(32)
+    name        String               @unique
     superuser   Boolean
     editable    Boolean
-    permissions AuthRolePermission[]
     user        AuthUser[]
+    permissions AuthRolePermission[]
 
-    @@map("auth_role")
+    @@schema("auth")
 }
 
 model AuthRolePermission {
-    roleId   String     @map("role_id") @db.Uuid
-    methodId String     @map("method_id") @db.Uuid
+    role     AuthRole   @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    roleId   String @db.Uuid
+    method   AuthMethod @relation(fields: [methodId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    methodId String @db.Uuid
     allowed  Boolean
     editable Boolean    @default(true)
-    method   AuthMethod @relation(fields: [methodId], references: [id], onDelete: Cascade, map: "FK__AUTH_ROLE_PERMISSION__METHOD")
-    role     AuthRole   @relation(fields: [roleId], references: [id], onDelete: Cascade, map: "FK__AUTH_ROLE_PERMISSION__ROLE")
 
     @@id([roleId, methodId])
-    @@map("auth_role_permission")
+    @@schema("auth")
 }
 
 model AuthMethod {
-    id          String               @id @default(uuid()) @db.Uuid
-    name        String               @unique @db.VarChar(32)
+    id          String @id @default(uuid()) @db.Uuid
+    name        String @unique
     description String
-    group       String               @db.VarChar
+    group       String
+
     permissions AuthRolePermission[]
 
-    @@map("auth_method")
+    @@schema("auth")
+}
+
+enum AuthUserStatusEnum {
+    WAITING_COMPLETE
+    ACTIVE
+    BLOCKED
+
+    @@schema("auth")
 }
 
 model AuthSettings {
     id                      Int     @id
     defaultRolesInitialized Boolean @default(false)
 
-    @@map("auth_settings")
-}
-
-model SystemSettings {
-    id String @id @default(uuid()) @db.Uuid
-
-    @@map("system_settings")
+    @@schema("auth")
 }
 
 model NotificationPreferences {
@@ -94,6 +98,8 @@ model NotificationPreferences {
     telegramEnabled Boolean
     telegramAccount Int?
     nofications     Notification[]
+
+    @@schema("notifications")
 }
 
 model Notification {
@@ -106,25 +112,50 @@ model Notification {
     sentAt        DateTime?
     error         String?
     Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
-    preferencesId String?                  @db.Uuid
+    preferencesId String? @db.Uuid
+
+    @@schema("notifications")
+}
+
+enum NotificationTypeEnum {
+    EMAIL
+    WEB
+    TELEGRAM
+
+    @@schema("notifications")
+}
+
+model File {
+    id           String @id @default(uuid()) @db.Uuid
+    originalName String
+    mimeType     String
+    size         Int
+    eTag         String
+    bucket       String
+    key          String
+    location     String
+    userId       String @db.Uuid
+
+    @@schema("files")
 }
 
 model TaskUser {
-    id         String @id @default(uuid()) @db.Uuid
-    roleId     String @map("role_id") @db.Uuid
+    id     String @id @default(uuid()) @db.Uuid
+    roleId String @map("role_id") @db.Uuid
 
-    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
-    projects          TaskProjectOnUser[]
-    tasksAssignedTo   Task[]              @relation("FK__TASK__ASSIGNED_TO")
-    attachments       TaskAttachment[]
-    changes           TaskChange[]
-    comments          TaskComment[]
-    efforts           TaskEffort[]
-    role              TaskUserRole        @relation(fields: [roleId], references: [id], map: "FK__USER__ROLE")
+    projects        TaskProjectOnUser[]
+    tasksAssignedTo Task[]              @relation("FK__TASK__ASSIGNED_TO")
+    attachments     TaskAttachment[]
+    changes         TaskChange[]
+    comments        TaskComment[]
+    efforts         TaskEffort[]
+    role            TaskUserRole        @relation(fields: [roleId], references: [id], map: "FK__USER__ROLE")
 
     @@map("task_user")
+    @@schema("tasks")
 }
 
 model TaskUserRole {
@@ -147,6 +178,7 @@ model TaskUserRole {
 
     @@unique([code, isDeleted])
     @@map("task_user_role")
+    @@schema("tasks")
 }
 
 model TaskUserAction {
@@ -166,6 +198,7 @@ model TaskUserAction {
 
     @@unique([code, isDeleted])
     @@map("task_user_action")
+    @@schema("tasks")
 }
 
 model TaskUserPermission {
@@ -185,6 +218,7 @@ model TaskUserPermission {
 
     @@unique([roleId, actionId, isDeleted])
     @@map("task_user_permission")
+    @@schema("tasks")
 }
 
 model TaskProject {
@@ -207,6 +241,7 @@ model TaskProject {
     tasksUserRoles       TaskUserRole[]
 
     @@map("task_project")
+    @@schema("tasks")
 }
 
 model TaskProjectOnUser {
@@ -217,6 +252,7 @@ model TaskProjectOnUser {
 
     @@id([projectId, userId], map: "PK__PROJECT_ON_USER")
     @@map("task_project_on_user")
+    @@schema("tasks")
 }
 
 model Task {
@@ -259,6 +295,7 @@ model Task {
     customFields TaskCustomField[]
 
     @@map("task")
+    @@schema("tasks")
 }
 
 model TaskStatus {
@@ -282,6 +319,7 @@ model TaskStatus {
     @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_status")
+    @@schema("tasks")
 }
 
 model TaskEffort {
@@ -300,6 +338,7 @@ model TaskEffort {
     user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_EFFORT__USER")
 
     @@map("task_effort")
+    @@schema("tasks")
 }
 
 model TaskTag {
@@ -322,6 +361,7 @@ model TaskTag {
     @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_tag")
+    @@schema("tasks")
 }
 
 model TaskOnTaskTag {
@@ -337,6 +377,7 @@ model TaskOnTaskTag {
 
     @@id([taskId, taskTagId], map: "PK__TASK_ON_TASK_TAG")
     @@map("task_on_task_tag")
+    @@schema("tasks")
 }
 
 model TaskAttachment {
@@ -357,6 +398,7 @@ model TaskAttachment {
     user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_ATTACHMENT__USER")
 
     @@map("task_attachment")
+    @@schema("tasks")
 }
 
 model TaskComment {
@@ -374,6 +416,7 @@ model TaskComment {
     user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_COMMENT__USER")
 
     @@map("task_comment")
+    @@schema("tasks")
 }
 
 model TaskChange {
@@ -393,6 +436,7 @@ model TaskChange {
     user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_CHANGE__USER")
 
     @@map("task_change")
+    @@schema("tasks")
 }
 
 model TaskOnTaskRelation {
@@ -411,6 +455,7 @@ model TaskOnTaskRelation {
 
     @@id([taskMainId, taskForeignId], map: "PK__TASK_RELATION")
     @@map("task_on_task_relation")
+    @@schema("tasks")
 }
 
 model TaskRelation {
@@ -434,6 +479,7 @@ model TaskRelation {
     @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_relation")
+    @@schema("tasks")
 }
 
 model TaskCustomField {
@@ -451,6 +497,7 @@ model TaskCustomField {
     task                  Task                @relation(fields: [taskId], references: [id], map: "FK__TASK_CUSTOM_FIELD__TASK")
 
     @@map("task_custom_field")
+    @@schema("tasks")
 }
 
 model TaskCustomFieldType {
@@ -481,6 +528,7 @@ model TaskCustomFieldType {
     @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_custom_field_type")
+    @@schema("tasks")
 }
 
 model TaskCustomFieldValueType {
@@ -499,20 +547,5 @@ model TaskCustomFieldValueType {
     @@unique([code, isDeleted])
     @@unique([position, isDeleted])
     @@map("task_custom_field_value_type")
-}
-
-enum AuthUserStatusEnum {
-    WAITING_COMPLETE
-    ACTIVE
-    BLOCKED
-
-    @@map("auth_user_status_enum")
-}
-
-enum NotificationTypeEnum {
-    EMAIL
-    WEB
-    TELEGRAM
-
-    @@map("notification_type_enum")
+    @@schema("tasks")
 }

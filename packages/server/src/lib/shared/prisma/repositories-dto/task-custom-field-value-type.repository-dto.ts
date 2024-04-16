@@ -1,4 +1,4 @@
-import { OrderEnum } from "../../../shared/interfaces/shared.interfaces"
+import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 
 export type TaskCustomFieldValueTypeCreateRepositoryDto = {
     code: string

@@ -1,11 +1,16 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskCommentCreateRepositoryDto, TaskCommentDeleteRepositoryDto, TaskCommentFindManyRepositoryDto, TaskCommentUpdateRepositoryDto } from "../repositories-dto/task-comment.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskCommentCreateRepositoryDto,
+    TaskCommentDeleteRepositoryDto,
+    TaskCommentFindManyRepositoryDto,
+    TaskCommentUpdateRepositoryDto,
+} from '../repositories-dto/task-comment.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskCommentModelExtentions = {
     async extCreate(
@@ -13,7 +18,8 @@ export const taskCommentModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { text, taskId, userId } = dto
 
@@ -44,7 +50,8 @@ export const taskCommentModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, text } = dto
 
@@ -74,7 +81,8 @@ export const taskCommentModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -101,11 +109,14 @@ export const taskCommentModelExtentions = {
         dto: TaskCommentFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskComment.findMany>>
+        data: Awaited<
+            ReturnType<typeof PrismaService.instance.taskComment.findMany>
+        >
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -127,7 +138,7 @@ export const taskCommentModelExtentions = {
             if (dto.filterByText) {
                 delegateWhere.text = {
                     contains: dto.filterByText,
-                    mode: 'insensitive'
+                    mode: 'insensitive',
                 }
             }
 

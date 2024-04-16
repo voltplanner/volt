@@ -1,6 +1,6 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from '@nestjs/graphql'
 
-import { TaskIntegrationUserObject } from "./task-integration-user.object-type";
+import { TaskIntegrationUserObject } from './task-integration-user.object-type'
 
 @ObjectType()
 export class TaskIntegrationTaskObject {

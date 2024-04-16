@@ -1,11 +1,18 @@
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma, Task, TaskProject, TaskStatus } from ".."
-import { PrismaService } from "../prisma.service"
-import { TaskCreateRepositoryDto, TaskDeleteRepositoryDto, TaskFindManyRepositoryDto, TaskFindOneRepositoryDto, TaskFindSubtasksRepositoryDto, TaskUpdateRepositoryDto } from "../repositories-dto/task.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { TPaginatedMeta } from '../../types/paginated-meta.type'
+import { parseMetaArgs } from '../../utils'
+import { Prisma, Task, TaskProject, TaskStatus } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskCreateRepositoryDto,
+    TaskDeleteRepositoryDto,
+    TaskFindManyRepositoryDto,
+    TaskFindOneRepositoryDto,
+    TaskFindSubtasksRepositoryDto,
+    TaskUpdateRepositoryDto,
+} from '../repositories-dto/task.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskModelExtentions = {
     async extCreate(
@@ -13,7 +20,8 @@ export const taskModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const {
                 name,
@@ -96,7 +104,7 @@ export const taskModelExtentions = {
 
             if (tagsIds?.length) {
                 await client.taskOnTaskTag.createMany({
-                    data: tagsIds.map(taskTagId => ({
+                    data: tagsIds.map((taskTagId) => ({
                         taskId: id,
                         taskTagId,
                     })),
@@ -123,7 +131,8 @@ export const taskModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const {
                 id,
@@ -177,7 +186,9 @@ export const taskModelExtentions = {
 
                 // Define expand size
                 const pr =
-                    parent.rgt > task.rgt ? parent.rgt - keysToMoveCount : parent.rgt
+                    parent.rgt > task.rgt
+                        ? parent.rgt - keysToMoveCount
+                        : parent.rgt
 
                 // Expand place for the replaced tree
                 await client.task.updateMany({
@@ -198,9 +209,10 @@ export const taskModelExtentions = {
                 })
 
                 // Paste replaced tree
-                const pd = parent.rgt > task.rgt
-                    ? parent.rgt - task.rgt - 1
-                    : parent.rgt - task.rgt - 1 + keysToMoveCount
+                const pd =
+                    parent.rgt > task.rgt
+                        ? parent.rgt - task.rgt - 1
+                        : parent.rgt - task.rgt - 1 + keysToMoveCount
 
                 const dl = parent.level + 1 - task.level
 
@@ -245,7 +257,8 @@ export const taskModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -318,11 +331,12 @@ export const taskModelExtentions = {
         dto: TaskFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: (Task & { status: Pick<TaskStatus, 'id' | 'code' | 'name'>})[]
+        data: (Task & { status: Pick<TaskStatus, 'id' | 'code' | 'name'> })[]
         meta: TPaginatedMeta
     }> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { curPage, perPage, take, skip } = parseMetaArgs({
                 curPage: dto.curPage,
@@ -340,13 +354,13 @@ export const taskModelExtentions = {
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskOrderByWithRelationAndSearchRelevanceInput = { createdAt: 'desc' }
-
+            const delegateOrderBy: Prisma.TaskOrderByWithRelationAndSearchRelevanceInput =
+                { createdAt: 'desc' }
 
             if (dto.filterByName) {
                 delegateWhere.name = {
                     contains: dto.filterByName,
-                    mode: 'insensitive'
+                    mode: 'insensitive',
                 }
             }
 
@@ -396,9 +410,9 @@ export const taskModelExtentions = {
                             id: true,
                             code: true,
                             name: true,
-                        }
+                        },
                     },
-                }
+                },
             })
 
             return {
@@ -424,9 +438,12 @@ export const taskModelExtentions = {
     async extFindOne(
         dto: TaskFindOneRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.task.findFirst>>> {
+    ): Promise<
+        Awaited<ReturnType<typeof PrismaService.instance.task.findFirst>>
+    > {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -451,9 +468,12 @@ export const taskModelExtentions = {
     async extFindSubtasks(
         dto: TaskFindSubtasksRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.task.findMany>>> {
+    ): Promise<
+        Awaited<ReturnType<typeof PrismaService.instance.task.findMany>>
+    > {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { parentId } = dto
 
@@ -485,11 +505,12 @@ export const taskModelExtentions = {
     },
 
     async extSetTags(
-        dto: { taskId: string, taskTagIds: string[] },
+        dto: { taskId: string; taskTagIds: string[] },
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { taskId, taskTagIds } = dto
 
@@ -498,7 +519,7 @@ export const taskModelExtentions = {
             })
 
             await client.taskOnTaskTag.createMany({
-                data: taskTagIds.map(i => ({
+                data: taskTagIds.map((i) => ({
                     taskId,
                     taskTagId: i,
                 })),

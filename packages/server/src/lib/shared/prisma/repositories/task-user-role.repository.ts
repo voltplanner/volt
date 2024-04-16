@@ -1,9 +1,15 @@
-import { Prisma } from ".."
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { PrismaService } from "../prisma.service"
-import { TaskUserRoleDeleteRepositoryDto, TaskUserRoleFindManyRepositoryDto, TaskUserRoleGetOneByCodeRepositoryDto, TaskUserRoleUpdateRepositoryDto, TaskUserRoleUpsertRepositoryDto } from "../repositories-dto/task-user-role.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskUserRoleDeleteRepositoryDto,
+    TaskUserRoleFindManyRepositoryDto,
+    TaskUserRoleGetOneByCodeRepositoryDto,
+    TaskUserRoleUpdateRepositoryDto,
+    TaskUserRoleUpsertRepositoryDto,
+} from '../repositories-dto/task-user-role.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskUserRoleModelExtentions = {
     async extUpsert(
@@ -11,11 +17,14 @@ export const taskUserRoleModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { name, code, projectId, description } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskUserRole.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskUserRole.aggregate({
                 _max: { position: true },
             })
 
@@ -31,7 +40,8 @@ export const taskUserRoleModelExtentions = {
                     name,
                     projectId,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 update: {
                     name,
@@ -59,7 +69,8 @@ export const taskUserRoleModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, name, code, description, position: newPosition } = dto
 
@@ -130,7 +141,8 @@ export const taskUserRoleModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -156,9 +168,12 @@ export const taskUserRoleModelExtentions = {
     async extFindMany(
         dto: TaskUserRoleFindManyRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserRole.findMany>>> {
+    ): Promise<
+        Awaited<ReturnType<typeof PrismaService.instance.taskUserRole.findMany>>
+    > {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { projectId } = dto
 
@@ -185,11 +200,18 @@ export const taskUserRoleModelExtentions = {
     async extGetOneByCode(
         dto: TaskUserRoleGetOneByCodeRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskUserRole.findUniqueOrThrow>>> {
+    ): Promise<
+        Awaited<
+            ReturnType<
+                typeof PrismaService.instance.taskUserRole.findUniqueOrThrow
+            >
+        >
+    > {
         try {
             const { code } = dto
 
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const data = await client.taskUserRole.findUniqueOrThrow({
                 where: {

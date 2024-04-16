@@ -1,9 +1,17 @@
-import { Prisma } from ".."
-import { DefaultError } from "../../errors/default.error"
-import { UnexpectedError } from "../../errors/unexpected.error"
-import { PrismaService } from "../prisma.service"
-import { TaskTagConnectTaskRepositoryDto, TaskTagCreateRepositoryDto, TaskTagDeleteRepositoryDto, TaskTagDisconnectTaskRepositoryDto, TaskTagFindManyRepositoryDto, TaskTagUpdateRepositoryDto, TaskTagUpsertRepositoryDto } from "../repositories-dto/task-tag.repository-dto"
-import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
+import { DefaultError } from '../../errors/default.error'
+import { UnexpectedError } from '../../errors/unexpected.error'
+import { Prisma } from '..'
+import { PrismaService } from '../prisma.service'
+import {
+    TaskTagConnectTaskRepositoryDto,
+    TaskTagCreateRepositoryDto,
+    TaskTagDeleteRepositoryDto,
+    TaskTagDisconnectTaskRepositoryDto,
+    TaskTagFindManyRepositoryDto,
+    TaskTagUpdateRepositoryDto,
+    TaskTagUpsertRepositoryDto,
+} from '../repositories-dto/task-tag.repository-dto'
+import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskTagModelExtentions = {
     async extCreate(
@@ -11,11 +19,14 @@ export const taskTagModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { code, name, description, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskTag.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskTag.aggregate({
                 _max: { position: true },
             })
 
@@ -24,7 +35,8 @@ export const taskTagModelExtentions = {
                     code,
                     name,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                     projectId,
                 },
                 select: { id: true },
@@ -48,7 +60,8 @@ export const taskTagModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id, name, code, description, position: newPosition } = dto
 
@@ -119,11 +132,14 @@ export const taskTagModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { name, code, description, isDefault, projectId } = dto
 
-            const { _max: { position: maxPosition } } = await client.taskTag.aggregate({
+            const {
+                _max: { position: maxPosition },
+            } = await client.taskTag.aggregate({
                 _max: { position: true },
             })
 
@@ -139,7 +155,8 @@ export const taskTagModelExtentions = {
                     name,
                     projectId,
                     description,
-                    position: typeof maxPosition === 'number' ? maxPosition + 1 : 0,
+                    position:
+                        typeof maxPosition === 'number' ? maxPosition + 1 : 0,
                 },
                 update: {
                     code,
@@ -172,7 +189,8 @@ export const taskTagModelExtentions = {
         prisma?: any,
     ): Promise<string> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { id } = dto
 
@@ -198,9 +216,12 @@ export const taskTagModelExtentions = {
     async extFindMany(
         dto: TaskTagFindManyRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskTag.findMany>>> {
+    ): Promise<
+        Awaited<ReturnType<typeof PrismaService.instance.taskTag.findMany>>
+    > {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { projectId } = dto
 
@@ -209,9 +230,10 @@ export const taskTagModelExtentions = {
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskTagOrderByWithRelationAndSearchRelevanceInput = {
-                position: 'asc',
-            }
+            const delegateOrderBy: Prisma.TaskTagOrderByWithRelationAndSearchRelevanceInput =
+                {
+                    position: 'asc',
+                }
 
             return await client.taskTag.findMany({
                 where: delegateWhere,
@@ -234,7 +256,8 @@ export const taskTagModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { taskTagId, taskId } = dto
 
@@ -267,7 +290,8 @@ export const taskTagModelExtentions = {
         prisma?: any,
     ): Promise<void> {
         try {
-            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
 
             const { taskTagId, taskId } = dto
 

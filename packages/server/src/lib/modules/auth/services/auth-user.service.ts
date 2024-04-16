@@ -15,9 +15,9 @@ import {
 } from '../../../shared/prisma'
 import { parseMetaArgs } from '../../../shared/utils'
 import {
-    AUTH_EVENTS,
+    AUTH_PUBLISHER,
     AuthEventPattern,
-    AuthEventServiceInterface,
+    AuthEventsPublisher,
 } from '../configs/auth-events.config'
 import { AUTH_CONFIG, AuthConfig } from '../configs/auth-module.config'
 import {
@@ -34,8 +34,8 @@ export class AuthUserService {
     constructor(
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
-        @Inject(AUTH_EVENTS)
-        private readonly events: AuthEventServiceInterface,
+        @Inject(AUTH_PUBLISHER)
+        private readonly events: AuthEventsPublisher,
         private readonly prisma: PrismaService,
     ) {}
 
@@ -243,7 +243,7 @@ export class AuthUserService {
             },
         })
 
-        this.events.send({
+        await this.events.send({
             pattern: AuthEventPattern.COMPLETE_SIGNIN,
             data: {
                 userId: user.id,
