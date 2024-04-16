@@ -1,1 +1,1 @@
-export { GroupInfo} from './ui/GroupInfo'
+export { GroupInfo } from './ui/GroupInfo'

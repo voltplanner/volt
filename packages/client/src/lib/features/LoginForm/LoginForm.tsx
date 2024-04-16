@@ -88,7 +88,6 @@ const ContainerStyled = styled.div`
     height: 100%;
     max-width: 320px;
     margin: 0px auto;
-    display: flex;
     flex-grow: 1;
     flex-basis: auto;
     flex-direction: column;
