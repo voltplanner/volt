@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 
 import { AccessControl } from '../../../shared/decorators'
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator'
@@ -8,13 +8,16 @@ import { CurrentUserPayload } from '../../../shared/interfaces/shared.interfaces
 import {
     ChangeMyNotificationPreferences,
     GetNotificationPreferences,
+    NotificationWebResponse,
 } from '../interfaces/notifications.graphql'
 import { NotificationsPreferencesService } from '../services/preferences.service'
+import { NotificationsWebService } from '../services/web.service'
 
 @Resolver()
 export class NotificationsResolver {
     constructor(
         private readonly preferencesService: NotificationsPreferencesService,
+        private readonly webService: NotificationsWebService,
     ) {}
 
     @UseGuards(ACLGuard)
@@ -45,5 +48,15 @@ export class NotificationsResolver {
         })
 
         return true
+    }
+
+    @UseGuards(ACLGuard)
+    @Subscription(() => NotificationWebResponse)
+    @AccessControl({
+        group: 'notifications',
+        description: `Get web notifications`,
+    })
+    async getNotifications(@CurrentUser() user: CurrentUserPayload) {
+        return this.webService.subscribe(user.userId)
     }
 }

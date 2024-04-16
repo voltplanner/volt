@@ -2,19 +2,19 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 
 import { environment } from '../../environments/environment'
 import {
-    AUTH_EVENTS,
+    AUTH_LISTENER,
     AuthEventPattern,
-    AuthEventServiceInterface,
+    AuthEventsListener,
 } from '../modules/auth/configs/auth-events.config'
 import { NotificationsService } from '../modules/notifications/services/notifications.service'
 
 @Injectable()
-export class AuthIntegration {
+export class NotificationsIntegration {
     private logger = new Logger()
 
     constructor(
-        @Inject(AUTH_EVENTS)
-        private readonly authEvents: AuthEventServiceInterface,
+        @Inject(AUTH_LISTENER)
+        private readonly authEvents: AuthEventsListener,
         private readonly notificationsService: NotificationsService,
     ) {}
 

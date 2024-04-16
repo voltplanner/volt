@@ -1,16 +1,27 @@
+import { FactoryProvider } from '@nestjs/common'
 import {
-    EventsServiceInterface,
-    EventsServiceInterfaceConstructor,
-} from '../../../shared/events/interfaces/events.interfaces'
+    EventsListenerInterface,
+    EventsPublisherInterface,
+} from '@shelfjs/events'
 
-export const AUTH_EVENTS = 'AUTH_EVENTS'
+export const AUTH_PUBLISHER = 'AUTH_PUBLISHER'
+export const AUTH_LISTENER = 'AUTH_LISTENER'
+export const AUTH_CONTEXT = 'auth'
 
-export type AuthEventServiceInterface = EventsServiceInterface<
+export type AuthEventPublisherProvider = Omit<
+    FactoryProvider<AuthEventsPublisher>,
+    'provide'
+>
+
+export type AuthEventsPublisher = EventsPublisherInterface<
     AuthEventPattern,
     AuthEventPatternToData
 >
-export type AuthEventServiceInterfaceConstructor =
-    EventsServiceInterfaceConstructor<AuthEventPattern, AuthEventPatternToData>
+
+export type AuthEventsListener = EventsListenerInterface<
+    AuthEventPattern,
+    AuthEventPatternToData
+>
 
 export enum AuthEventPattern {
     COMPLETE_SIGNIN = 'COMPLETE_SIGNIN',

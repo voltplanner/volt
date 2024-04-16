@@ -13,6 +13,7 @@ import { NotificationsEmailService } from './services/email.service'
 import { NotificationsService } from './services/notifications.service'
 import { NotificationsPreferencesService } from './services/preferences.service'
 import { NotificationsTelegramService } from './services/telegram.service'
+import { NotificationsWebService } from './services/web.service'
 
 @Module({})
 export class NotificationsModule extends NotificationsConfigurableModuleClass {
@@ -42,6 +43,7 @@ export class NotificationsModule extends NotificationsConfigurableModuleClass {
             NotificationsPreferencesService,
             NotificationsEmailService,
             NotificationsTelegramService,
+            NotificationsWebService,
             NotificationsResolver,
         ]
 

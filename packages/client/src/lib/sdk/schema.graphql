@@ -67,6 +67,13 @@ type GetNotificationPreferences {
   telegramAccount: Float
 }
 
+type NotificationWebResponse {
+  userId: String!
+  topic: String!
+  message: String!
+  link: String
+}
+
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
   getRoles(input: GetRolesInput!): PaginatedRoles!
@@ -203,4 +210,8 @@ input ChangeMyNotificationPreferences {
   webEnabled: Boolean
   telegramEnabled: Boolean
   telegramAccount: Float
+}
+
+type Subscription {
+  getNotifications: NotificationWebResponse!
 }
