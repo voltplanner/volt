@@ -1,8 +1,9 @@
 import { Field, InputType } from "@nestjs/graphql";
+
 import { OrderByInput, PaginatedMetaInput } from "../../../shared/graphql/shared.graphql";
 
 @InputType()
-export class TaskIntegrationGetProjectUsersInput extends PaginatedMetaInput {
+export class ProjectIntegrationProjectUsersInput extends PaginatedMetaInput {
     @Field(() => String)
     readonly projectId!: string
 

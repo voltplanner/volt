@@ -1,19 +1,19 @@
-export const DEFAULT_TASK_STATUSES = [
+export const DEFAULT_TASKS_TAGS = [
     {
-        code: 'OPENED',
-        name: 'Opened',
+        code: 'TASK',
+        name: 'Task',
         description: '',
         isDefault: true,
     },
     {
-        code: 'IN_PROGRESS',
-        name: 'In Progress',
+        code: 'BUG',
+        name: 'Bug',
         description: '',
         isDefault: false,
     },
     {
-        code: 'CLOSED',
-        name: 'Closed',
+        code: 'STORY',
+        name: 'Story',
         description: '',
         isDefault: false,
     },

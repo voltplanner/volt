@@ -189,6 +189,7 @@ CREATE TABLE "task" (
     "number" SERIAL NOT NULL,
     "created_by_id" UUID NOT NULL,
     "description" TEXT,
+    "version" INTEGER NOT NULL,
     "estimated_date_start" TIMESTAMP(6),
     "estimated_date_end" TIMESTAMP(6),
     "estimated_duration" BIGINT,

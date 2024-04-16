@@ -3,7 +3,7 @@ export const DEFAULT_USER_ROLE_CODES = {
     PERFORMER: 'PERFORMER',
 } as const
 
-export const DEFAULT_USER_ROLES: Record<
+export const DEFAULT_USERS_ROLES: Record<
     keyof typeof DEFAULT_USER_ROLE_CODES,
     { name: string; description: string }
 > = {

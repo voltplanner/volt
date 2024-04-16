@@ -8,6 +8,65 @@ export class TaskService {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
+    async taskFindMany(dto?: {
+        assignedToId?: string
+        curPage?: number
+        perPage?: number
+    }) {
+        const { assignedToId, curPage, perPage } = dto || {}
+
+        return await this._prismaService.task.extFindMany({
+            filterByAssignedToId: assignedToId,
+            curPage,
+            perPage,
+        })
+    }
+
+    async update(dto: {
+        id: string
+        version: number
+
+        name?: string
+        description?: string | null
+        estimatedDateEnd?: number | null
+        estimatedDateStart?: number | null
+        estimatedDuration?: number | null
+
+        parentId?: string
+        statusId?: string
+        assignedToId?: string | null
+
+        taskTagIds?: string[]
+    }, prisma?: PrismaTransactionClientType) {
+        const client = prisma || this._prismaService
+
+        const { taskTagIds } = dto
+
+        await client.task.extUpdate({
+            ...dto,
+            estimatedDateEnd: typeof dto.estimatedDateEnd === 'number' ? new Date(dto.estimatedDateEnd) : dto.estimatedDateEnd,
+            estimatedDateStart: typeof dto.estimatedDateStart === 'number' ? new Date(dto.estimatedDateStart) : dto.estimatedDateStart,
+        }, client)
+
+        if (taskTagIds?.length) {
+            await client.task.extSetTags({
+                taskId: dto.id,
+                taskTagIds: taskTagIds,
+            }, client)
+        }
+
+        return dto.id
+    }
+
+
+
+
+
+
+
+
+
+
     async taskCreate(dto: {
         readonly name: string
         readonly description?: string
@@ -25,46 +84,9 @@ export class TaskService {
     }, prisma?: PrismaTransactionClientType) {
         const client = prisma || this._prismaService
 
-        const projectId = await client.task.extCreate(dto, client)
-
-        return projectId
-    }
-
-    /**
-     * If `isDefault` is true, than it will replace current default status.
-     */
-    async statusUpsert(dto: {
-        readonly code: string
-        readonly name: string
-        readonly description: string
-        readonly projectId: string
-        readonly isDefault?: boolean
-    }, prisma?: PrismaTransactionClientType) {
-        const { code, name, description, projectId, isDefault } = dto
-
-        const client = prisma || this._prismaService
-
-        const id = await client.taskStatus.extUpsert({
-            code,
-            name,
-            description,
-            projectId,
-            isDefault,
-        }, client)
+        const id = await client.task.extCreate(dto, client)
 
         return id
-    }
-
-    async statusFindAll(dto: {
-        readonly projectId: string
-    }, prisma?: PrismaTransactionClientType) {
-        const { projectId } = dto
-
-        const client = prisma || this._prismaService
-
-        return await client.taskStatus.extFindMany({
-            projectId,
-        }, client)
     }
 
     /**
@@ -79,60 +101,6 @@ export class TaskService {
 
         await client.taskStatus.extSetDefault({
             id,
-        }, client)
-
-        return id
-    }
-
-    async tagUpsert(dto: {
-        readonly code: string
-        readonly name: string
-        readonly description: string
-        readonly projectId: string
-    }, prisma?: PrismaTransactionClientType) {
-        const { code, name, description, projectId } = dto
-
-        const client = prisma || this._prismaService
-
-        const id = await client.taskTag.extUpsert({
-            code,
-            name,
-            description,
-            projectId,
-        }, client)
-
-        return id
-    }
-
-    async tagFindAll(dto: {
-        readonly projectId: string
-    }, prisma?: PrismaTransactionClientType) {
-        const { projectId } = dto
-
-        const client = prisma || this._prismaService
-
-        return await client.taskTag.extFindMany({
-            projectId,
-        }, client)
-    }
-
-    async relationUpsert(dto: {
-        readonly code: string
-        readonly nameMain: string
-        readonly nameForeign: string
-        readonly description: string
-        readonly projectId: string
-    }, prisma?: PrismaTransactionClientType) {
-        const { code, nameMain, nameForeign, description, projectId } = dto
-
-        const client = prisma || this._prismaService
-
-        const id = await client.taskRelation.extUpsert({
-            code,
-            nameMain,
-            nameForeign,
-            description,
-            projectId,
         }, client)
 
         return id

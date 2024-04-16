@@ -1,8 +1,8 @@
-import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
+import { Prisma, Task, TaskProject, TaskStatus } from ".."
 import { PrismaService } from "../prisma.service"
 import { TaskCreateRepositoryDto, TaskDeleteRepositoryDto, TaskFindManyRepositoryDto, TaskFindOneRepositoryDto, TaskFindSubtasksRepositoryDto, TaskUpdateRepositoryDto } from "../repositories-dto/task.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
@@ -83,6 +83,7 @@ export const taskModelExtentions = {
                     estimatedDateEnd,
                     estimatedDateStart,
                     estimatedDuration,
+                    version: 0,
 
                     statusId,
                     projectId,
@@ -126,6 +127,7 @@ export const taskModelExtentions = {
 
             const {
                 id,
+                version,
 
                 name,
                 description,
@@ -147,7 +149,7 @@ export const taskModelExtentions = {
                     where: { id },
                 })
 
-                // Count of keys to replase (one node has 2 keys, left key and right key)
+                // Count of keys to replace (one node has 2 keys, left key and right key)
                 const keysToMoveCount = task.rgt - task.lft + 1
 
                 // Hide replaced tree. Set negative keys to tree whitch we want to replace.
@@ -209,7 +211,7 @@ export const taskModelExtentions = {
 
             // Set new parent to replaced tree root task
             await client.task.update({
-                where: { id },
+                where: { id, version },
                 data: {
                     name,
                     description,
@@ -316,7 +318,7 @@ export const taskModelExtentions = {
         dto: TaskFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.task.findMany>>
+        data: (Task & { status: Pick<TaskStatus, 'id' | 'code' | 'name'>})[]
         meta: TPaginatedMeta
     }> {
         try {
@@ -388,6 +390,15 @@ export const taskModelExtentions = {
                 orderBy: delegateOrderBy,
                 skip,
                 take,
+                include: {
+                    status: {
+                        select: {
+                            id: true,
+                            code: true,
+                            name: true,
+                        }
+                    },
+                }
             })
 
             return {
@@ -461,6 +472,37 @@ export const taskModelExtentions = {
             })
 
             return data
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extSetTags(
+        dto: { taskId: string, taskTagIds: string[] },
+        prisma?: any,
+    ): Promise<void> {
+        try {
+            const client: PrismaTransactionClientType = prisma || PrismaService.instance
+
+            const { taskId, taskTagIds } = dto
+
+            await client.taskOnTaskTag.deleteMany({
+                where: { taskId },
+            })
+
+            await client.taskOnTaskTag.createMany({
+                data: taskTagIds.map(i => ({
+                    taskId,
+                    taskTagId: i,
+                })),
+            })
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

@@ -225,6 +225,7 @@ model Task {
     number             Int       @default(autoincrement()) @db.Integer
     createdById        String    @map("created_by_id") @db.Uuid
     description        String?
+    version            Int       @db.Integer
     estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
     estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
     estimatedDuration  BigInt?   @map("estimated_duration")

@@ -18,11 +18,12 @@ export type TaskCreateRepositoryDto = {
 
 export type TaskUpdateRepositoryDto = {
     id: string
+    version: number
 
     name?: string
     description?: string
-    estimatedDateEnd?: string
-    estimatedDateStart?: string
+    estimatedDateEnd?: Date
+    estimatedDateStart?: Date
     estimatedDuration?: number
 
     parentId?: string

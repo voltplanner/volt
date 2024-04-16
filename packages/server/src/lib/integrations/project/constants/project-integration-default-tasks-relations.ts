@@ -1,4 +1,4 @@
-export const DEFAULT_TASK_RELATIONS = [
+export const DEFAULT_TASKS_RELATIONS = [
     {
         code: 'CONNECTED_WITH',
         nameMain: 'Connected with',

@@ -1,7 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
 
 @InputType()
-export class TaskIntegrationGetTaskStatusesInput {
+export class ProjectIntegrationProjectTasksStatusesInput {
     @Field(() => String)
     readonly projectId!: string
 }

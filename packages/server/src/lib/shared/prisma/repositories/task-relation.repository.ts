@@ -1,8 +1,6 @@
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
-import { TPaginatedMeta } from "../../types/paginated-meta.type"
-import { parseMetaArgs } from "../../utils"
-import { Prisma } from ".."
+import { Prisma, TaskRelation } from ".."
 import { PrismaService } from "../prisma.service"
 import { TaskRelationConnectTaskRepositoryDto, TaskRelationCreateRepositoryDto, TaskRelationDeleteRepositoryDto, TaskRelationDisconnectTaskRepositoryDto, TaskRelationFindManyRepositoryDto, TaskRelationUpdateRepositoryDto, TaskRelationUpsertRepositoryDto } from "../repositories-dto/task-relation.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
@@ -198,21 +196,16 @@ export const taskRelationModelExtentions = {
     },
 
     async extFindMany(
-        dto: TaskRelationFindManyRepositoryDto = {},
+        dto: TaskRelationFindManyRepositoryDto,
         prisma?: any,
-    ): Promise<{
-        data: Awaited<ReturnType<typeof PrismaService.instance.taskRelation.findMany>>
-        meta: TPaginatedMeta
-    }> {
+    ): Promise<TaskRelation[]> {
+        const { projectId } = dto
+
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 
-            const { curPage, perPage, take, skip } = parseMetaArgs({
-                curPage: dto.curPage,
-                perPage: dto.perPage,
-            })
-
             const delegateWhere: Prisma.TaskRelationWhereInput = {
+                projectId,
                 nameMain: undefined,
                 nameForeign: undefined,
                 isDeleted: false,
@@ -244,25 +237,10 @@ export const taskRelationModelExtentions = {
                 }
             }
 
-            const count = await client.taskRelation.count({
-                where: delegateWhere,
-            })
-
-            const data = await client.taskRelation.findMany({
+            return await client.taskRelation.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
-                take,
-                skip,
             })
-
-            return {
-                data,
-                meta: {
-                    curPage,
-                    perPage,
-                    total: count,
-                },
-            }
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

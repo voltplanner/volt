@@ -25,6 +25,7 @@ export type TaskProjectFindManyRepositoryDto = {
     perPage?: number
 
     filterByName?: string
+    filterByUserId?: string
     filterByCreatedAt?: {
         from?: Date
         to?: Date

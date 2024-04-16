@@ -1,15 +1,13 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 
-
 @ObjectType()
-export class TaskIntegrationGetProjectUsersObject {
+export class TaskIntegrationUserObject {
     @Field(() => String)
-    readonly userId!: string
+    readonly id!: string
 
     @Field(() => String)
-    readonly firstName!: string
+    readonly firstname!: string
 
     @Field(() => String)
-    readonly lastName!: string
+    readonly lastname!: string
 }
-

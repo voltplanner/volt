@@ -1,6 +1,6 @@
-import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
+import { Prisma, TaskStatus } from ".."
 import { PrismaService } from "../prisma.service"
 import { TaskStatusCreateRepositoryDto, TaskStatusDeleteRepositoryDto, TaskStatusFindManyRepositoryDto, TaskStatusSetDefaultRepositoryDto, TaskStatusUpdateRepositoryDto, TaskStatusUpsertRepositoryDto } from "../repositories-dto/task-status.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
@@ -206,7 +206,7 @@ export const taskStatusModelExtentions = {
     async extFindMany(
         dto: TaskStatusFindManyRepositoryDto,
         prisma?: any,
-    ): Promise<Awaited<ReturnType<typeof PrismaService.instance.taskStatus.findMany>>> {
+    ): Promise<TaskStatus[]> {
         try {
             const client: PrismaTransactionClientType = prisma || PrismaService.instance
 

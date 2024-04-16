@@ -40,36 +40,6 @@ export class TaskUserService {
         }, client)
     }
 
-    async roleUpsert(dto: {
-        readonly code: string
-        readonly name: string
-        readonly projectId: string
-        readonly description: string
-    }, prisma?: PrismaTransactionClientType): Promise<string> {
-        const { code, name, projectId, description } = dto
-
-        const client = prisma || this._prismaService
-
-        const roleId = await client.taskUserRole.extUpsert({
-            code,
-            name,
-            projectId,
-            description,
-        }, client)
-
-        return roleId
-    }
-
-    async roleGetMany(dto: {
-        readonly projectId: string
-    }, prisma?: PrismaTransactionClientType) {
-        const { projectId } = dto
-
-        const client = prisma || this._prismaService
-
-        return await client.taskUserRole.extFindMany({ projectId })
-    }
-
     async actionUpsert(dto: {
         readonly roleCode: string
         readonly actionCode: string

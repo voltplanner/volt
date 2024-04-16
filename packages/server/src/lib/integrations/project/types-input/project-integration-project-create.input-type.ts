@@ -1,16 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
 
 @InputType()
-export class TaskIntegrationCreateProjectMembersInput {
-    @Field(() => String)
-    readonly userId!: string
-
-    @Field(() => String)
-    readonly roleCode!: string
-}
-
-@InputType()
-export class TaskIntegrationCreateProjectInput {
+export class ProjectIntegrationCreateProjectInput {
     @Field(() => String)
     readonly name!: string
 
@@ -27,8 +18,17 @@ export class TaskIntegrationCreateProjectInput {
     @Field(() => String)
     readonly description!: string
 
-    @Field(() => [TaskIntegrationCreateProjectMembersInput], {
+    @Field(() => [ProjectIntegrationCreateProjectMemberInput], {
         nullable: true,
     })
-    readonly members?: TaskIntegrationCreateProjectMembersInput[] | null
+    readonly members?: ProjectIntegrationCreateProjectMemberInput[] | null
+}
+
+@InputType()
+export class ProjectIntegrationCreateProjectMemberInput {
+    @Field(() => String)
+    readonly userId!: string
+
+    @Field(() => String)
+    readonly roleCode!: string
 }

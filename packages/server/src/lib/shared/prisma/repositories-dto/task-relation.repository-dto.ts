@@ -30,8 +30,7 @@ export type TaskRelationDeleteRepositoryDto = {
 }
 
 export type TaskRelationFindManyRepositoryDto = {
-    curPage?: number
-    perPage?: number
+    projectId: string
 
     filterByNameMain?: string
     filterByNameForeign?: string

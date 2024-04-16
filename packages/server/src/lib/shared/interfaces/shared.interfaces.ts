@@ -7,6 +7,11 @@ export interface PaginatedResponse<T> {
     data: T[]
 }
 
+export interface PaginatedInput {
+    curPage?: number
+    perPage?: number
+}
+
 export type NullableListOptions = { nullable?: true | 'itemsAndList' }
 
 export enum OrderEnum {

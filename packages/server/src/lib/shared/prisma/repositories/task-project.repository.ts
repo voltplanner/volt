@@ -1,8 +1,8 @@
-import { Prisma } from ".."
 import { DefaultError } from "../../errors/default.error"
 import { UnexpectedError } from "../../errors/unexpected.error"
 import { TPaginatedMeta } from "../../types/paginated-meta.type"
 import { parseMetaArgs } from "../../utils"
+import { Prisma } from ".."
 import { PrismaService } from "../prisma.service"
 import { TaskProjectConnectUsersRepositoryDto, TaskProjectCreateRepositoryDto, TaskProjectDeleteRepositoryDto, TaskProjectDisconnectUsersRepositoryDto, TaskProjectFindManyRepositoryDto, TaskProjectUpdateRepositoryDto } from "../repositories-dto/task-project.repository-dto"
 import { PrismaTransactionClientType } from "../types/prisma-transaction-client.type"
@@ -124,6 +124,12 @@ export const taskProjectModelExtentions = {
                 delegateWhere.name = {
                     contains: dto.filterByName,
                     mode: 'insensitive',
+                }
+            }
+
+            if (dto.filterByUserId) {
+                delegateWhere.users = {
+                    some: { userId: dto.filterByUserId },
                 }
             }
 

@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
-export class TaskIntegrationGetTaskTagsObject {
+export class ProjectIntegrationTasksStatusObject {
     @Field(() => String)
     readonly id!: string
 
@@ -11,8 +11,12 @@ export class TaskIntegrationGetTaskTagsObject {
     @Field(() => String)
     readonly name!: string
 
-    @Field(() => String, {
-        nullable: true,
-    })
+    @Field(() => Number)
+    readonly position!: number
+
+    @Field(() => Boolean)
+    readonly isDefault!: boolean
+
+    @Field(() => String, { nullable: true })
     readonly description?: string | null
 }
