@@ -1,18 +1,13 @@
+import { TasksOverview } from 'features'
+import { WrapperStyled } from './styles'
 
 const MainPage = () => {
+    
     return (
-        <div
-            style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: '#F6F6F6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}
-        >
-            MainPage
-        </div>
+        <WrapperStyled>
+            <div>graph with hours</div>
+            <TasksOverview />
+        </WrapperStyled>
     )
 }
 export default MainPage

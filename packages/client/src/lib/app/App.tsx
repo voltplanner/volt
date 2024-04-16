@@ -12,6 +12,7 @@ export function App() {
 export default App
 const WrapperStyled = styled.div`
     display: flex;
-    width: 100%;
-    min-height: 100%;
+    width: 100vw;
+    height: 100%;
+    background: #fff;
 `
