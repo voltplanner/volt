@@ -8,18 +8,22 @@ export class NotificationsWebService {
     private _pubSub = new PubSub()
     private _triggerName = 'web'
 
-    subscribe() {
-        return this._pubSub.asyncIterator<SendWebPayload>(this._triggerName)
+    subscribe(userId: string) {
+        return this._pubSub.asyncIterator<SendWebPayload>(
+            `${this._triggerName}.${userId}`,
+        )
     }
 
     async send(data: SendWebPayload) {
         const { userId, message, topic, link } = data
 
-        this._pubSub.publish(this._triggerName, {
-            userId,
-            message,
-            topic,
-            link,
+        await this._pubSub.publish(`${this._triggerName}.${userId}`, {
+            getNotifications: {
+                userId,
+                message,
+                topic,
+                link,
+            },
         })
     }
 }

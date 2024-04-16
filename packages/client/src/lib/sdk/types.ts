@@ -1,5 +1,5 @@
 export default {
-    scalars: [1, 3, 4, 5, 9, 10, 18, 39],
+    scalars: [1, 3, 4, 5, 9, 10, 18],
     types: {
         PaginatedMetaType: {
             curPage: [1],
@@ -93,12 +93,6 @@ export default {
                 },
             ],
             getMyNotificationPreferences: [13],
-            getFile: [
-                4,
-                {
-                    input: [23, 'GetFileInput!'],
-                },
-            ],
             __typename: [4],
         },
         GetUsersInput: {
@@ -136,87 +130,77 @@ export default {
             userId: [3],
             __typename: [4],
         },
-        GetFileInput: {
-            id: [4],
-            __typename: [4],
-        },
         Mutation: {
             updateRole: [
                 5,
                 {
-                    input: [25, 'UpdateRoleInput!'],
+                    input: [24, 'UpdateRoleInput!'],
                 },
             ],
             changeUserRole: [
                 5,
                 {
-                    input: [26, 'ChangeUserRoleInput!'],
+                    input: [25, 'ChangeUserRoleInput!'],
                 },
             ],
             createRole: [
                 5,
                 {
-                    input: [27, 'CreateRoleInput!'],
+                    input: [26, 'CreateRoleInput!'],
                 },
             ],
             deleteRole: [
                 5,
                 {
-                    input: [28, 'DeleteRoleInput!'],
+                    input: [27, 'DeleteRoleInput!'],
                 },
             ],
             changePermissions: [
                 5,
                 {
-                    input: [29, 'ChangePermissionsInput!'],
+                    input: [28, 'ChangePermissionsInput!'],
                 },
             ],
             updateUser: [
                 5,
                 {
-                    input: [31, 'UpdateUserInput!'],
+                    input: [30, 'UpdateUserInput!'],
                 },
             ],
             signIn: [
                 12,
                 {
-                    input: [32, 'SignInInput!'],
+                    input: [31, 'SignInInput!'],
                 },
             ],
             refreshToken: [
                 12,
                 {
-                    input: [33, 'RefreshTokenInput!'],
+                    input: [32, 'RefreshTokenInput!'],
                 },
             ],
             createUser: [
                 8,
                 {
-                    input: [34, 'CreateUserInput!'],
+                    input: [33, 'CreateUserInput!'],
                 },
             ],
             deleteUser: [
                 5,
                 {
-                    input: [35, 'DeleteUserInput!'],
+                    input: [34, 'DeleteUserInput!'],
                 },
             ],
             completeSignIn: [
                 12,
                 {
-                    input: [36, 'CompleteSignInInput!'],
+                    input: [35, 'CompleteSignInInput!'],
                 },
             ],
             changeMyNotificationPreferences: [
                 5,
                 {
-                    input: [37, 'ChangeMyNotificationPreferences!'],
-                },
-            ],
-            uploadFile: [
-                4,
-                {
-                    input: [38, 'UploadFileInput!'],
+                    input: [36, 'ChangeMyNotificationPreferences!'],
                 },
             ],
             __typename: [4],
@@ -243,7 +227,7 @@ export default {
         },
         ChangePermissionsInput: {
             roleId: [3],
-            permissions: [30],
+            permissions: [29],
             __typename: [4],
         },
         PermissionInput: {
@@ -295,11 +279,6 @@ export default {
             telegramAccount: [1],
             __typename: [4],
         },
-        UploadFileInput: {
-            file: [39],
-            __typename: [4],
-        },
-        Upload: {},
         Subscription: {
             getNotifications: [14],
             __typename: [4],

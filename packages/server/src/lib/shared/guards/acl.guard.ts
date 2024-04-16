@@ -126,7 +126,28 @@ export class ACLGuard extends AuthGuard('jwt') {
     }
 
     private extractTokenFromHeader(request: Request): string | undefined {
-        const [type, token] = request.headers['authorization'].split(' ') ?? []
+        let type = undefined
+        let token = undefined
+
+        try {
+            const [typeFromHeaders, tokenFromHeaders] =
+                request.headers['authorization'].split(' ') ?? []
+
+            type = typeFromHeaders
+            token = tokenFromHeaders
+        } catch (error) {
+            // skip
+        }
+
+        try {
+            const [typeFromHeaders, tokenFromHeaders] =
+                request['connectionParams']['Authorization'].split(' ') ?? []
+
+            type = typeFromHeaders
+            token = tokenFromHeaders
+        } catch (error) {
+            // skip
+        }
 
         if (!token) {
             throw new UnauthorizedException()

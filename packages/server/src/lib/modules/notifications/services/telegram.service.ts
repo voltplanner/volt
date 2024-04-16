@@ -30,7 +30,7 @@ export class NotificationsTelegramService {
 
         this.telegramBot.command('start', (ctx) => {
             const authorizeUrl = this.generateLink(ctx.chat.id)
-            console.log(authorizeUrl)
+
             return ctx.reply(
                 `Hello, to enable notifications via Telegram, [authorize within this link](${authorizeUrl})`,
                 { parse_mode: 'MarkdownV2' },

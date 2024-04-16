@@ -2,11 +2,13 @@ generator client {
   provider      = "prisma-client-js"
   output        = "../../../../node_modules/generatedprisma"
   binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x"]
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas = ["auth", "notifications", "files"]
 }
 
 model AuthUser {
@@ -24,6 +26,8 @@ model AuthUser {
   createdAt DateTime           @default(now())
   deletedAt DateTime?
   tokens    AuthRefreshToken[]
+
+  @@schema("auth")
 }
 
 model AuthRefreshToken {
@@ -32,6 +36,8 @@ model AuthRefreshToken {
   expiresAt DateTime
   user      AuthUser @relation(fields: [userId], references: [id])
   userId    String
+
+  @@schema("auth")
 }
 
 model AuthRole {
@@ -41,6 +47,8 @@ model AuthRole {
   editable    Boolean
   user        AuthUser[]
   permissions AuthRolePermission[]
+
+  @@schema("auth")
 }
 
 model AuthRolePermission {
@@ -52,6 +60,7 @@ model AuthRolePermission {
   editable Boolean    @default(true)
 
   @@id([roleId, methodId])
+  @@schema("auth")
 }
 
 model AuthMethod {
@@ -61,21 +70,23 @@ model AuthMethod {
   group       String
 
   permissions AuthRolePermission[]
+
+  @@schema("auth")
 }
 
 enum AuthUserStatusEnum {
   WAITING_COMPLETE
   ACTIVE
   BLOCKED
+
+  @@schema("auth")
 }
 
 model AuthSettings {
   id                      Int     @id
   defaultRolesInitialized Boolean @default(false)
-}
 
-model SystemSettings {
-  id String @id @default(uuid())
+  @@schema("auth")
 }
 
 model NotificationPreferences {
@@ -87,6 +98,8 @@ model NotificationPreferences {
   telegramEnabled Boolean
   telegramAccount Int?
   nofications     Notification[]
+
+  @@schema("notifications")
 }
 
 model Notification {
@@ -100,12 +113,16 @@ model Notification {
   error         String?
   Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
   preferencesId String?
+
+  @@schema("notifications")
 }
 
 enum NotificationTypeEnum {
   EMAIL
   WEB
   TELEGRAM
+
+  @@schema("notifications")
 }
 
 model File {
@@ -118,4 +135,6 @@ model File {
   key          String
   location     String
   userId       String
+
+  @@schema("files")
 }
