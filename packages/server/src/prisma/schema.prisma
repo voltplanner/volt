@@ -1,12 +1,14 @@
 generator client {
   provider      = "prisma-client-js"
   output        = "../../../../node_modules/generatedprisma"
-  binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+  binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x"]
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas = ["auth", "notifications", "files"]
 }
 
 model AuthUser {
@@ -20,11 +22,12 @@ model AuthUser {
   role   AuthRole @relation(fields: [roleId], references: [id])
   roleId String
 
-  status        AuthUserStatusEnum @default(WAITING_COMPLETE)
-  createdAt     DateTime           @default(now())
-  deletedAt     DateTime?
-  tokens        AuthRefreshToken[]
-  notifications Notification[]
+  status    AuthUserStatusEnum @default(WAITING_COMPLETE)
+  createdAt DateTime           @default(now())
+  deletedAt DateTime?
+  tokens    AuthRefreshToken[]
+
+  @@schema("auth")
 }
 
 model AuthRefreshToken {
@@ -33,6 +36,8 @@ model AuthRefreshToken {
   expiresAt DateTime
   user      AuthUser @relation(fields: [userId], references: [id])
   userId    String
+
+  @@schema("auth")
 }
 
 model AuthRole {
@@ -42,6 +47,8 @@ model AuthRole {
   editable    Boolean
   user        AuthUser[]
   permissions AuthRolePermission[]
+
+  @@schema("auth")
 }
 
 model AuthRolePermission {
@@ -53,6 +60,7 @@ model AuthRolePermission {
   editable Boolean    @default(true)
 
   @@id([roleId, methodId])
+  @@schema("auth")
 }
 
 model AuthMethod {
@@ -62,37 +70,71 @@ model AuthMethod {
   group       String
 
   permissions AuthRolePermission[]
+
+  @@schema("auth")
 }
 
 enum AuthUserStatusEnum {
   WAITING_COMPLETE
   ACTIVE
   BLOCKED
+
+  @@schema("auth")
 }
 
 model AuthSettings {
   id                      Int     @id
   defaultRolesInitialized Boolean @default(false)
+
+  @@schema("auth")
 }
 
-model SystemSettings {
-  id String @id @default(uuid())
+model NotificationPreferences {
+  id              String         @id @default(uuid())
+  externalUserId  String         @unique
+  emailEnabled    Boolean
+  email           String?
+  webEnabled      Boolean
+  telegramEnabled Boolean
+  telegramAccount Int?
+  nofications     Notification[]
+
+  @@schema("notifications")
 }
 
 model Notification {
-  id      String               @id @default(uuid())
-  topic   String
-  message String
-  link    String?
-  type    NotificationTypeEnum
-  sent    Boolean              @default(false)
-  sentAt  DateTime?
-  error   String?
-  user    AuthUser             @relation(fields: [userId], references: [id])
-  userId  String
+  id            String                   @id @default(uuid())
+  topic         String
+  message       String
+  link          String?
+  type          NotificationTypeEnum
+  sent          Boolean                  @default(false)
+  sentAt        DateTime?
+  error         String?
+  Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
+  preferencesId String?
+
+  @@schema("notifications")
 }
 
 enum NotificationTypeEnum {
   EMAIL
   WEB
+  TELEGRAM
+
+  @@schema("notifications")
+}
+
+model File {
+  id           String               @id @default(uuid())
+  originalName String
+  mimeType     String
+  size         Int
+  eTag         String
+  bucket       String
+  key          String
+  location     String
+  userId       String
+
+  @@schema("files")
 }

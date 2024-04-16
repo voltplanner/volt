@@ -13,7 +13,6 @@ import {
     SignInPayload,
     SignInResponse,
 } from '../interfaces/auth.interfaces'
-import { AuthRoleService } from './auth-role.service'
 import { AuthTokensService } from './auth-tokens.service'
 
 @Injectable()
@@ -21,7 +20,6 @@ export class AuthAuthService {
     constructor(
         private readonly tokens: AuthTokensService,
         private readonly prisma: PrismaService,
-        private readonly role: AuthRoleService,
     ) {}
 
     async signIn(data: SignInPayload): Promise<SignInResponse> {

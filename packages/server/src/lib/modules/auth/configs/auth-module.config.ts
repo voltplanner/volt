@@ -1,6 +1,8 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common'
 import { merge } from 'lodash'
 
+import { AuthEventPublisherProvider } from './auth-events.config'
+
 export interface AuthDefaultPermissions {
     methodName: string
     roleName: string
@@ -18,6 +20,7 @@ export interface AuthConfig {
         refreshTokenTTL: number
     }
     defaultAllowPermissions: AuthDefaultPermissions[]
+    eventsProvider: AuthEventPublisherProvider
     temp?: boolean
 }
 

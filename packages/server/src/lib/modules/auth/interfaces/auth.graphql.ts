@@ -35,7 +35,7 @@ export class RefreshTokenInput {
 
 @InputType()
 export class CompleteSignInInput {
-    @Field()
+    @Field(() => ID)
     userId: string
 
     @Field()
@@ -103,14 +103,26 @@ export class GetUsersInput {
 }
 
 @InputType()
-export class GetRolesInput {
+export class GetRolesFilterInput {
     @Field({ nullable: true })
     name?: string
 }
 
 @InputType()
+export class GetRolesInput {
+    @Field({ nullable: true })
+    curPage?: number
+
+    @Field({ nullable: true })
+    perPage?: number
+
+    @Field(() => GetRolesFilterInput, { nullable: true })
+    filter?: GetRolesFilterInput
+}
+
+@InputType()
 export class PermissionInput {
-    @Field()
+    @Field(() => ID)
     methodId: string
 
     @Field()
@@ -119,7 +131,7 @@ export class PermissionInput {
 
 @InputType()
 export class ChangePermissionsInput {
-    @Field()
+    @Field(() => ID)
     roleId: string
 
     @Field(() => [PermissionInput])
@@ -128,7 +140,7 @@ export class ChangePermissionsInput {
 
 @InputType()
 export class UpdateRoleInput {
-    @Field()
+    @Field(() => ID)
     roleId: string
 
     @Field({ nullable: true })
@@ -142,9 +154,30 @@ export class UpdateRoleInput {
 }
 
 @InputType()
-export class DeleteRoleInput {
+export class ChangeUserRoleInput {
+    @Field(() => ID)
+    userId: string
+
     @Field()
+    roleName: string
+}
+
+@InputType()
+export class CreateRoleInput {
+    @Field()
+    name: string
+}
+
+@InputType()
+export class DeleteRoleInput {
+    @Field(() => ID)
     roleId: string
+}
+
+@InputType()
+export class GetUserInput {
+    @Field(() => ID)
+    userId: string
 }
 
 @InputType()
@@ -196,8 +229,11 @@ export class RoleType {
 }
 
 @ObjectType()
+export class PaginatedRoles extends PaginatedResponseType(RoleType) {}
+
+@ObjectType()
 export class UserType {
-    @Field()
+    @Field(() => ID)
     id: string
 
     @Field()
@@ -239,7 +275,7 @@ export class CreateUserInput {
 
 @InputType()
 export class DeleteUserInput {
-    @Field()
+    @Field(() => ID)
     userId: string
 }
 
@@ -251,7 +287,7 @@ export class AuthorizationResponse {
     @Field()
     accessToken: string
 
-    @Field()
+    @Field(() => ID)
     userId: string
 
     @Field()

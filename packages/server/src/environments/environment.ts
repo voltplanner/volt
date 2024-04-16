@@ -1,3 +1,4 @@
+import * as AWS from '@aws-sdk/client-s3'
 import { get } from 'env-var'
 
 import { parseSmtpConnectionUrl } from '../lib/shared/utils'
@@ -19,12 +20,26 @@ export const environment = {
             .asInt(),
         secret: get('JWT_SECRET').required().asString(),
     },
-    mailer: {
+    notifications: {
         transport: parseSmtpConnectionUrl(
             get('SMTP_URL').required().asUrlString(),
         ),
         defaults: {
-            from: get('SMTP_NO_REPLY_EMAIL'),
+            from: get('SMTP_NO_REPLY_EMAIL').required().asString(),
         },
+        telegram: {
+            botToken: get('TELEGRAM_BOT_TOKEN').asString(),
+            rootUrl: get('ROOT_URL').required().asUrlString(),
+        },
+    },
+    s3Storage: {
+        s3UploadBucketUrl: get('S3_UPLOAD_BUCKET_URL').required().asUrlString(),
+        s3Region: get('S3_REGION').required().asString(),
+        s3BucketName: get('S3_BUCKET_NAME').required().asString(),
+        s3AccessKeyId: get('S3_ACCESS_KEY_ID').required().asString(),
+        s3SecretAccessKey: get('S3_SECRET_ACCESS_KEY').required().asString(),
+        s3ForcePathStyle: get('S3_FORCE_PATH_STYLE').default('true').asBool(),
+        s3AccelerateUrl: get('S3_ACCELERATE_URL').required(false).asString(),
+        s3Acl: get('S3_ACL').asEnum(Object.values(AWS.ObjectCannedACL)),
     },
 }
