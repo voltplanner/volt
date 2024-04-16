@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 export type Scalars = {
-    Float: number
-    ID: string
-    String: string
-    Boolean: boolean
-    DateTime: any
+    Float: number,
+    ID: string,
+    String: string,
+    Boolean: boolean,
+    DateTime: any,
 }
 
 export interface PaginatedMetaType {
@@ -50,7 +50,7 @@ export interface UserType {
     email: Scalars['String']
     status: AuthUserStatusEnum
     createdAt: Scalars['DateTime']
-    deletedAt: Scalars['DateTime'] | null
+    deletedAt: (Scalars['DateTime'] | null)
     __typename: 'UserType'
 }
 
@@ -72,10 +72,10 @@ export interface AuthorizationResponse {
 
 export interface GetNotificationPreferences {
     emailEnabled: Scalars['Boolean']
-    email: Scalars['String'] | null
+    email: (Scalars['String'] | null)
     webEnabled: Scalars['Boolean']
     telegramEnabled: Scalars['Boolean']
-    telegramAccount: Scalars['Float'] | null
+    telegramAccount: (Scalars['Float'] | null)
     __typename: 'GetNotificationPreferences'
 }
 
@@ -83,7 +83,7 @@ export interface NotificationWebResponse {
     userId: Scalars['String']
     topic: Scalars['String']
     message: Scalars['String']
-    link: Scalars['String'] | null
+    link: (Scalars['String'] | null)
     __typename: 'NotificationWebResponse'
 }
 
@@ -119,7 +119,7 @@ export interface Subscription {
     __typename: 'Subscription'
 }
 
-export interface PaginatedMetaTypeGenqlSelection {
+export interface PaginatedMetaTypeGenqlSelection{
     curPage?: boolean | number
     perPage?: boolean | number
     total?: boolean | number
@@ -127,7 +127,7 @@ export interface PaginatedMetaTypeGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface MethodsTypeGenqlSelection {
+export interface MethodsTypeGenqlSelection{
     id?: boolean | number
     name?: boolean | number
     group?: boolean | number
@@ -138,7 +138,7 @@ export interface MethodsTypeGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface RoleTypeGenqlSelection {
+export interface RoleTypeGenqlSelection{
     id?: boolean | number
     name?: boolean | number
     editable?: boolean | number
@@ -148,14 +148,14 @@ export interface RoleTypeGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface PaginatedRolesGenqlSelection {
+export interface PaginatedRolesGenqlSelection{
     data?: RoleTypeGenqlSelection
     meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface UserTypeGenqlSelection {
+export interface UserTypeGenqlSelection{
     id?: boolean | number
     firstname?: boolean | number
     lastname?: boolean | number
@@ -167,14 +167,14 @@ export interface UserTypeGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface PaginatedUsersGenqlSelection {
+export interface PaginatedUsersGenqlSelection{
     data?: UserTypeGenqlSelection
     meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface AuthorizationResponseGenqlSelection {
+export interface AuthorizationResponseGenqlSelection{
     refreshToken?: boolean | number
     accessToken?: boolean | number
     userId?: boolean | number
@@ -183,7 +183,7 @@ export interface AuthorizationResponseGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface GetNotificationPreferencesGenqlSelection {
+export interface GetNotificationPreferencesGenqlSelection{
     emailEnabled?: boolean | number
     email?: boolean | number
     webEnabled?: boolean | number
@@ -193,7 +193,7 @@ export interface GetNotificationPreferencesGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface NotificationWebResponseGenqlSelection {
+export interface NotificationWebResponseGenqlSelection{
     userId?: boolean | number
     topic?: boolean | number
     message?: boolean | number
@@ -202,277 +202,180 @@ export interface NotificationWebResponseGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface QueryGenqlSelection {
-    getUsers?: PaginatedUsersGenqlSelection & {
-        __args: { input: GetUsersInput }
-    }
-    getRoles?: PaginatedRolesGenqlSelection & {
-        __args: { input: GetRolesInput }
-    }
+export interface QueryGenqlSelection{
+    getUsers?: (PaginatedUsersGenqlSelection & { __args: {input: GetUsersInput} })
+    getRoles?: (PaginatedRolesGenqlSelection & { __args: {input: GetRolesInput} })
     getMyRole?: RoleTypeGenqlSelection
-    getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
+    getUser?: (UserTypeGenqlSelection & { __args: {input: GetUserInput} })
     getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface GetUsersInput {
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
-    orderBy?: OrderByInput | null
-    filter?: GetUsersFilterInput | null
-}
+export interface GetUsersInput {curPage?: (Scalars['Float'] | null),perPage?: (Scalars['Float'] | null),orderBy?: (OrderByInput | null),filter?: (GetUsersFilterInput | null)}
 
-export interface OrderByInput {
-    field: Scalars['String']
-    order: OrderEnum
-}
+export interface OrderByInput {field: Scalars['String'],order: OrderEnum}
 
-export interface GetUsersFilterInput {
-    email?: Scalars['String'] | null
-    firstname?: Scalars['String'] | null
-    lastname?: Scalars['String'] | null
-    role?: Scalars['String'] | null
-    status?: AuthUserStatusEnum | null
-}
+export interface GetUsersFilterInput {email?: (Scalars['String'] | null),firstname?: (Scalars['String'] | null),lastname?: (Scalars['String'] | null),role?: (Scalars['String'] | null),status?: (AuthUserStatusEnum | null)}
 
-export interface GetRolesInput {
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
-    filter?: GetRolesFilterInput | null
-}
+export interface GetRolesInput {curPage?: (Scalars['Float'] | null),perPage?: (Scalars['Float'] | null),filter?: (GetRolesFilterInput | null)}
 
-export interface GetRolesFilterInput {
-    name?: Scalars['String'] | null
-}
+export interface GetRolesFilterInput {name?: (Scalars['String'] | null)}
 
-export interface GetUserInput {
-    userId: Scalars['ID']
-}
+export interface GetUserInput {userId: Scalars['ID']}
 
-export interface MutationGenqlSelection {
-    updateRole?: { __args: { input: UpdateRoleInput } }
-    changeUserRole?: { __args: { input: ChangeUserRoleInput } }
-    createRole?: { __args: { input: CreateRoleInput } }
-    deleteRole?: { __args: { input: DeleteRoleInput } }
-    changePermissions?: { __args: { input: ChangePermissionsInput } }
-    updateUser?: { __args: { input: UpdateUserInput } }
-    signIn?: AuthorizationResponseGenqlSelection & {
-        __args: { input: SignInInput }
-    }
-    refreshToken?: AuthorizationResponseGenqlSelection & {
-        __args: { input: RefreshTokenInput }
-    }
-    createUser?: UserTypeGenqlSelection & { __args: { input: CreateUserInput } }
-    deleteUser?: { __args: { input: DeleteUserInput } }
-    completeSignIn?: AuthorizationResponseGenqlSelection & {
-        __args: { input: CompleteSignInInput }
-    }
-    changeMyNotificationPreferences?: {
-        __args: { input: ChangeMyNotificationPreferences }
-    }
+export interface MutationGenqlSelection{
+    updateRole?: { __args: {input: UpdateRoleInput} }
+    changeUserRole?: { __args: {input: ChangeUserRoleInput} }
+    createRole?: { __args: {input: CreateRoleInput} }
+    deleteRole?: { __args: {input: DeleteRoleInput} }
+    changePermissions?: { __args: {input: ChangePermissionsInput} }
+    updateUser?: { __args: {input: UpdateUserInput} }
+    signIn?: (AuthorizationResponseGenqlSelection & { __args: {input: SignInInput} })
+    refreshToken?: (AuthorizationResponseGenqlSelection & { __args: {input: RefreshTokenInput} })
+    createUser?: (UserTypeGenqlSelection & { __args: {input: CreateUserInput} })
+    deleteUser?: { __args: {input: DeleteUserInput} }
+    completeSignIn?: (AuthorizationResponseGenqlSelection & { __args: {input: CompleteSignInInput} })
+    changeMyNotificationPreferences?: { __args: {input: ChangeMyNotificationPreferences} }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface UpdateRoleInput {
-    roleId: Scalars['ID']
-    name?: Scalars['String'] | null
-    superuser?: Scalars['Boolean'] | null
-    editable?: Scalars['Boolean'] | null
-}
+export interface UpdateRoleInput {roleId: Scalars['ID'],name?: (Scalars['String'] | null),superuser?: (Scalars['Boolean'] | null),editable?: (Scalars['Boolean'] | null)}
 
-export interface ChangeUserRoleInput {
-    userId: Scalars['ID']
-    roleName: Scalars['String']
-}
+export interface ChangeUserRoleInput {userId: Scalars['ID'],roleName: Scalars['String']}
 
-export interface CreateRoleInput {
-    name: Scalars['String']
-}
+export interface CreateRoleInput {name: Scalars['String']}
 
-export interface DeleteRoleInput {
-    roleId: Scalars['ID']
-}
+export interface DeleteRoleInput {roleId: Scalars['ID']}
 
-export interface ChangePermissionsInput {
-    roleId: Scalars['ID']
-    permissions: PermissionInput[]
-}
+export interface ChangePermissionsInput {roleId: Scalars['ID'],permissions: PermissionInput[]}
 
-export interface PermissionInput {
-    methodId: Scalars['ID']
-    allow: Scalars['Boolean']
-}
+export interface PermissionInput {methodId: Scalars['ID'],allow: Scalars['Boolean']}
 
-export interface UpdateUserInput {
-    userId: Scalars['ID']
-    email?: Scalars['String'] | null
-    firstname?: Scalars['String'] | null
-    lastname?: Scalars['String'] | null
-    password?: Scalars['String'] | null
-    role?: Scalars['String'] | null
-    status?: AuthUserStatusEnum | null
-}
+export interface UpdateUserInput {userId: Scalars['ID'],email?: (Scalars['String'] | null),firstname?: (Scalars['String'] | null),lastname?: (Scalars['String'] | null),password?: (Scalars['String'] | null),role?: (Scalars['String'] | null),status?: (AuthUserStatusEnum | null)}
 
-export interface SignInInput {
-    email: Scalars['String']
-    password: Scalars['String']
-}
+export interface SignInInput {email: Scalars['String'],password: Scalars['String']}
 
-export interface RefreshTokenInput {
-    refreshToken: Scalars['String']
-}
+export interface RefreshTokenInput {refreshToken: Scalars['String']}
 
-export interface CreateUserInput {
-    email: Scalars['String']
-    firstname: Scalars['String']
-    lastname: Scalars['String']
-    roleName: Scalars['String']
-}
+export interface CreateUserInput {email: Scalars['String'],firstname: Scalars['String'],lastname: Scalars['String'],roleName: Scalars['String']}
 
-export interface DeleteUserInput {
-    userId: Scalars['ID']
-}
+export interface DeleteUserInput {userId: Scalars['ID']}
 
-export interface CompleteSignInInput {
-    userId: Scalars['ID']
-    code: Scalars['String']
-    password: Scalars['String']
-}
+export interface CompleteSignInInput {userId: Scalars['ID'],code: Scalars['String'],password: Scalars['String']}
 
-export interface ChangeMyNotificationPreferences {
-    emailEnabled?: Scalars['Boolean'] | null
-    email?: Scalars['String'] | null
-    webEnabled?: Scalars['Boolean'] | null
-    telegramEnabled?: Scalars['Boolean'] | null
-    telegramAccount?: Scalars['Float'] | null
-}
+export interface ChangeMyNotificationPreferences {emailEnabled?: (Scalars['Boolean'] | null),email?: (Scalars['String'] | null),webEnabled?: (Scalars['Boolean'] | null),telegramEnabled?: (Scalars['Boolean'] | null),telegramAccount?: (Scalars['Float'] | null)}
 
-export interface SubscriptionGenqlSelection {
+export interface SubscriptionGenqlSelection{
     getNotifications?: NotificationWebResponseGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
-export const isPaginatedMetaType = (
-    obj?: { __typename?: any } | null,
-): obj is PaginatedMetaType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isPaginatedMetaType"')
-    return PaginatedMetaType_possibleTypes.includes(obj.__typename)
-}
 
-const MethodsType_possibleTypes: string[] = ['MethodsType']
-export const isMethodsType = (
-    obj?: { __typename?: any } | null,
-): obj is MethodsType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isMethodsType"')
-    return MethodsType_possibleTypes.includes(obj.__typename)
-}
+    const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
+    export const isPaginatedMetaType = (obj?: { __typename?: any } | null): obj is PaginatedMetaType => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isPaginatedMetaType"')
+      return PaginatedMetaType_possibleTypes.includes(obj.__typename)
+    }
+    
 
-const RoleType_possibleTypes: string[] = ['RoleType']
-export const isRoleType = (
-    obj?: { __typename?: any } | null,
-): obj is RoleType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isRoleType"')
-    return RoleType_possibleTypes.includes(obj.__typename)
-}
 
-const PaginatedRoles_possibleTypes: string[] = ['PaginatedRoles']
-export const isPaginatedRoles = (
-    obj?: { __typename?: any } | null,
-): obj is PaginatedRoles => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isPaginatedRoles"')
-    return PaginatedRoles_possibleTypes.includes(obj.__typename)
-}
+    const MethodsType_possibleTypes: string[] = ['MethodsType']
+    export const isMethodsType = (obj?: { __typename?: any } | null): obj is MethodsType => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isMethodsType"')
+      return MethodsType_possibleTypes.includes(obj.__typename)
+    }
+    
 
-const UserType_possibleTypes: string[] = ['UserType']
-export const isUserType = (
-    obj?: { __typename?: any } | null,
-): obj is UserType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isUserType"')
-    return UserType_possibleTypes.includes(obj.__typename)
-}
 
-const PaginatedUsers_possibleTypes: string[] = ['PaginatedUsers']
-export const isPaginatedUsers = (
-    obj?: { __typename?: any } | null,
-): obj is PaginatedUsers => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isPaginatedUsers"')
-    return PaginatedUsers_possibleTypes.includes(obj.__typename)
-}
+    const RoleType_possibleTypes: string[] = ['RoleType']
+    export const isRoleType = (obj?: { __typename?: any } | null): obj is RoleType => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isRoleType"')
+      return RoleType_possibleTypes.includes(obj.__typename)
+    }
+    
 
-const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
-export const isAuthorizationResponse = (
-    obj?: { __typename?: any } | null,
-): obj is AuthorizationResponse => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isAuthorizationResponse"')
-    return AuthorizationResponse_possibleTypes.includes(obj.__typename)
-}
 
-const GetNotificationPreferences_possibleTypes: string[] = [
-    'GetNotificationPreferences',
-]
-export const isGetNotificationPreferences = (
-    obj?: { __typename?: any } | null,
-): obj is GetNotificationPreferences => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isGetNotificationPreferences"',
-        )
-    return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
-}
+    const PaginatedRoles_possibleTypes: string[] = ['PaginatedRoles']
+    export const isPaginatedRoles = (obj?: { __typename?: any } | null): obj is PaginatedRoles => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isPaginatedRoles"')
+      return PaginatedRoles_possibleTypes.includes(obj.__typename)
+    }
+    
 
-const NotificationWebResponse_possibleTypes: string[] = [
-    'NotificationWebResponse',
-]
-export const isNotificationWebResponse = (
-    obj?: { __typename?: any } | null,
-): obj is NotificationWebResponse => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isNotificationWebResponse"')
-    return NotificationWebResponse_possibleTypes.includes(obj.__typename)
-}
 
-const Query_possibleTypes: string[] = ['Query']
-export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
-    if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
-    return Query_possibleTypes.includes(obj.__typename)
-}
+    const UserType_possibleTypes: string[] = ['UserType']
+    export const isUserType = (obj?: { __typename?: any } | null): obj is UserType => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isUserType"')
+      return UserType_possibleTypes.includes(obj.__typename)
+    }
+    
 
-const Mutation_possibleTypes: string[] = ['Mutation']
-export const isMutation = (
-    obj?: { __typename?: any } | null,
-): obj is Mutation => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isMutation"')
-    return Mutation_possibleTypes.includes(obj.__typename)
-}
 
-const Subscription_possibleTypes: string[] = ['Subscription']
-export const isSubscription = (
-    obj?: { __typename?: any } | null,
-): obj is Subscription => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isSubscription"')
-    return Subscription_possibleTypes.includes(obj.__typename)
-}
+    const PaginatedUsers_possibleTypes: string[] = ['PaginatedUsers']
+    export const isPaginatedUsers = (obj?: { __typename?: any } | null): obj is PaginatedUsers => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isPaginatedUsers"')
+      return PaginatedUsers_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
+    export const isAuthorizationResponse = (obj?: { __typename?: any } | null): obj is AuthorizationResponse => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isAuthorizationResponse"')
+      return AuthorizationResponse_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const GetNotificationPreferences_possibleTypes: string[] = ['GetNotificationPreferences']
+    export const isGetNotificationPreferences = (obj?: { __typename?: any } | null): obj is GetNotificationPreferences => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isGetNotificationPreferences"')
+      return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const NotificationWebResponse_possibleTypes: string[] = ['NotificationWebResponse']
+    export const isNotificationWebResponse = (obj?: { __typename?: any } | null): obj is NotificationWebResponse => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isNotificationWebResponse"')
+      return NotificationWebResponse_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const Query_possibleTypes: string[] = ['Query']
+    export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
+      return Query_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const Mutation_possibleTypes: string[] = ['Mutation']
+    export const isMutation = (obj?: { __typename?: any } | null): obj is Mutation => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isMutation"')
+      return Mutation_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const Subscription_possibleTypes: string[] = ['Subscription']
+    export const isSubscription = (obj?: { __typename?: any } | null): obj is Subscription => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isSubscription"')
+      return Subscription_possibleTypes.includes(obj.__typename)
+    }
+    
 
 export const enumAuthUserStatusEnum = {
-    WAITING_COMPLETE: 'WAITING_COMPLETE' as const,
-    ACTIVE: 'ACTIVE' as const,
-    BLOCKED: 'BLOCKED' as const,
+   WAITING_COMPLETE: 'WAITING_COMPLETE' as const,
+   ACTIVE: 'ACTIVE' as const,
+   BLOCKED: 'BLOCKED' as const
 }
 
 export const enumOrderEnum = {
-    ASC: 'ASC' as const,
-    DESC: 'DESC' as const,
+   ASC: 'ASC' as const,
+   DESC: 'DESC' as const
 }

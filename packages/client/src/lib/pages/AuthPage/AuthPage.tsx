@@ -7,9 +7,9 @@ const AuthPage = () => {
     const handleBack = () => {
         setIsOwn(false)
     }
-    if (true) {
-        return <RegisterForm />
-    }
+    // if (true) {
+    //     return <RegisterForm />
+    // }
 
     return <LoginForm title="Login to Volt" />
 }
