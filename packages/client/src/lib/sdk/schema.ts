@@ -37,8 +37,14 @@ export interface RoleType {
     __typename: 'RoleType'
 }
 
+export interface PaginatedRoles {
+    data: RoleType[]
+    meta: PaginatedMetaType
+    __typename: 'PaginatedRoles'
+}
+
 export interface UserType {
-    id: Scalars['String']
+    id: Scalars['ID']
     firstname: Scalars['String']
     lastname: Scalars['String']
     email: Scalars['String']
@@ -59,16 +65,34 @@ export interface PaginatedUsers {
 export interface AuthorizationResponse {
     refreshToken: Scalars['String']
     accessToken: Scalars['String']
-    userId: Scalars['String']
+    userId: Scalars['ID']
     expiresAt: Scalars['Float']
     __typename: 'AuthorizationResponse'
 }
 
+export interface GetNotificationPreferences {
+    emailEnabled: Scalars['Boolean']
+    email: Scalars['String'] | null
+    webEnabled: Scalars['Boolean']
+    telegramEnabled: Scalars['Boolean']
+    telegramAccount: Scalars['Float'] | null
+    __typename: 'GetNotificationPreferences'
+}
+
+export interface NotificationWebResponse {
+    userId: Scalars['String']
+    topic: Scalars['String']
+    message: Scalars['String']
+    link: Scalars['String'] | null
+    __typename: 'NotificationWebResponse'
+}
+
 export interface Query {
     getUsers: PaginatedUsers
-    getRoles: RoleType[]
+    getRoles: PaginatedRoles
     getMyRole: RoleType
-    getMyUser: UserType
+    getUser: UserType
+    getMyNotificationPreferences: GetNotificationPreferences
     __typename: 'Query'
 }
 
@@ -76,6 +100,7 @@ export type OrderEnum = 'ASC' | 'DESC'
 
 export interface Mutation {
     updateRole: Scalars['Boolean']
+    changeUserRole: Scalars['Boolean']
     createRole: Scalars['Boolean']
     deleteRole: Scalars['Boolean']
     changePermissions: Scalars['Boolean']
@@ -85,7 +110,13 @@ export interface Mutation {
     createUser: UserType
     deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
+    changeMyNotificationPreferences: Scalars['Boolean']
     __typename: 'Mutation'
+}
+
+export interface Subscription {
+    getNotifications: NotificationWebResponse
+    __typename: 'Subscription'
 }
 
 export interface PaginatedMetaTypeGenqlSelection {
@@ -113,6 +144,13 @@ export interface RoleTypeGenqlSelection {
     editable?: boolean | number
     superuser?: boolean | number
     methods?: MethodsTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface PaginatedRolesGenqlSelection {
+    data?: RoleTypeGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -145,13 +183,35 @@ export interface AuthorizationResponseGenqlSelection {
     __scalar?: boolean | number
 }
 
+export interface GetNotificationPreferencesGenqlSelection {
+    emailEnabled?: boolean | number
+    email?: boolean | number
+    webEnabled?: boolean | number
+    telegramEnabled?: boolean | number
+    telegramAccount?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface NotificationWebResponseGenqlSelection {
+    userId?: boolean | number
+    topic?: boolean | number
+    message?: boolean | number
+    link?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface QueryGenqlSelection {
     getUsers?: PaginatedUsersGenqlSelection & {
         __args: { input: GetUsersInput }
     }
-    getRoles?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyRole?: RoleTypeGenqlSelection & { __args: { input: GetRolesInput } }
-    getMyUser?: UserTypeGenqlSelection
+    getRoles?: PaginatedRolesGenqlSelection & {
+        __args: { input: GetRolesInput }
+    }
+    getMyRole?: RoleTypeGenqlSelection
+    getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
+    getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -177,11 +237,22 @@ export interface GetUsersFilterInput {
 }
 
 export interface GetRolesInput {
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+    filter?: GetRolesFilterInput | null
+}
+
+export interface GetRolesFilterInput {
     name?: Scalars['String'] | null
+}
+
+export interface GetUserInput {
+    userId: Scalars['ID']
 }
 
 export interface MutationGenqlSelection {
     updateRole?: { __args: { input: UpdateRoleInput } }
+    changeUserRole?: { __args: { input: ChangeUserRoleInput } }
     createRole?: { __args: { input: CreateRoleInput } }
     deleteRole?: { __args: { input: DeleteRoleInput } }
     changePermissions?: { __args: { input: ChangePermissionsInput } }
@@ -197,15 +268,23 @@ export interface MutationGenqlSelection {
     completeSignIn?: AuthorizationResponseGenqlSelection & {
         __args: { input: CompleteSignInInput }
     }
+    changeMyNotificationPreferences?: {
+        __args: { input: ChangeMyNotificationPreferences }
+    }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
 export interface UpdateRoleInput {
-    roleId: Scalars['String']
+    roleId: Scalars['ID']
     name?: Scalars['String'] | null
     superuser?: Scalars['Boolean'] | null
     editable?: Scalars['Boolean'] | null
+}
+
+export interface ChangeUserRoleInput {
+    userId: Scalars['ID']
+    roleName: Scalars['String']
 }
 
 export interface CreateRoleInput {
@@ -213,16 +292,16 @@ export interface CreateRoleInput {
 }
 
 export interface DeleteRoleInput {
-    roleId: Scalars['String']
+    roleId: Scalars['ID']
 }
 
 export interface ChangePermissionsInput {
-    roleId: Scalars['String']
+    roleId: Scalars['ID']
     permissions: PermissionInput[]
 }
 
 export interface PermissionInput {
-    methodId: Scalars['String']
+    methodId: Scalars['ID']
     allow: Scalars['Boolean']
 }
 
@@ -253,13 +332,27 @@ export interface CreateUserInput {
 }
 
 export interface DeleteUserInput {
-    userId: Scalars['String']
+    userId: Scalars['ID']
 }
 
 export interface CompleteSignInInput {
-    userId: Scalars['String']
+    userId: Scalars['ID']
     code: Scalars['String']
     password: Scalars['String']
+}
+
+export interface ChangeMyNotificationPreferences {
+    emailEnabled?: Scalars['Boolean'] | null
+    email?: Scalars['String'] | null
+    webEnabled?: Scalars['Boolean'] | null
+    telegramEnabled?: Scalars['Boolean'] | null
+    telegramAccount?: Scalars['Float'] | null
+}
+
+export interface SubscriptionGenqlSelection {
+    getNotifications?: NotificationWebResponseGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
 }
 
 const PaginatedMetaType_possibleTypes: string[] = ['PaginatedMetaType']
@@ -289,6 +382,15 @@ export const isRoleType = (
     return RoleType_possibleTypes.includes(obj.__typename)
 }
 
+const PaginatedRoles_possibleTypes: string[] = ['PaginatedRoles']
+export const isPaginatedRoles = (
+    obj?: { __typename?: any } | null,
+): obj is PaginatedRoles => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isPaginatedRoles"')
+    return PaginatedRoles_possibleTypes.includes(obj.__typename)
+}
+
 const UserType_possibleTypes: string[] = ['UserType']
 export const isUserType = (
     obj?: { __typename?: any } | null,
@@ -316,6 +418,30 @@ export const isAuthorizationResponse = (
     return AuthorizationResponse_possibleTypes.includes(obj.__typename)
 }
 
+const GetNotificationPreferences_possibleTypes: string[] = [
+    'GetNotificationPreferences',
+]
+export const isGetNotificationPreferences = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationPreferences => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isGetNotificationPreferences"',
+        )
+    return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
+}
+
+const NotificationWebResponse_possibleTypes: string[] = [
+    'NotificationWebResponse',
+]
+export const isNotificationWebResponse = (
+    obj?: { __typename?: any } | null,
+): obj is NotificationWebResponse => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isNotificationWebResponse"')
+    return NotificationWebResponse_possibleTypes.includes(obj.__typename)
+}
+
 const Query_possibleTypes: string[] = ['Query']
 export const isQuery = (obj?: { __typename?: any } | null): obj is Query => {
     if (!obj?.__typename) throw new Error('__typename is missing in "isQuery"')
@@ -329,6 +455,15 @@ export const isMutation = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isMutation"')
     return Mutation_possibleTypes.includes(obj.__typename)
+}
+
+const Subscription_possibleTypes: string[] = ['Subscription']
+export const isSubscription = (
+    obj?: { __typename?: any } | null,
+): obj is Subscription => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isSubscription"')
+    return Subscription_possibleTypes.includes(obj.__typename)
 }
 
 export const enumAuthUserStatusEnum = {

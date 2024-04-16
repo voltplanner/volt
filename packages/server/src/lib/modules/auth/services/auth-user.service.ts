@@ -14,9 +14,18 @@ import {
     PrismaService,
 } from '../../../shared/prisma'
 import { parseMetaArgs } from '../../../shared/utils'
-import { AUTH_CONFIG, AuthConfig } from '../auth.config'
-import { CreateUser, GetUsers, UpdateUser } from '../interfaces/auth.interfaces'
-import { AuthEventPattern, AuthEventsService } from './auth-events.service'
+import {
+    AUTH_PUBLISHER,
+    AuthEventPattern,
+    AuthEventsPublisher,
+} from '../configs/auth-events.config'
+import { AUTH_CONFIG, AuthConfig } from '../configs/auth-module.config'
+import {
+    ChangeUserRolePayload,
+    CreateUser,
+    GetUsers,
+    UpdateUser,
+} from '../interfaces/auth.interfaces'
 
 @Injectable()
 export class AuthUserService {
@@ -25,11 +34,12 @@ export class AuthUserService {
     constructor(
         @Inject(AUTH_CONFIG)
         private readonly config: AuthConfig,
+        @Inject(AUTH_PUBLISHER)
+        private readonly events: AuthEventsPublisher,
         private readonly prisma: PrismaService,
-        private readonly events: AuthEventsService,
     ) {}
 
-    async getMyUser(userId: string) {
+    async getUser(userId: string) {
         const user = await this.prisma.authUser.findUnique({
             where: {
                 id: userId,
@@ -220,7 +230,7 @@ export class AuthUserService {
                 lastname,
                 role: {
                     connect: {
-                        name: roleName,
+                        name: roleName.toLowerCase(),
                     },
                 },
                 completeCode: hashedCode,
@@ -228,11 +238,12 @@ export class AuthUserService {
             },
         })
 
-        this.events.send({
+        await this.events.send({
             pattern: AuthEventPattern.COMPLETE_SIGNIN,
             data: {
                 userId: user.id,
                 code: code,
+                email: user.email,
             },
         })
 
@@ -254,6 +265,23 @@ export class AuthUserService {
         })
 
         return user
+    }
+
+    async changeUserRole(data: ChangeUserRolePayload) {
+        const { userId, roleName } = data
+
+        await this.prisma.authUser.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                role: {
+                    connect: {
+                        name: roleName,
+                    },
+                },
+            },
+        })
     }
 
     async _createOwnerIfNotExists() {

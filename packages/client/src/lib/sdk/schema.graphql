@@ -21,8 +21,13 @@ type RoleType {
   methods: [MethodsType!]!
 }
 
+type PaginatedRoles {
+  data: [RoleType!]!
+  meta: PaginatedMetaType!
+}
+
 type UserType {
-  id: String!
+  id: ID!
   firstname: String!
   lastname: String!
   email: String!
@@ -50,15 +55,31 @@ type PaginatedUsers {
 type AuthorizationResponse {
   refreshToken: String!
   accessToken: String!
-  userId: String!
+  userId: ID!
   expiresAt: Float!
+}
+
+type GetNotificationPreferences {
+  emailEnabled: Boolean!
+  email: String
+  webEnabled: Boolean!
+  telegramEnabled: Boolean!
+  telegramAccount: Float
+}
+
+type NotificationWebResponse {
+  userId: String!
+  topic: String!
+  message: String!
+  link: String
 }
 
 type Query {
   getUsers(input: GetUsersInput!): PaginatedUsers!
-  getRoles(input: GetRolesInput!): [RoleType!]!
-  getMyRole(input: GetRolesInput!): RoleType!
-  getMyUser: UserType!
+  getRoles(input: GetRolesInput!): PaginatedRoles!
+  getMyRole: RoleType!
+  getUser(input: GetUserInput!): UserType!
+  getMyNotificationPreferences: GetNotificationPreferences!
 }
 
 input GetUsersInput {
@@ -87,11 +108,22 @@ input GetUsersFilterInput {
 }
 
 input GetRolesInput {
+  curPage: Float
+  perPage: Float
+  filter: GetRolesFilterInput
+}
+
+input GetRolesFilterInput {
   name: String
+}
+
+input GetUserInput {
+  userId: ID!
 }
 
 type Mutation {
   updateRole(input: UpdateRoleInput!): Boolean!
+  changeUserRole(input: ChangeUserRoleInput!): Boolean!
   createRole(input: CreateRoleInput!): Boolean!
   deleteRole(input: DeleteRoleInput!): Boolean!
   changePermissions(input: ChangePermissionsInput!): Boolean!
@@ -101,13 +133,21 @@ type Mutation {
   createUser(input: CreateUserInput!): UserType!
   deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
+  changeMyNotificationPreferences(
+    input: ChangeMyNotificationPreferences!
+  ): Boolean!
 }
 
 input UpdateRoleInput {
-  roleId: String!
+  roleId: ID!
   name: String
   superuser: Boolean
   editable: Boolean
+}
+
+input ChangeUserRoleInput {
+  userId: ID!
+  roleName: String!
 }
 
 input CreateRoleInput {
@@ -115,16 +155,16 @@ input CreateRoleInput {
 }
 
 input DeleteRoleInput {
-  roleId: String!
+  roleId: ID!
 }
 
 input ChangePermissionsInput {
-  roleId: String!
+  roleId: ID!
   permissions: [PermissionInput!]!
 }
 
 input PermissionInput {
-  methodId: String!
+  methodId: ID!
   allow: Boolean!
 }
 
@@ -155,11 +195,23 @@ input CreateUserInput {
 }
 
 input DeleteUserInput {
-  userId: String!
+  userId: ID!
 }
 
 input CompleteSignInInput {
-  userId: String!
+  userId: ID!
   code: String!
   password: String!
+}
+
+input ChangeMyNotificationPreferences {
+  emailEnabled: Boolean
+  email: String
+  webEnabled: Boolean
+  telegramEnabled: Boolean
+  telegramAccount: Float
+}
+
+type Subscription {
+  getNotifications: NotificationWebResponse!
 }
