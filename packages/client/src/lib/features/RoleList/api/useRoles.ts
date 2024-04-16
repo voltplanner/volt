@@ -12,18 +12,18 @@ export const useRoles = () => {
                 input: {
                 },
             },
-            editable: true,
-            id: true,
-            name: true,
-            superuser: true,
-            methods: {
-                allowed: true,
-                description: true,
-                editable: true,
-                group: true,
-                id: true,
-                name: true,
-            }
+            // editable: true,
+            // id: true,
+            // name: true,
+            // superuser: true,
+            // methods: {
+            //     allowed: true,
+            //     description: true,
+            //     editable: true,
+            //     group: true,
+            //     id: true,
+            //     name: true,
+            // }
         },
     })
 

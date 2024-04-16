@@ -133,9 +133,7 @@ type Mutation {
   createUser(input: CreateUserInput!): UserType!
   deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
-  changeMyNotificationPreferences(
-    input: ChangeMyNotificationPreferences!
-  ): Boolean!
+  changeMyNotificationPreferences(input: ChangeMyNotificationPreferences!): Boolean!
 }
 
 input UpdateRoleInput {
