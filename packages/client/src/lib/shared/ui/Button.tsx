@@ -9,6 +9,9 @@ const baseButtonStyles = css`
     white-space: nowrap;
     display: flex;
     transition: 0.3s;
+    &:disabled {
+        cursor: default;
+    }
 `
 const variants = {
     primary: css`
@@ -38,6 +41,20 @@ const variants = {
         border: none;
         &:hover {
             filter: brightness(55%);
+        }
+    `,
+    image: css`
+        padding: 0;
+        border-radius: 50%;
+        overflow: hidden;
+        background: transparent;
+        &:disabled {
+            &:hover {
+                filter: none;
+            }
+        }
+        &:hover {
+            filter: invert(50%);
         }
     `,
 }
@@ -82,11 +99,47 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     square?: boolean
     disabled?: boolean
     children?: ReactNode
-    variant?: 'primary' | 'secondary' | 'ghost'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'image'
+    image?: any
+    altImage?: string
+    width?: string
+    height?: string
 }
 
 export const Button = (props: ButtonProps) => {
-    const { children, onClick, variant, size, disabled } = props
+    const {
+        children,
+        onClick,
+        variant,
+        size,
+        disabled,
+        image,
+        altImage = 'button image',
+        width = 'fit-content',
+        height = 'fit-content',
+    } = props
+    if (variant === 'image' && image) {
+        return (
+            <ButtonStyled
+                onClick={onClick}
+                variant={variant}
+                size={size}
+                disabled={disabled}
+                {...props}
+                style={{ width: width, height: height }}
+            >
+                <div
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                    }}
+                >
+                    {image}
+                </div>
+            </ButtonStyled>
+        )
+    }
     return (
         <ButtonStyled
             onClick={onClick}
