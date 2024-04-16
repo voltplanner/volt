@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button, Input } from 'shared'
-import styled from 'styled-components'
+import { ContainerStyled, FormStyled, WrapperStyled } from './styles'
 
 export const HiddenForm = ({
     onChange,
@@ -37,13 +37,3 @@ export const HiddenForm = ({
         </ContainerStyled>
     )
 }
-const ContainerStyled = styled.div`
-    width: 100%;
-`
-const FormStyled = styled.form``
-const WrapperStyled = styled.div`
-    display: flex;
-    height: 32px;
-    flex-direction: row;
-    gap: 8px;
-`
