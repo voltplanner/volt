@@ -5,10 +5,14 @@ import { TrashIcon } from 'shared'
 import { GroupInfo } from 'entities'
 import styled from 'styled-components'
 import { RoleGroups } from '../model/types'
+import { useNavigate } from 'react-router-dom'
 
 export const RoleGroup = ({ group }: RoleGroups) => {
-    const { editable, id, methods, name, superuser } = group
-
+    const { editable,id, methods, name, superuser } = group
+    const navigate = useNavigate()
+    const handleNavigate = () => {
+        navigate('/roles/' + name)
+    }
     return (
         <WrapperStyled>
             <GroupInfo
@@ -23,6 +27,7 @@ export const RoleGroup = ({ group }: RoleGroups) => {
                 <Button
                     variant="image"
                     image={<EditIcon color={!editable ? '#BCBCBC' : '#000'} />}
+                    onClick={handleNavigate}
                     disabled={!editable}
                 />
                 <Button variant="image" image={<PeopleIcon />} />
