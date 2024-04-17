@@ -3,7 +3,6 @@ import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 
 import {
     OrderEnum,
-    PaginatedInput,
     PaginatedResponse,
 } from '../interfaces/shared.interfaces'
 import { TPaginatedMeta } from '../types/paginated-meta.type'
@@ -53,29 +52,4 @@ export const PaginatedResponseType = <T>(
     }
 
     return PaginatedResponseType
-}
-
-export const PaginatedInputType = (classRef?: Type): Type<PaginatedInput> => {
-    if (classRef) {
-        @InputType({ isAbstract: true })
-        class PaginatedInputType extends classRef {
-            @Field({ nullable: true })
-            curPage?: number
-
-            @Field({ nullable: true })
-            perPage?: number
-        }
-
-        return PaginatedInputType
-    } else {
-        class PaginatedInputType {
-            @Field({ nullable: true })
-            curPage?: number
-
-            @Field({ nullable: true })
-            perPage?: number
-        }
-
-        return PaginatedInputType
-    }
 }

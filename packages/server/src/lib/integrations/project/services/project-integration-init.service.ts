@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common'
 
 import { TaskProjectService } from '../../../modules/task/services/task-project.service'
-import { TaskUserService } from '../../../modules/task/services/task-user.service'
 import { PrismaTransactionClientType } from '../../../shared/prisma'
-import { getObjectKeys, getObjectValues } from '../../../shared/utils'
+import { getObjectValues } from '../../../shared/utils'
 import { DEFAULT_TASKS_RELATIONS } from '../constants/project-integration-default-tasks-relations'
 import { DEFAULT_TASKS_STATUSES } from '../constants/project-integration-default-tasks-statuses'
 import { DEFAULT_TASKS_TAGS } from '../constants/project-integration-default-tasks-tags'
-import { DEFAULT_USERS_ACTIONS } from '../constants/project-integration-default-users-actions.constant'
-import { DEFAULT_USERS_PERMISSIONS } from '../constants/project-integration-default-users-permissions.constant'
 import {
     DEFAULT_USER_ROLE_CODES,
     DEFAULT_USERS_ROLES,
@@ -18,10 +15,9 @@ import {
 export class ProjectIntegrationInitService {
     constructor(
         private readonly _taskProjectService: TaskProjectService,
-        private readonly _taskUserService: TaskUserService,
     ) {}
 
-    async initProjectRolesAndPermissions(
+    async initProjectRoles(
         dto: {
             projectId: string
         },
@@ -41,22 +37,6 @@ export class ProjectIntegrationInitService {
                 },
                 client,
             )
-
-            for (const actionCode of getObjectKeys(DEFAULT_USERS_ACTIONS)) {
-                const action = DEFAULT_USERS_ACTIONS[actionCode]
-
-                await this._taskUserService.actionUpsert(
-                    {
-                        roleCode,
-                        actionCode,
-                        actionName: action.name,
-                        actionDescription: action.description,
-                        isAllowed:
-                            DEFAULT_USERS_PERMISSIONS[roleCode][actionCode],
-                    },
-                    client,
-                )
-            }
         }
     }
 

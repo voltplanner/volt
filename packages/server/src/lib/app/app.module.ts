@@ -13,13 +13,15 @@ import { join } from 'path'
 import { environment } from '../../environments/environment'
 import { defaultAllowPermissions } from '../../environments/permissions'
 import { NotificationsIntegration } from '../integrations/notifications.integration'
-import { ProjectIntegrationModule } from '../integrations/project/project-integration.module'
-import { TaskIntegrationModule } from '../integrations/task/task-integration.module'
+import { ProjectIntegrationResolver } from '../integrations/project/project-integration.resolver'
+import { ProjectIntegrationInitService } from '../integrations/project/services/project-integration-init.service'
+import { TaskIntegrationBootstrapService } from '../integrations/task/services/task-integration-bootstrap.service'
+import { TaskIntegrationResolver } from '../integrations/task/task-integration.resolver'
 import { AuthModule } from '../modules/auth/auth.module'
 import { AUTH_LISTENER } from '../modules/auth/configs/auth-events.config'
-import { AuthUserService } from '../modules/auth/services/auth-user.service'
 import { FilesModule } from '../modules/files/files.module'
 import { NotificationsModule } from '../modules/notifications/notifications.module'
+import { TaskModule } from '../modules/task/task.module'
 import { PrismaModule } from '../shared/prisma'
 
 @Module({
@@ -57,8 +59,7 @@ import { PrismaModule } from '../shared/prisma'
             telegram: environment.notifications.telegram,
         }),
         FilesModule.forRoot(environment.s3Storage),
-        TaskIntegrationModule,
-        ProjectIntegrationModule,
+        TaskModule,
     ],
     controllers: [],
     providers: [
@@ -66,6 +67,10 @@ import { PrismaModule } from '../shared/prisma'
         createEventEmitterListener({
             injectionToken: AUTH_LISTENER,
         }),
+        TaskIntegrationResolver,
+        TaskIntegrationBootstrapService,
+        ProjectIntegrationResolver,
+        ProjectIntegrationInitService,
     ],
 })
 export class AppModule {}

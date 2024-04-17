@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 
 import {
+    PrismaService,
     PrismaServiceWithExtentionsType,
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
@@ -8,7 +9,7 @@ import {
 @Injectable()
 export class TaskUserService {
     constructor(
-        @Inject('PRISMA_CLIENT')
+        @Inject(PrismaService)
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
@@ -54,73 +55,5 @@ export class TaskUserService {
             },
             client,
         )
-    }
-
-    async actionUpsert(
-        dto: {
-            readonly roleCode: string
-            readonly actionCode: string
-            readonly actionName: string
-            readonly actionDescription: string
-            readonly isAllowed: boolean
-        },
-        prisma?: PrismaTransactionClientType,
-    ): Promise<string> {
-        const {
-            roleCode,
-            actionCode,
-            actionName,
-            actionDescription,
-            isAllowed,
-        } = dto
-
-        const client = prisma || this._prismaService
-
-        const { id: roleId } = await client.taskUserRole.extGetOneByCode({
-            code: roleCode,
-        })
-
-        const actionId = await client.taskUserAction.extUpsert(
-            {
-                code: actionCode,
-                name: actionName,
-                description: actionDescription,
-            },
-            client,
-        )
-
-        await client.taskUserPermission.extCreate(
-            {
-                roleId,
-                actionId,
-                isAllowed,
-            },
-            client,
-        )
-
-        return actionId
-    }
-
-    async isUserCanPerformAction(
-        dto: {
-            readonly userId: string
-            readonly actionCode: string
-        },
-        prisma?: PrismaTransactionClientType,
-    ): Promise<boolean> {
-        const { userId, actionCode } = dto
-
-        const client = prisma || this._prismaService
-
-        const permission =
-            await client.taskUserPermission.extGetPermissionByUserAndAction(
-                {
-                    actionCode,
-                    userId,
-                },
-                client,
-            )
-
-        return permission.isAllowed
     }
 }

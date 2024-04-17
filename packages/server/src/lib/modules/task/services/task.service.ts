@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 
 import {
+    PrismaService,
     PrismaServiceWithExtentionsType,
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
@@ -8,7 +9,7 @@ import {
 @Injectable()
 export class TaskService {
     constructor(
-        @Inject('PRISMA_CLIENT')
+        @Inject(PrismaService)
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 

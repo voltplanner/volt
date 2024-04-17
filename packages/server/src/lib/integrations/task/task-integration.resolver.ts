@@ -3,27 +3,26 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
 import {
     CurrentUserPayload,
-    PaginatedInput,
-    PaginatedResponse,
+    PaginatedResponse
 } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskService } from '../../modules/task/services/task.service'
-import {
-    PaginatedInputType,
-    PaginatedResponseType,
-} from '../../shared/graphql/shared.graphql'
-import { PrismaServiceWithExtentionsType } from '../../shared/prisma'
+import { PrismaService, PrismaServiceWithExtentionsType } from '../../shared/prisma'
 import { TaskIntegrationTaskCreateInput } from './types-input/task-integration-task-create.input-type'
 import { TaskIntegrationTaskUpdateInput } from './types-input/task-integration-task-update.input-type'
+import { TaskIntegrationTasksInput } from './types-input/task-integration-tasks.input-type'
+import { TaskIntegrationTasksOfCurrentUserInput } from './types-input/task-integration-tasks-of-current-user.input-type'
 import { TaskIntegrationTaskObject } from './types-object/task-integration-task.object-type'
+import { TaskIntegrationTasksOutput } from './types-output/task-integration-tasks.output-type'
+import { TaskIntegrationTasksOfCurrentUserOutput } from './types-output/task-integration-tasks-of-current-user.output-type'
 
 @Resolver()
 export class TaskIntegrationResolver {
     constructor(
-        @Inject('asd')
         private readonly _authUserService: AuthUserService,
         private readonly _taskService: TaskService,
+        @Inject(PrismaService)
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
@@ -82,11 +81,10 @@ export class TaskIntegrationResolver {
         return await this._taskService.update(input)
     }
 
-    @Query(() => PaginatedResponseType(TaskIntegrationTaskObject))
+    @Query(() => TaskIntegrationTasksOutput)
     async tasks(
-        @Args('input', { type: () => PaginatedInputType(), nullable: true })
-        input?: PaginatedInput | null,
-    ): Promise<PaginatedResponse<TaskIntegrationTaskObject>> {
+        @Args('input', { nullable: true }) input?: TaskIntegrationTasksInput | null,
+    ): Promise<TaskIntegrationTasksOutput> {
         const { curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.taskFindMany({
@@ -127,12 +125,11 @@ export class TaskIntegrationResolver {
         return { meta, data: tasks }
     }
 
-    @Query(() => PaginatedResponseType(TaskIntegrationTaskObject))
+    @Query(() => TaskIntegrationTasksOfCurrentUserOutput)
     async tasksOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input', { type: () => PaginatedInputType(), nullable: true })
-        input?: PaginatedInput | null,
-    ): Promise<PaginatedResponse<TaskIntegrationTaskObject>> {
+        @Args('input', { nullable: true }) input?: TaskIntegrationTasksOfCurrentUserInput | null,
+    ): Promise<TaskIntegrationTasksOfCurrentUserOutput> {
         const { curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.taskFindMany({

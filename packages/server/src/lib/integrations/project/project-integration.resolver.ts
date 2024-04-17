@@ -1,17 +1,17 @@
+import { Inject } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
 import {
     CurrentUserPayload,
     OrderEnum,
-    PaginatedResponse,
 } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskProjectService } from '../../modules/task/services/task-project.service'
 import { TaskUserService } from '../../modules/task/services/task-user.service'
-import { PaginatedResponseType } from '../../shared/graphql/shared.graphql'
 import {
     AuthUserStatusEnum,
+    PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
 import { ProjectIntegrationInitService } from './services/project-integration-init.service'
@@ -29,8 +29,10 @@ import { ProjectIntegrationProjectObject } from './types-object/project-integrat
 import { ProjectIntegrationTasksRelationObject } from './types-object/project-integration-tasks-relation.object-type'
 import { ProjectIntegrationTasksStatusObject } from './types-object/project-integration-tasks-status.object-type'
 import { ProjectIntegrationTasksTagObject } from './types-object/project-integration-tasks-tag.object-type'
-import { ProjectIntegrationUserObject } from './types-object/project-integration-user.object-type'
 import { ProjectIntegrationUsersRoleObject } from './types-object/project-integration-users-role.object-type'
+import { ProjectIntegrationProjectUsersOutput } from './types-output/project-integration-project-users.output-type'
+import { ProjectIntegrationProjectsOutput } from './types-output/project-integration-projects.output-type'
+import { ProjectIntegrationProjectsOfCurrentUserOutput } from './types-output/project-integration-projects-of-current-user.output-type'
 
 @Resolver()
 export class ProjectIntegrationResolver {
@@ -38,6 +40,7 @@ export class ProjectIntegrationResolver {
         private readonly _authUserService: AuthUserService,
         private readonly _taskUserService: TaskUserService,
         private readonly _taskProjectService: TaskProjectService,
+        @Inject(PrismaService)
         private readonly _prismaService: PrismaServiceWithExtentionsType,
         private readonly _projectIntegrationInitService: ProjectIntegrationInitService,
     ) {}
@@ -72,7 +75,7 @@ export class ProjectIntegrationResolver {
                 tx,
             )
 
-            await this._projectIntegrationInitService.initProjectRolesAndPermissions(
+            await this._projectIntegrationInitService.initProjectRoles(
                 {
                     projectId,
                 },
@@ -119,9 +122,9 @@ export class ProjectIntegrationResolver {
         return await this._taskProjectService.projectUpdate(input)
     }
 
-    @Query(() => PaginatedResponseType(ProjectIntegrationProjectObject))
+    @Query(() => ProjectIntegrationProjectsOutput)
     async projects(): Promise<
-        PaginatedResponse<ProjectIntegrationProjectObject>
+        ProjectIntegrationProjectsOutput
     > {
         const { data, meta } = await this._taskProjectService.projectFindMany()
 
@@ -134,10 +137,10 @@ export class ProjectIntegrationResolver {
         return { meta, data: projects }
     }
 
-    @Query(() => PaginatedResponseType(ProjectIntegrationProjectObject))
+    @Query(() => ProjectIntegrationProjectsOfCurrentUserOutput)
     async projectsOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
-    ): Promise<PaginatedResponse<ProjectIntegrationProjectObject>> {
+    ): Promise<ProjectIntegrationProjectsOfCurrentUserOutput> {
         const { data, meta } = await this._taskProjectService.projectFindMany({
             userId,
         })
@@ -151,10 +154,10 @@ export class ProjectIntegrationResolver {
         return { meta, data: projects }
     }
 
-    @Query(() => PaginatedResponseType(ProjectIntegrationUserObject))
+    @Query(() => ProjectIntegrationProjectUsersOutput)
     async projectUsers(
         @Args('input') input: ProjectIntegrationProjectUsersInput,
-    ): Promise<PaginatedResponse<ProjectIntegrationUserObject>> {
+    ): Promise<ProjectIntegrationProjectUsersOutput> {
         const { projectId, filterByName, orderBy, curPage, perPage } = input
 
         const projectUsersIds = await this._taskUserService.userFindAll({

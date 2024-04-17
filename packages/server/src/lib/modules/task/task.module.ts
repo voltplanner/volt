@@ -7,11 +7,7 @@ import { TaskUserService } from './services/task-user.service'
 
 @Module({
     imports: [PrismaModule],
-    providers: [{
-        provide: 'PRISMA_CLIENT',
-        useFactory: (p: PrismaService) => p.withExtensions(),
-        inject: [PrismaService]
-    }, TaskProjectService, TaskUserService, TaskService],
+    providers: [TaskProjectService, TaskUserService, TaskService],
     exports: [TaskProjectService, TaskUserService, TaskService],
 })
 export class TaskModule {}

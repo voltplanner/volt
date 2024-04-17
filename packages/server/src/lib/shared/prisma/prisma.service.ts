@@ -21,13 +21,9 @@ import { taskRelationModelExtentions } from './repositories/task-relation.reposi
 import { taskStatusModelExtentions } from './repositories/task-status.repository'
 import { taskTagModelExtentions } from './repositories/task-tag.repository'
 import { taskUserModelExtentions } from './repositories/task-user.repository'
-import { taskUserActionModelExtentions } from './repositories/task-user-action.repository'
-import { taskUserPermissionModelExtentions } from './repositories/task-user-permission.repository'
 import { taskUserRoleModelExtentions } from './repositories/task-user-role.repository'
 
-export type PrismaServiceWithExtentionsType = ReturnType<
-    PrismaService['withExtensions']
->
+export type PrismaServiceWithExtentionsType = ReturnType<PrismaService['_withExtensions']>
 
 @Injectable()
 export class PrismaService
@@ -35,6 +31,7 @@ export class PrismaService
     implements OnModuleInit, OnModuleDestroy
 {
     public static instance: PrismaService
+    public static instanceWithExtentions: PrismaServiceWithExtentionsType
 
     private logger = new Logger(PrismaService.name)
 
@@ -61,9 +58,10 @@ export class PrismaService
         })
 
         PrismaService.instance = this
+        PrismaService.instanceWithExtentions = this._withExtensions()
     }
 
-    withExtensions() {
+    private _withExtensions() {
         return this.$extends({
             model: {
                 task: taskModelExtentions,
@@ -76,10 +74,8 @@ export class PrismaService
                 taskComment: taskCommentModelExtentions,
                 taskUserRole: taskUserRoleModelExtentions,
                 taskRelation: taskRelationModelExtentions,
-                taskUserAction: taskUserActionModelExtentions,
                 taskAttachment: taskAttachmentModelExtentions,
                 taskCustomField: taskCustomFieldModelExtentions,
-                taskUserPermission: taskUserPermissionModelExtentions,
                 taskCustomFieldType: taskCustomFieldTypeModelExtentions,
                 taskCustomFieldValueType:
                     taskCustomFieldValueTypeModelExtentions,
@@ -92,7 +88,7 @@ export class PrismaService
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-extra-semi
-            ;(this as any).$on('query', (e: any) => {
+            ;(PrismaService.instance as any).$on('query', (e: any) => {
                 if (logging === 'all_queries') {
                     if (e.query !== 'SELECT 1') {
                         this.logger.log(

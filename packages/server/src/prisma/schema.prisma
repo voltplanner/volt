@@ -174,50 +174,9 @@ model TaskUserRole {
     project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_USER_ROLE__PROJECT")
 
     users       TaskUser[]
-    permissions TaskUserPermission[]
 
     @@unique([code, isDeleted])
     @@map("task_user_role")
-    @@schema("tasks")
-}
-
-model TaskUserAction {
-    id String @id @default(uuid()) @db.Uuid
-
-    code        String  @unique @db.VarChar(128)
-    name        String  @db.VarChar(64)
-    position    Int     @db.SmallInt
-    description String?
-
-    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
-    isDeleted Boolean   @default(false) @map("is_deleted")
-
-    permissions TaskUserPermission[]
-
-    @@unique([code, isDeleted])
-    @@map("task_user_action")
-    @@schema("tasks")
-}
-
-model TaskUserPermission {
-    id       String @id @default(uuid()) @db.Uuid
-    roleId   String @map("role_id") @db.Uuid
-    actionId String @map("action_id") @db.Uuid
-
-    isAllowed Boolean @default(false) @map("is_ allowed")
-
-    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
-    isDeleted Boolean   @default(false) @map("is_deleted")
-
-    role   TaskUserRole   @relation(fields: [roleId], references: [id], map: "FK__USER_PERMISSION__ROLE", onDelete: Cascade)
-    action TaskUserAction @relation(fields: [actionId], references: [id], map: "FK__USER_PERMISSION__ACTION", onDelete: Cascade)
-
-    @@unique([roleId, actionId, isDeleted])
-    @@map("task_user_permission")
     @@schema("tasks")
 }
 

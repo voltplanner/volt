@@ -16,17 +16,19 @@ import {
 export class PrismaModule extends PrismaConfigurableModuleClass {
     static forRoot(options: typeof PRISMA_OPTIONS_TYPE): DynamicModule {
         const providers: Provider[] = [
-            PrismaService.instance
+            PrismaService.instanceWithExtentions
                 ? {
                       provide: PrismaService,
-                      useValue: PrismaService.instance,
+                      useValue: PrismaService.instanceWithExtentions,
                   }
                 : {
                       provide: PrismaService,
                       useFactory: (
                           config: PrismaConfig,
                       ): PrismaServiceWithExtentionsType => {
-                          return new PrismaService(config).withExtensions()
+                        new PrismaService(config)
+
+                        return PrismaService.instanceWithExtentions
                       },
                       inject: [PRISMA_CONFIG],
                   },
