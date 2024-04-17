@@ -46,7 +46,8 @@ export class ProjectIntegrationResolver {
     ): Promise<string> {
         const { name, budget, deadline, description } = input
 
-        const members: ProjectIntegrationCreateProjectMemberInput[] = input.members ?? []
+        const members: ProjectIntegrationCreateProjectMemberInput[] =
+            input.members ?? []
         const userIds: string[] = []
 
         return await this._prismaService.$transaction(async (client) => {

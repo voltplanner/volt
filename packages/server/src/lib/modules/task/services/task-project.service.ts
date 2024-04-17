@@ -10,7 +10,10 @@ import { getObjectValues } from '../../../shared/utils/object.util'
 import { TASK_DEFAULT_TASKS_RELATIONS } from '../constants/task-default-tasks-relations'
 import { TASK_DEFAULT_TASKS_STATUSES } from '../constants/task-default-tasks-statuses'
 import { TASK_DEFAULT_TASKS_TAGS } from '../constants/task-default-tasks-tags'
-import { TASK_DEFAULT_USER_ROLE_CODES,TASK_DEFAULT_USERS_ROLES } from '../constants/task-default-users-roles.constant'
+import {
+    TASK_DEFAULT_USER_ROLE_CODES,
+    TASK_DEFAULT_USERS_ROLES,
+} from '../constants/task-default-users-roles.constant'
 
 @Injectable()
 export class TaskProjectService {
