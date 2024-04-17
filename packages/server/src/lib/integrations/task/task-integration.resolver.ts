@@ -1,14 +1,14 @@
 import { Inject } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
-import {
-    CurrentUserPayload,
-    PaginatedResponse
-} from '@shared/interfaces'
+import { CurrentUserPayload } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskService } from '../../modules/task/services/task.service'
-import { PrismaService, PrismaServiceWithExtentionsType } from '../../shared/prisma'
+import {
+    PrismaService,
+    PrismaServiceWithExtentionsType,
+} from '../../shared/prisma'
 import { TaskIntegrationTaskCreateInput } from './types-input/task-integration-task-create.input-type'
 import { TaskIntegrationTaskUpdateInput } from './types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from './types-input/task-integration-tasks.input-type'
@@ -55,7 +55,7 @@ export class TaskIntegrationResolver {
             : undefined
 
         return await this._prismaService.$transaction(async (tx) => {
-            const taskId = await this._taskService.taskCreate(
+            const taskId = await this._taskService.create(
                 {
                     createdById: userId,
                     name,
@@ -83,11 +83,12 @@ export class TaskIntegrationResolver {
 
     @Query(() => TaskIntegrationTasksOutput)
     async tasks(
-        @Args('input', { nullable: true }) input?: TaskIntegrationTasksInput | null,
+        @Args('input', { nullable: true })
+        input?: TaskIntegrationTasksInput | null,
     ): Promise<TaskIntegrationTasksOutput> {
         const { curPage, perPage } = input || {}
 
-        const { data, meta } = await this._taskService.taskFindMany({
+        const { data, meta } = await this._taskService.findMany({
             curPage,
             perPage,
         })
@@ -128,12 +129,13 @@ export class TaskIntegrationResolver {
     @Query(() => TaskIntegrationTasksOfCurrentUserOutput)
     async tasksOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input', { nullable: true }) input?: TaskIntegrationTasksOfCurrentUserInput | null,
+        @Args('input', { nullable: true })
+        input?: TaskIntegrationTasksOfCurrentUserInput | null,
     ): Promise<TaskIntegrationTasksOfCurrentUserOutput> {
         const { curPage, perPage } = input || {}
 
-        const { data, meta } = await this._taskService.taskFindMany({
-            assignedToId: userId,
+        const { data, meta } = await this._taskService.findMany({
+            filterByAssignedToId: userId,
             curPage,
             perPage,
         })

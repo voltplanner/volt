@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 
+import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 import {
     PrismaService,
     PrismaServiceWithExtentionsType,
@@ -13,18 +14,29 @@ export class TaskService {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
-    async taskFindMany(dto?: {
-        assignedToId?: string
-        curPage?: number
-        perPage?: number
-    }) {
-        const { assignedToId, curPage, perPage } = dto || {}
+    async create(
+        dto: {
+            readonly name: string
+            readonly description?: string
+            readonly estimatedDateEnd?: Date
+            readonly estimatedDateStart?: Date
+            readonly estimatedDuration?: number
 
-        return await this._prismaService.task.extFindMany({
-            filterByAssignedToId: assignedToId,
-            curPage,
-            perPage,
-        })
+            readonly statusId: string
+            readonly projectId: string
+            readonly createdById: string
+
+            readonly parentId?: string
+            readonly assignedToId?: string
+            readonly tagsIds?: string[]
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
+        const client = prisma || this._prismaService
+
+        const id = await client.task.extCreate(dto, client)
+
+        return id
     }
 
     async update(
@@ -78,52 +90,28 @@ export class TaskService {
         return dto.id
     }
 
-    async taskCreate(
-        dto: {
-            readonly name: string
-            readonly description?: string
-            readonly estimatedDateEnd?: Date
-            readonly estimatedDateStart?: Date
-            readonly estimatedDuration?: number
+    async findMany(dto?: {
+        curPage?: number
+        perPage?: number
 
-            readonly statusId: string
-            readonly projectId: string
-            readonly createdById: string
+        filterByName?: string
+        filterByNumber?: number
+        filterByStatusId?: string
+        filterByParentId?: string
+        filterByProjectId?: string
+        filterByCreatedById?: string
+        filterByAssignedToId?: string
+        filterByCreatedAt?: {
+            from?: Date
+            to?: Date
+        }
 
-            readonly parentId?: string
-            readonly assignedToId?: string
-            readonly tagsIds?: string[]
-        },
-        prisma?: PrismaTransactionClientType,
-    ) {
-        const client = prisma || this._prismaService
-
-        const id = await client.task.extCreate(dto, client)
-
-        return id
-    }
-
-    /**
-     * New default status will replace the current.
-     */
-    async statusSetDefault(
-        dto: {
-            readonly id: string
-        },
-        prisma?: PrismaTransactionClientType,
-    ) {
-        const { id } = dto
-
-        const client = prisma || this._prismaService
-
-        await client.taskStatus.extSetDefault(
-            {
-                id,
-            },
-            client,
-        )
-
-        return id
+        orderBy?: {
+            field: 'name' | 'status' | 'createdAt'
+            order: OrderEnum
+        }
+    }) {
+        return await this._prismaService.task.extFindMany(dto)
     }
 
     async customFieldValueTypeUpsert(

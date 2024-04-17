@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 
+import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 import {
     PrismaService,
     PrismaServiceWithExtentionsType,
@@ -13,40 +14,7 @@ export class TaskProjectService {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
-    async projectFindMany(dto?: { userId?: string }) {
-        const { userId } = dto || {}
-
-        return await this._prismaService.taskProject.extFindMany({
-            filterByUserId: userId,
-        })
-    }
-
-    async projectUpdate(
-        dto: {
-            readonly id: string
-            readonly version: number
-            readonly name?: string
-            readonly budget?: number | null
-            readonly deadline?: number | null
-            readonly description?: string | null
-        },
-        prisma?: PrismaTransactionClientType,
-    ) {
-        const client = prisma || this._prismaService
-
-        return await client.taskProject.extUpdate(
-            {
-                ...dto,
-                deadline:
-                    typeof dto.deadline === 'number'
-                        ? new Date(dto.deadline)
-                        : dto.deadline,
-            },
-            client,
-        )
-    }
-
-    async projectCreate(
+    async create(
         dto: {
             readonly name: string
             readonly budget?: number
@@ -72,7 +40,51 @@ export class TaskProjectService {
         return projectId
     }
 
-    async projectAddUsers(
+    async update(
+        dto: {
+            readonly id: string
+            readonly version: number
+            readonly name?: string
+            readonly budget?: number | null
+            readonly deadline?: number | null
+            readonly description?: string | null
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
+        const client = prisma || this._prismaService
+
+        return await client.taskProject.extUpdate(
+            {
+                ...dto,
+                deadline:
+                    typeof dto.deadline === 'number'
+                        ? new Date(dto.deadline)
+                        : dto.deadline,
+            },
+            client,
+        )
+    }
+
+    async findMany(dto?: {
+        curPage?: number
+        perPage?: number
+
+        filterByName?: string
+        filterByUserId?: string
+        filterByCreatedAt?: {
+            from?: Date
+            to?: Date
+        }
+
+        orderBy?: {
+            field: 'name' | 'status' | 'createdAt'
+            order: OrderEnum
+        }
+    }) {
+        return await this._prismaService.taskProject.extFindMany(dto)
+    }
+
+    async usersAdd(
         dto: {
             readonly projectId: string
             readonly userIds: string[]

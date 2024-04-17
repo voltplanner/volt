@@ -1,10 +1,7 @@
 import { Inject } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
-import {
-    CurrentUserPayload,
-    OrderEnum,
-} from '@shared/interfaces'
+import { CurrentUserPayload, OrderEnum } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskProjectService } from '../../modules/task/services/task-project.service'
@@ -57,7 +54,7 @@ export class ProjectIntegrationResolver {
 
         return await this._prismaService.$transaction(async (tx) => {
             for (const member of members) {
-                const internalUserId = await this._taskUserService.userUpsert(
+                const internalUserId = await this._taskUserService.upsert(
                     member,
                     tx,
                 )
@@ -65,7 +62,7 @@ export class ProjectIntegrationResolver {
                 memberIds.push(internalUserId)
             }
 
-            const projectId = await this._taskProjectService.projectCreate(
+            const projectId = await this._taskProjectService.create(
                 {
                     name,
                     budget,
@@ -103,7 +100,7 @@ export class ProjectIntegrationResolver {
                 tx,
             )
 
-            await this._taskProjectService.projectAddUsers(
+            await this._taskProjectService.usersAdd(
                 {
                     projectId,
                     userIds: memberIds,
@@ -119,14 +116,12 @@ export class ProjectIntegrationResolver {
     async projectUpdate(
         @Args('input') input: ProjectIntegrationProjectUpdateInput,
     ) {
-        return await this._taskProjectService.projectUpdate(input)
+        return await this._taskProjectService.update(input)
     }
 
     @Query(() => ProjectIntegrationProjectsOutput)
-    async projects(): Promise<
-        ProjectIntegrationProjectsOutput
-    > {
-        const { data, meta } = await this._taskProjectService.projectFindMany()
+    async projects(): Promise<ProjectIntegrationProjectsOutput> {
+        const { data, meta } = await this._taskProjectService.findMany()
 
         const projects: ProjectIntegrationProjectObject[] = data.map((i) => ({
             ...i,
@@ -141,8 +136,8 @@ export class ProjectIntegrationResolver {
     async projectsOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
     ): Promise<ProjectIntegrationProjectsOfCurrentUserOutput> {
-        const { data, meta } = await this._taskProjectService.projectFindMany({
-            userId,
+        const { data, meta } = await this._taskProjectService.findMany({
+            filterByUserId: userId,
         })
 
         const projects: ProjectIntegrationProjectObject[] = data.map((i) => ({
@@ -160,7 +155,7 @@ export class ProjectIntegrationResolver {
     ): Promise<ProjectIntegrationProjectUsersOutput> {
         const { projectId, filterByName, orderBy, curPage, perPage } = input
 
-        const projectUsersIds = await this._taskUserService.userFindAll({
+        const projectUsersIds = await this._taskUserService.findAll({
             projectId,
         })
 

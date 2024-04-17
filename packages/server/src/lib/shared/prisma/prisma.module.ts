@@ -26,9 +26,9 @@ export class PrismaModule extends PrismaConfigurableModuleClass {
                       useFactory: (
                           config: PrismaConfig,
                       ): PrismaServiceWithExtentionsType => {
-                        new PrismaService(config)
+                          new PrismaService(config)
 
-                        return PrismaService.instanceWithExtentions
+                          return PrismaService.instanceWithExtentions
                       },
                       inject: [PRISMA_CONFIG],
                   },

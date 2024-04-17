@@ -1,10 +1,7 @@
 import { Type } from '@nestjs/common'
 import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 
-import {
-    OrderEnum,
-    PaginatedResponse,
-} from '../interfaces/shared.interfaces'
+import { OrderEnum, PaginatedResponse } from '../interfaces/shared.interfaces'
 import { TPaginatedMeta } from '../types/paginated-meta.type'
 
 registerEnumType(OrderEnum, { name: 'OrderEnum' })

@@ -23,7 +23,9 @@ import { taskTagModelExtentions } from './repositories/task-tag.repository'
 import { taskUserModelExtentions } from './repositories/task-user.repository'
 import { taskUserRoleModelExtentions } from './repositories/task-user-role.repository'
 
-export type PrismaServiceWithExtentionsType = ReturnType<PrismaService['_withExtensions']>
+export type PrismaServiceWithExtentionsType = ReturnType<
+    PrismaService['_withExtensions']
+>
 
 @Injectable()
 export class PrismaService

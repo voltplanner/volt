@@ -13,7 +13,7 @@ export class TaskUserService {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
-    async userUpsert(
+    async upsert(
         dto: {
             readonly userId: string
             readonly roleCode: string
@@ -39,7 +39,7 @@ export class TaskUserService {
         return internalUserId
     }
 
-    async userFindAll(
+    async findAll(
         dto: {
             readonly projectId: string
         },

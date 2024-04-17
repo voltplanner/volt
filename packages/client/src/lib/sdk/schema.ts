@@ -9,7 +9,6 @@ export type Scalars = {
     String: string
     Boolean: boolean
     DateTime: any
-    Upload: any
 }
 
 export interface PaginatedMetaType {
@@ -94,7 +93,6 @@ export interface Query {
     getMyRole: RoleType
     getUser: UserType
     getMyNotificationPreferences: GetNotificationPreferences
-    getFile: Scalars['String']
     __typename: 'Query'
 }
 
@@ -113,7 +111,6 @@ export interface Mutation {
     deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
     changeMyNotificationPreferences: Scalars['Boolean']
-    uploadFile: Scalars['String']
     __typename: 'Mutation'
 }
 
@@ -215,7 +212,6 @@ export interface QueryGenqlSelection {
     getMyRole?: RoleTypeGenqlSelection
     getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
     getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
-    getFile?: { __args: { input: GetFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -254,10 +250,6 @@ export interface GetUserInput {
     userId: Scalars['ID']
 }
 
-export interface GetFileInput {
-    id: Scalars['String']
-}
-
 export interface MutationGenqlSelection {
     updateRole?: { __args: { input: UpdateRoleInput } }
     changeUserRole?: { __args: { input: ChangeUserRoleInput } }
@@ -279,7 +271,6 @@ export interface MutationGenqlSelection {
     changeMyNotificationPreferences?: {
         __args: { input: ChangeMyNotificationPreferences }
     }
-    uploadFile?: { __args: { input: UploadFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -356,10 +347,6 @@ export interface ChangeMyNotificationPreferences {
     webEnabled?: Scalars['Boolean'] | null
     telegramEnabled?: Scalars['Boolean'] | null
     telegramAccount?: Scalars['Float'] | null
-}
-
-export interface UploadFileInput {
-    file: Scalars['Upload']
 }
 
 export interface SubscriptionGenqlSelection {

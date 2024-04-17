@@ -13,9 +13,7 @@ import {
 
 @Injectable()
 export class ProjectIntegrationInitService {
-    constructor(
-        private readonly _taskProjectService: TaskProjectService,
-    ) {}
+    constructor(private readonly _taskProjectService: TaskProjectService) {}
 
     async initProjectRoles(
         dto: {
