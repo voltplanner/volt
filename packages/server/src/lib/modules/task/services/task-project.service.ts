@@ -6,6 +6,11 @@ import {
     PrismaServiceWithExtentionsType,
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
+import { getObjectValues } from '../../../shared/utils/object.util'
+import { TASK_DEFAULT_TASKS_RELATIONS } from '../constants/task-default-tasks-relations'
+import { TASK_DEFAULT_TASKS_STATUSES } from '../constants/task-default-tasks-statuses'
+import { TASK_DEFAULT_TASKS_TAGS } from '../constants/task-default-tasks-tags'
+import { TASK_DEFAULT_USER_ROLE_CODES,TASK_DEFAULT_USERS_ROLES } from '../constants/task-default-users-roles.constant'
 
 @Injectable()
 export class TaskProjectService {
@@ -36,6 +41,11 @@ export class TaskProjectService {
             },
             client,
         )
+
+        await this.tasksTagsInitialize({ projectId }, client)
+        await this.usersRolesInitialize({ projectId }, client)
+        await this.tasksStatusesInitialize({ projectId }, client)
+        await this.tasksRelationsInitialize({ projectId }, client)
 
         return projectId
     }
@@ -152,6 +162,19 @@ export class TaskProjectService {
         )
     }
 
+    async tasksStatusesInitialize(
+        dto: {
+            projectId: string
+        },
+        client?: PrismaTransactionClientType,
+    ) {
+        const { projectId } = dto
+
+        for (const item of TASK_DEFAULT_TASKS_STATUSES) {
+            await this.tasksStatusesUpsert({ ...item, projectId }, client)
+        }
+    }
+
     async tasksTagsUpsert(
         dto: {
             readonly code: string
@@ -194,6 +217,19 @@ export class TaskProjectService {
             },
             client,
         )
+    }
+
+    async tasksTagsInitialize(
+        dto: {
+            projectId: string
+        },
+        client?: PrismaTransactionClientType,
+    ) {
+        const { projectId } = dto
+
+        for (const item of TASK_DEFAULT_TASKS_TAGS) {
+            await this.tasksTagsUpsert({ ...item, projectId }, client)
+        }
     }
 
     async tasksRelationsUpsert(
@@ -242,6 +278,19 @@ export class TaskProjectService {
         )
     }
 
+    async tasksRelationsInitialize(
+        dto: {
+            projectId: string
+        },
+        client?: PrismaTransactionClientType,
+    ) {
+        const { projectId } = dto
+
+        for (const item of TASK_DEFAULT_TASKS_RELATIONS) {
+            await this.tasksRelationsUpsert({ ...item, projectId }, client)
+        }
+    }
+
     async usersRolesUpsert(
         dto: {
             readonly code: string
@@ -279,5 +328,28 @@ export class TaskProjectService {
         const client = prisma || this._prismaService
 
         return await client.taskUserRole.extFindMany({ projectId })
+    }
+
+    async usersRolesInitialize(
+        dto: {
+            projectId: string
+        },
+        client?: PrismaTransactionClientType,
+    ): Promise<void> {
+        const { projectId } = dto
+
+        for (const roleCode of getObjectValues(TASK_DEFAULT_USER_ROLE_CODES)) {
+            const role = TASK_DEFAULT_USERS_ROLES[roleCode]
+
+            await this.usersRolesUpsert(
+                {
+                    projectId,
+                    code: roleCode,
+                    name: role.name,
+                    description: role.description,
+                },
+                client,
+            )
+        }
     }
 }

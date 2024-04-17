@@ -1,4 +1,4 @@
-export const DEFAULT_TASKS_STATUSES = [
+export const TASK_DEFAULT_TASKS_STATUSES = [
     {
         code: 'OPENED',
         name: 'Opened',

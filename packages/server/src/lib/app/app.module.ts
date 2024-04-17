@@ -14,8 +14,6 @@ import { environment } from '../../environments/environment'
 import { defaultAllowPermissions } from '../../environments/permissions'
 import { NotificationsIntegration } from '../integrations/notifications.integration'
 import { ProjectIntegrationResolver } from '../integrations/project/project-integration.resolver'
-import { ProjectIntegrationInitService } from '../integrations/project/services/project-integration-init.service'
-import { TaskIntegrationBootstrapService } from '../integrations/task/services/task-integration-bootstrap.service'
 import { TaskIntegrationResolver } from '../integrations/task/task-integration.resolver'
 import { AuthModule } from '../modules/auth/auth.module'
 import { AUTH_LISTENER } from '../modules/auth/configs/auth-events.config'
@@ -59,7 +57,7 @@ import { PrismaModule } from '../shared/prisma'
             telegram: environment.notifications.telegram,
         }),
         FilesModule.forRoot(environment.s3Storage),
-        TaskModule,
+        TaskModule.forRoot(),
     ],
     controllers: [],
     providers: [
@@ -68,9 +66,7 @@ import { PrismaModule } from '../shared/prisma'
             injectionToken: AUTH_LISTENER,
         }),
         TaskIntegrationResolver,
-        TaskIntegrationBootstrapService,
         ProjectIntegrationResolver,
-        ProjectIntegrationInitService,
     ],
 })
 export class AppModule {}

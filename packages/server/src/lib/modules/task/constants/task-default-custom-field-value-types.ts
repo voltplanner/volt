@@ -1,4 +1,4 @@
-export const DEFAULT_TASK_CUSTOM_FIELD_VALUE_TYPES = [
+export const TASK_DEFAULT_CUSTOM_FIELD_VALUE_TYPES = [
     {
         code: 'STRING',
         name: 'String',

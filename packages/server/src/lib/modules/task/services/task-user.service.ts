@@ -28,7 +28,7 @@ export class TaskUserService {
             code: roleCode,
         })
 
-        const internalUserId = await client.taskUser.extUpsert(
+        const id = await client.taskUser.extUpsert(
             {
                 id: userId,
                 roleId: role.id,
@@ -36,7 +36,7 @@ export class TaskUserService {
             client,
         )
 
-        return internalUserId
+        return id
     }
 
     async findAll(

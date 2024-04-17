@@ -11,7 +11,6 @@ import {
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
-import { ProjectIntegrationInitService } from './services/project-integration-init.service'
 import {
     ProjectIntegrationCreateProjectInput,
     ProjectIntegrationCreateProjectMemberInput,
@@ -39,7 +38,6 @@ export class ProjectIntegrationResolver {
         private readonly _taskProjectService: TaskProjectService,
         @Inject(PrismaService)
         private readonly _prismaService: PrismaServiceWithExtentionsType,
-        private readonly _projectIntegrationInitService: ProjectIntegrationInitService,
     ) {}
 
     @Mutation(() => String)
@@ -48,18 +46,17 @@ export class ProjectIntegrationResolver {
     ): Promise<string> {
         const { name, budget, deadline, description } = input
 
-        const members: ProjectIntegrationCreateProjectMemberInput[] =
-            input.members ?? []
-        const memberIds: string[] = []
+        const members: ProjectIntegrationCreateProjectMemberInput[] = input.members ?? []
+        const userIds: string[] = []
 
-        return await this._prismaService.$transaction(async (tx) => {
+        return await this._prismaService.$transaction(async (client) => {
             for (const member of members) {
-                const internalUserId = await this._taskUserService.upsert(
+                const userId = await this._taskUserService.upsert(
                     member,
-                    tx,
+                    client,
                 )
 
-                memberIds.push(internalUserId)
+                userIds.push(userId)
             }
 
             const projectId = await this._taskProjectService.create(
@@ -69,43 +66,15 @@ export class ProjectIntegrationResolver {
                     description,
                     deadline: new Date(deadline),
                 },
-                tx,
-            )
-
-            await this._projectIntegrationInitService.initProjectRoles(
-                {
-                    projectId,
-                },
-                tx,
-            )
-
-            await this._projectIntegrationInitService.initProjectTasksRelations(
-                {
-                    projectId,
-                },
-                tx,
-            )
-
-            await this._projectIntegrationInitService.initProjectTasksStatuses(
-                {
-                    projectId,
-                },
-                tx,
-            )
-
-            await this._projectIntegrationInitService.initProjectTasksTags(
-                {
-                    projectId,
-                },
-                tx,
+                client,
             )
 
             await this._taskProjectService.usersAdd(
                 {
                     projectId,
-                    userIds: memberIds,
+                    userIds,
                 },
-                tx,
+                client,
             )
 
             return projectId

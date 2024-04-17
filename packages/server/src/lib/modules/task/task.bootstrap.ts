@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 
-import { TaskService } from '../../../modules/task/services/task.service'
-import { DEFAULT_TASK_CUSTOM_FIELD_VALUE_TYPES } from '../constants/task-integration-default-task-custom-field-value-types'
+import { TASK_DEFAULT_CUSTOM_FIELD_VALUE_TYPES } from './constants/task-default-custom-field-value-types'
+import { TaskService } from './services/task.service'
 
 @Injectable()
-export class TaskIntegrationBootstrapService {
+export class TaskBootstrap {
     constructor(private readonly _taskService: TaskService) {}
 
     async onApplicationBootstrap() {
@@ -12,7 +12,7 @@ export class TaskIntegrationBootstrapService {
     }
 
     async initTaskCustomFieldValueType() {
-        for (const item of DEFAULT_TASK_CUSTOM_FIELD_VALUE_TYPES) {
+        for (const item of TASK_DEFAULT_CUSTOM_FIELD_VALUE_TYPES) {
             await this._taskService.customFieldValueTypeUpsert(item)
         }
     }

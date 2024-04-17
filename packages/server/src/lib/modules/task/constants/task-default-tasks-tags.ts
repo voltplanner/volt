@@ -1,4 +1,4 @@
-export const DEFAULT_TASKS_TAGS = [
+export const TASK_DEFAULT_TASKS_TAGS = [
     {
         code: 'TASK',
         name: 'Task',
