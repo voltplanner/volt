@@ -6,7 +6,6 @@ import { Skeleton } from 'shared'
 
 export const RoleList = () => {
     const { data, loading, error } = useRoles()
-    console.log('DATA',data)
     if (loading) {
         return (
             <WrapperStyled>
