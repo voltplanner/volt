@@ -25,7 +25,6 @@ interface TasksOverviewProps<T> {
 }
 export const Table = (props: TasksOverviewProps<any>) => {
     const { columns, data, styles, width } = props
-
     return (
         <WrapperStyled style={styles}>
             <TitleStyled>My tasks overview</TitleStyled>
@@ -40,7 +39,7 @@ export const Table = (props: TasksOverviewProps<any>) => {
                     </THeadStyled>
                 </thead>
                 <TBodyStyled>
-                    {data.map((elem) => (
+                    {data?.map((elem) => (
                         <Row style={{ maxWidth: width }} key={elem.id}>
                             {columns.map(
                                 ({ dataIndex, key, width, render }) => (
