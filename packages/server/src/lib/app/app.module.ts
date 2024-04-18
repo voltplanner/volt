@@ -57,7 +57,9 @@ import { PrismaModule } from '../shared/prisma'
             telegram: environment.notifications.telegram,
         }),
         FilesModule.forRoot(environment.s3Storage),
-        TaskModule.forRoot(),
+        TaskModule.forRoot({
+            eventsProvider: createEventEmitterPublisher(),
+        }),
     ],
     controllers: [],
     providers: [

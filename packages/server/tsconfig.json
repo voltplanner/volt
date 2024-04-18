@@ -1,25 +1,25 @@
 {
-    "extends": "../../tsconfig.base.json",
-    "files": [],
-    "include": [],
-    "references": [
-        {
-            "path": "./tsconfig.app.json"
-        },
-        {
-            "path": "./tsconfig.spec.json"
-        }
-    ],
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "paths": {
-            "@shared/decorators": [
-                "packages/server/src/lib/shared/decorators/index.ts"
-            ],
-            "@shared/interfaces": [
-                "packages/server/src/lib/shared/interfaces/index.ts"
-            ],
-            "@shared/utils": ["packages/server/src/lib/shared/utils/index.ts"]
-        }
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
     }
+  ],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "paths": {
+      "@shared/decorators": [
+        "packages/server/src/lib/shared/decorators/index.ts"
+      ],
+      "@shared/interfaces": [
+        "packages/server/src/lib/shared/interfaces/index.ts"
+      ],
+      "@shared/utils": ["packages/server/src/lib/shared/utils/index.ts"]
+    }
+  }
 }

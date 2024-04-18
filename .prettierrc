@@ -1,13 +1,13 @@
 {
-    "singleQuote": true,
-    "overrides": [
-        {
-            "files": ["**/*.ts", "**/*.tsx"],
-            "options": {
-                "tabWidth": 4,
-                "trailingComma": "all",
-                "semi": false
-            }
-        }
-    ]
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "options": {
+        "tabWidth": 4,
+        "trailingComma": "all",
+        "semi": false
+      }
+    }
+  ]
 }

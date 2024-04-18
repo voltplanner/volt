@@ -10,7 +10,7 @@ import {
 export class TaskUserService {
     constructor(
         @Inject(PrismaService)
-        private readonly _prismaService: PrismaServiceWithExtentionsType,
+        private readonly prisma: PrismaServiceWithExtentionsType,
     ) {}
 
     async upsert(
@@ -22,7 +22,7 @@ export class TaskUserService {
     ): Promise<string> {
         const { userId, roleCode } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const role = await client.taskUserRole.extGetOneByCode({
             code: roleCode,
@@ -47,7 +47,7 @@ export class TaskUserService {
     ): Promise<string[]> {
         const { projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         return await client.taskUser.extFindAll(
             {

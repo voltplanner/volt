@@ -27,7 +27,7 @@ export class TaskIntegrationResolver {
     ) {}
 
     @Mutation(() => String)
-    async taskCreate(
+    async createTask(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskIntegrationTaskCreateInput,
     ): Promise<string> {
@@ -77,7 +77,7 @@ export class TaskIntegrationResolver {
     }
 
     @Mutation(() => String)
-    async taskUpdate(@Args('input') input: TaskIntegrationTaskUpdateInput) {
+    async updateTask(@Args('input') input: TaskIntegrationTaskUpdateInput) {
         return await this._taskService.update(input)
     }
 
@@ -127,7 +127,7 @@ export class TaskIntegrationResolver {
     }
 
     @Query(() => TaskIntegrationTasksOfCurrentUserOutput)
-    async tasksOfCurrentUser(
+    async myTasks(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input', { nullable: true })
         input?: TaskIntegrationTasksOfCurrentUserInput | null,

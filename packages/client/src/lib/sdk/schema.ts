@@ -5,10 +5,11 @@
 
 export type Scalars = {
     Float: number
-    ID: string
     String: string
     Boolean: boolean
+    ID: string
     DateTime: any
+    Upload: any
 }
 
 export interface PaginatedMetaType {
@@ -16,6 +17,115 @@ export interface PaginatedMetaType {
     perPage: Scalars['Float']
     total: Scalars['Float']
     __typename: 'PaginatedMetaType'
+}
+
+export interface ProjectIntegrationTasksRelationObject {
+    id: Scalars['String']
+    code: Scalars['String']
+    nameMain: Scalars['String']
+    nameForeign: Scalars['String']
+    position: Scalars['Float']
+    description: Scalars['String'] | null
+    __typename: 'ProjectIntegrationTasksRelationObject'
+}
+
+export interface ProjectIntegrationTasksStatusObject {
+    id: Scalars['String']
+    code: Scalars['String']
+    name: Scalars['String']
+    position: Scalars['Float']
+    isDefault: Scalars['Boolean']
+    description: Scalars['String'] | null
+    __typename: 'ProjectIntegrationTasksStatusObject'
+}
+
+export interface ProjectIntegrationTasksTagObject {
+    id: Scalars['String']
+    code: Scalars['String']
+    name: Scalars['String']
+    position: Scalars['Float']
+    description: Scalars['String'] | null
+    __typename: 'ProjectIntegrationTasksTagObject'
+}
+
+export interface ProjectIntegrationUsersRoleObject {
+    id: Scalars['String']
+    code: Scalars['String']
+    name: Scalars['String']
+    position: Scalars['Float']
+    description: Scalars['String'] | null
+    __typename: 'ProjectIntegrationUsersRoleObject'
+}
+
+export interface ProjectIntegrationUserObject {
+    id: Scalars['String']
+    firstname: Scalars['String']
+    lastname: Scalars['String']
+    __typename: 'ProjectIntegrationUserObject'
+}
+
+export interface ProjectIntegrationProjectUsersOutput {
+    data: ProjectIntegrationUserObject[]
+    meta: PaginatedMetaType
+    __typename: 'ProjectIntegrationProjectUsersOutput'
+}
+
+export interface ProjectIntegrationProjectObject {
+    id: Scalars['String']
+    name: Scalars['String']
+    description: Scalars['String'] | null
+    deadline: Scalars['Float'] | null
+    budget: Scalars['Float'] | null
+    version: Scalars['Float']
+    createdAt: Scalars['Float']
+    __typename: 'ProjectIntegrationProjectObject'
+}
+
+export interface ProjectIntegrationProjectsOutput {
+    data: ProjectIntegrationProjectObject[]
+    meta: PaginatedMetaType
+    __typename: 'ProjectIntegrationProjectsOutput'
+}
+
+export interface ProjectIntegrationProjectsOfCurrentUserOutput {
+    data: ProjectIntegrationProjectObject[]
+    meta: PaginatedMetaType
+    __typename: 'ProjectIntegrationProjectsOfCurrentUserOutput'
+}
+
+export interface TaskIntegrationUserObject {
+    id: Scalars['String']
+    firstname: Scalars['String']
+    lastname: Scalars['String']
+    __typename: 'TaskIntegrationUserObject'
+}
+
+export interface TaskIntegrationTaskObject {
+    id: Scalars['String']
+    name: Scalars['String']
+    number: Scalars['Float']
+    description: Scalars['String'] | null
+    estimatedDateStart: Scalars['Float'] | null
+    estimatedDateEnd: Scalars['Float'] | null
+    estimatedDuration: Scalars['Float'] | null
+    version: Scalars['Float']
+    createdAt: Scalars['Float']
+    status: Scalars['String']
+    createdBy: TaskIntegrationUserObject
+    assignedTo: TaskIntegrationUserObject | null
+    __typename: 'TaskIntegrationTaskObject'
+}
+
+export interface TaskIntegrationTasksOutput {
+    data: TaskIntegrationTaskObject[]
+    meta: PaginatedMetaType
+    __typename: 'TaskIntegrationTasksOutput'
+}
+
+export interface TaskIntegrationTasksOfCurrentUserOutput {
+    data: TaskIntegrationTaskObject[]
+    meta: PaginatedMetaType
+    __typename: 'TaskIntegrationTasksOfCurrentUserOutput'
 }
 
 export interface MethodsType {
@@ -93,6 +203,16 @@ export interface Query {
     getMyRole: RoleType
     getUser: UserType
     getMyNotificationPreferences: GetNotificationPreferences
+    projects: ProjectIntegrationProjectsOutput
+    myProjects: ProjectIntegrationProjectsOfCurrentUserOutput
+    projectUsers: ProjectIntegrationProjectUsersOutput
+    projectUsersRoles: ProjectIntegrationUsersRoleObject[]
+    projectTasksTags: ProjectIntegrationTasksTagObject[]
+    projectTasksStatuses: ProjectIntegrationTasksStatusObject[]
+    projectTasksRelations: ProjectIntegrationTasksRelationObject[]
+    tasks: TaskIntegrationTasksOutput
+    myTasks: TaskIntegrationTasksOfCurrentUserOutput
+    getFile: Scalars['String']
     __typename: 'Query'
 }
 
@@ -111,6 +231,11 @@ export interface Mutation {
     deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
     changeMyNotificationPreferences: Scalars['Boolean']
+    createProject: Scalars['String']
+    updateProject: Scalars['String']
+    createTask: Scalars['String']
+    updateTask: Scalars['String']
+    uploadFile: Scalars['String']
     __typename: 'Mutation'
 }
 
@@ -123,6 +248,128 @@ export interface PaginatedMetaTypeGenqlSelection {
     curPage?: boolean | number
     perPage?: boolean | number
     total?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationTasksRelationObjectGenqlSelection {
+    id?: boolean | number
+    code?: boolean | number
+    nameMain?: boolean | number
+    nameForeign?: boolean | number
+    position?: boolean | number
+    description?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationTasksStatusObjectGenqlSelection {
+    id?: boolean | number
+    code?: boolean | number
+    name?: boolean | number
+    position?: boolean | number
+    isDefault?: boolean | number
+    description?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationTasksTagObjectGenqlSelection {
+    id?: boolean | number
+    code?: boolean | number
+    name?: boolean | number
+    position?: boolean | number
+    description?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationUsersRoleObjectGenqlSelection {
+    id?: boolean | number
+    code?: boolean | number
+    name?: boolean | number
+    position?: boolean | number
+    description?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationUserObjectGenqlSelection {
+    id?: boolean | number
+    firstname?: boolean | number
+    lastname?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationProjectUsersOutputGenqlSelection {
+    data?: ProjectIntegrationUserObjectGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationProjectObjectGenqlSelection {
+    id?: boolean | number
+    name?: boolean | number
+    description?: boolean | number
+    deadline?: boolean | number
+    budget?: boolean | number
+    version?: boolean | number
+    createdAt?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationProjectsOutputGenqlSelection {
+    data?: ProjectIntegrationProjectObjectGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ProjectIntegrationProjectsOfCurrentUserOutputGenqlSelection {
+    data?: ProjectIntegrationProjectObjectGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface TaskIntegrationUserObjectGenqlSelection {
+    id?: boolean | number
+    firstname?: boolean | number
+    lastname?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface TaskIntegrationTaskObjectGenqlSelection {
+    id?: boolean | number
+    name?: boolean | number
+    number?: boolean | number
+    description?: boolean | number
+    estimatedDateStart?: boolean | number
+    estimatedDateEnd?: boolean | number
+    estimatedDuration?: boolean | number
+    version?: boolean | number
+    createdAt?: boolean | number
+    status?: boolean | number
+    createdBy?: TaskIntegrationUserObjectGenqlSelection
+    assignedTo?: TaskIntegrationUserObjectGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface TaskIntegrationTasksOutputGenqlSelection {
+    data?: TaskIntegrationTaskObjectGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface TaskIntegrationTasksOfCurrentUserOutputGenqlSelection {
+    data?: TaskIntegrationTaskObjectGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -212,6 +459,30 @@ export interface QueryGenqlSelection {
     getMyRole?: RoleTypeGenqlSelection
     getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
     getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
+    projects?: ProjectIntegrationProjectsOutputGenqlSelection
+    myProjects?: ProjectIntegrationProjectsOfCurrentUserOutputGenqlSelection
+    projectUsers?: ProjectIntegrationProjectUsersOutputGenqlSelection & {
+        __args: { input: ProjectIntegrationProjectUsersInput }
+    }
+    projectUsersRoles?: ProjectIntegrationUsersRoleObjectGenqlSelection & {
+        __args: { input: ProjectIntegrationProjectUsersRolesInput }
+    }
+    projectTasksTags?: ProjectIntegrationTasksTagObjectGenqlSelection & {
+        __args: { input: ProjectIntegrationProjectTasksTagsInput }
+    }
+    projectTasksStatuses?: ProjectIntegrationTasksStatusObjectGenqlSelection & {
+        __args: { input: ProjectIntegrationProjectTasksStatusesInput }
+    }
+    projectTasksRelations?: ProjectIntegrationTasksRelationObjectGenqlSelection & {
+        __args: { input: ProjectIntegrationProjectTasksRelationsInput }
+    }
+    tasks?: TaskIntegrationTasksOutputGenqlSelection & {
+        __args?: { input?: TaskIntegrationTasksInput | null }
+    }
+    myTasks?: TaskIntegrationTasksOfCurrentUserOutputGenqlSelection & {
+        __args?: { input?: TaskIntegrationTasksOfCurrentUserInput | null }
+    }
+    getFile?: { __args: { input: GetFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -250,6 +521,42 @@ export interface GetUserInput {
     userId: Scalars['ID']
 }
 
+export interface ProjectIntegrationProjectUsersInput {
+    projectId: Scalars['String']
+    filterByName?: Scalars['String'] | null
+    orderBy?: OrderByInput | null
+}
+
+export interface ProjectIntegrationProjectUsersRolesInput {
+    projectId: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectTasksTagsInput {
+    projectId: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectTasksStatusesInput {
+    projectId: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectTasksRelationsInput {
+    projectId: Scalars['String']
+}
+
+export interface TaskIntegrationTasksInput {
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+}
+
+export interface TaskIntegrationTasksOfCurrentUserInput {
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+}
+
+export interface GetFileInput {
+    id: Scalars['String']
+}
+
 export interface MutationGenqlSelection {
     updateRole?: { __args: { input: UpdateRoleInput } }
     changeUserRole?: { __args: { input: ChangeUserRoleInput } }
@@ -271,6 +578,11 @@ export interface MutationGenqlSelection {
     changeMyNotificationPreferences?: {
         __args: { input: ChangeMyNotificationPreferences }
     }
+    createProject?: { __args: { input: ProjectIntegrationCreateProjectInput } }
+    updateProject?: { __args: { input: ProjectIntegrationProjectUpdateInput } }
+    createTask?: { __args: { input: TaskIntegrationTaskCreateInput } }
+    updateTask?: { __args: { input: TaskIntegrationTaskUpdateInput } }
+    uploadFile?: { __args: { input: UploadFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -349,6 +661,61 @@ export interface ChangeMyNotificationPreferences {
     telegramAccount?: Scalars['Float'] | null
 }
 
+export interface ProjectIntegrationCreateProjectInput {
+    name: Scalars['String']
+    /** Budget of the project in hours */
+    budget: Scalars['Float']
+    /** Deadline of the project in timestampMs */
+    deadline: Scalars['Float']
+    description: Scalars['String']
+    members?: ProjectIntegrationCreateProjectMemberInput[] | null
+}
+
+export interface ProjectIntegrationCreateProjectMemberInput {
+    userId: Scalars['String']
+    roleCode: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectUpdateInput {
+    id: Scalars['String']
+    version: Scalars['Float']
+    name?: Scalars['String'] | null
+    description?: Scalars['String'] | null
+    budget?: Scalars['Float'] | null
+    deadline?: Scalars['Float'] | null
+}
+
+export interface TaskIntegrationTaskCreateInput {
+    projectId: Scalars['String']
+    name: Scalars['String']
+    statusId: Scalars['String']
+    description?: Scalars['String'] | null
+    estimatedDateStart?: Scalars['Float'] | null
+    estimatedDateEnd?: Scalars['Float'] | null
+    estimatedDuration?: Scalars['Float'] | null
+    assignedToId?: Scalars['String'] | null
+    parentId?: Scalars['String'] | null
+    tagsIds?: Scalars['String'][] | null
+}
+
+export interface TaskIntegrationTaskUpdateInput {
+    id: Scalars['String']
+    version: Scalars['Float']
+    name?: Scalars['String'] | null
+    description?: Scalars['String'] | null
+    estimatedDateEnd?: Scalars['Float'] | null
+    estimatedDateStart?: Scalars['Float'] | null
+    estimatedDuration?: Scalars['Float'] | null
+    parentId?: Scalars['String'] | null
+    statusId?: Scalars['String'] | null
+    assignedToId?: Scalars['String'] | null
+    taskTagIds?: Scalars['String'][] | null
+}
+
+export interface UploadFileInput {
+    file: Scalars['Upload']
+}
+
 export interface SubscriptionGenqlSelection {
     getNotifications?: NotificationWebResponseGenqlSelection
     __typename?: boolean | number
@@ -362,6 +729,193 @@ export const isPaginatedMetaType = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isPaginatedMetaType"')
     return PaginatedMetaType_possibleTypes.includes(obj.__typename)
+}
+
+const ProjectIntegrationTasksRelationObject_possibleTypes: string[] = [
+    'ProjectIntegrationTasksRelationObject',
+]
+export const isProjectIntegrationTasksRelationObject = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationTasksRelationObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationTasksRelationObject"',
+        )
+    return ProjectIntegrationTasksRelationObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationTasksStatusObject_possibleTypes: string[] = [
+    'ProjectIntegrationTasksStatusObject',
+]
+export const isProjectIntegrationTasksStatusObject = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationTasksStatusObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationTasksStatusObject"',
+        )
+    return ProjectIntegrationTasksStatusObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationTasksTagObject_possibleTypes: string[] = [
+    'ProjectIntegrationTasksTagObject',
+]
+export const isProjectIntegrationTasksTagObject = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationTasksTagObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationTasksTagObject"',
+        )
+    return ProjectIntegrationTasksTagObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationUsersRoleObject_possibleTypes: string[] = [
+    'ProjectIntegrationUsersRoleObject',
+]
+export const isProjectIntegrationUsersRoleObject = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationUsersRoleObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationUsersRoleObject"',
+        )
+    return ProjectIntegrationUsersRoleObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationUserObject_possibleTypes: string[] = [
+    'ProjectIntegrationUserObject',
+]
+export const isProjectIntegrationUserObject = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationUserObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationUserObject"',
+        )
+    return ProjectIntegrationUserObject_possibleTypes.includes(obj.__typename)
+}
+
+const ProjectIntegrationProjectUsersOutput_possibleTypes: string[] = [
+    'ProjectIntegrationProjectUsersOutput',
+]
+export const isProjectIntegrationProjectUsersOutput = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationProjectUsersOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationProjectUsersOutput"',
+        )
+    return ProjectIntegrationProjectUsersOutput_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationProjectObject_possibleTypes: string[] = [
+    'ProjectIntegrationProjectObject',
+]
+export const isProjectIntegrationProjectObject = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationProjectObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationProjectObject"',
+        )
+    return ProjectIntegrationProjectObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationProjectsOutput_possibleTypes: string[] = [
+    'ProjectIntegrationProjectsOutput',
+]
+export const isProjectIntegrationProjectsOutput = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationProjectsOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationProjectsOutput"',
+        )
+    return ProjectIntegrationProjectsOutput_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const ProjectIntegrationProjectsOfCurrentUserOutput_possibleTypes: string[] = [
+    'ProjectIntegrationProjectsOfCurrentUserOutput',
+]
+export const isProjectIntegrationProjectsOfCurrentUserOutput = (
+    obj?: { __typename?: any } | null,
+): obj is ProjectIntegrationProjectsOfCurrentUserOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isProjectIntegrationProjectsOfCurrentUserOutput"',
+        )
+    return ProjectIntegrationProjectsOfCurrentUserOutput_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const TaskIntegrationUserObject_possibleTypes: string[] = [
+    'TaskIntegrationUserObject',
+]
+export const isTaskIntegrationUserObject = (
+    obj?: { __typename?: any } | null,
+): obj is TaskIntegrationUserObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskIntegrationUserObject"',
+        )
+    return TaskIntegrationUserObject_possibleTypes.includes(obj.__typename)
+}
+
+const TaskIntegrationTaskObject_possibleTypes: string[] = [
+    'TaskIntegrationTaskObject',
+]
+export const isTaskIntegrationTaskObject = (
+    obj?: { __typename?: any } | null,
+): obj is TaskIntegrationTaskObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskIntegrationTaskObject"',
+        )
+    return TaskIntegrationTaskObject_possibleTypes.includes(obj.__typename)
+}
+
+const TaskIntegrationTasksOutput_possibleTypes: string[] = [
+    'TaskIntegrationTasksOutput',
+]
+export const isTaskIntegrationTasksOutput = (
+    obj?: { __typename?: any } | null,
+): obj is TaskIntegrationTasksOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskIntegrationTasksOutput"',
+        )
+    return TaskIntegrationTasksOutput_possibleTypes.includes(obj.__typename)
+}
+
+const TaskIntegrationTasksOfCurrentUserOutput_possibleTypes: string[] = [
+    'TaskIntegrationTasksOfCurrentUserOutput',
+]
+export const isTaskIntegrationTasksOfCurrentUserOutput = (
+    obj?: { __typename?: any } | null,
+): obj is TaskIntegrationTasksOfCurrentUserOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskIntegrationTasksOfCurrentUserOutput"',
+        )
+    return TaskIntegrationTasksOfCurrentUserOutput_possibleTypes.includes(
+        obj.__typename,
+    )
 }
 
 const MethodsType_possibleTypes: string[] = ['MethodsType']

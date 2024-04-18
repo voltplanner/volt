@@ -6,20 +6,15 @@ import {
     PrismaServiceWithExtentionsType,
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
-import { getObjectValues } from '../../../shared/utils/object.util'
-import { TASK_DEFAULT_TASKS_RELATIONS } from '../constants/task-default-tasks-relations'
-import { TASK_DEFAULT_TASKS_STATUSES } from '../constants/task-default-tasks-statuses'
-import { TASK_DEFAULT_TASKS_TAGS } from '../constants/task-default-tasks-tags'
-import {
-    TASK_DEFAULT_USER_ROLE_CODES,
-    TASK_DEFAULT_USERS_ROLES,
-} from '../constants/task-default-users-roles.constant'
+import { TASK_CONFIG, TaskConfig } from '../configs/task-module.config'
 
 @Injectable()
 export class TaskProjectService {
     constructor(
         @Inject(PrismaService)
-        private readonly _prismaService: PrismaServiceWithExtentionsType,
+        private readonly prisma: PrismaServiceWithExtentionsType,
+        @Inject(TASK_CONFIG)
+        private readonly config: TaskConfig,
     ) {}
 
     async create(
@@ -33,7 +28,7 @@ export class TaskProjectService {
     ) {
         const { name, budget, deadline, description } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const projectId = await client.taskProject.extCreate(
             {
@@ -45,10 +40,10 @@ export class TaskProjectService {
             client,
         )
 
-        await this.tasksTagsInitialize({ projectId }, client)
-        await this.usersRolesInitialize({ projectId }, client)
-        await this.tasksStatusesInitialize({ projectId }, client)
-        await this.tasksRelationsInitialize({ projectId }, client)
+        await this.initializeTasksTags({ projectId }, client)
+        await this.initializeUsersRoles({ projectId }, client)
+        await this.initializeTasksStatuses({ projectId }, client)
+        await this.initializeTasksRelations({ projectId }, client)
 
         return projectId
     }
@@ -64,7 +59,7 @@ export class TaskProjectService {
         },
         prisma?: PrismaTransactionClientType,
     ) {
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         return await client.taskProject.extUpdate(
             {
@@ -94,10 +89,10 @@ export class TaskProjectService {
             order: OrderEnum
         }
     }) {
-        return await this._prismaService.taskProject.extFindMany(dto)
+        return await this.prisma.taskProject.extFindMany(dto)
     }
 
-    async usersAdd(
+    async addUsers(
         dto: {
             readonly projectId: string
             readonly userIds: string[]
@@ -106,7 +101,7 @@ export class TaskProjectService {
     ) {
         const { projectId, userIds } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         if (userIds.length) {
             await client.taskProject.extConnectUsers(
@@ -119,7 +114,7 @@ export class TaskProjectService {
         }
     }
 
-    async tasksStatusesUpsert(
+    async upsertTasksStatuses(
         dto: {
             readonly code: string
             readonly name: string
@@ -131,7 +126,7 @@ export class TaskProjectService {
     ) {
         const { code, name, description, projectId, isDefault } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const id = await client.taskStatus.extUpsert(
             {
@@ -147,7 +142,7 @@ export class TaskProjectService {
         return id
     }
 
-    async tasksStatusesFindAll(
+    async findAllTasksStatuses(
         dto: {
             readonly projectId: string
         },
@@ -155,7 +150,7 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         return await client.taskStatus.extFindMany(
             {
@@ -165,7 +160,7 @@ export class TaskProjectService {
         )
     }
 
-    async tasksStatusesInitialize(
+    async initializeTasksStatuses(
         dto: {
             projectId: string
         },
@@ -173,12 +168,12 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        for (const item of TASK_DEFAULT_TASKS_STATUSES) {
-            await this.tasksStatusesUpsert({ ...item, projectId }, client)
+        for (const item of this.config.statuses) {
+            await this.upsertTasksStatuses({ ...item, projectId }, client)
         }
     }
 
-    async tasksTagsUpsert(
+    async upsertTasksTags(
         dto: {
             readonly code: string
             readonly name: string
@@ -189,7 +184,7 @@ export class TaskProjectService {
     ) {
         const { code, name, description, projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const id = await client.taskTag.extUpsert(
             {
@@ -204,7 +199,7 @@ export class TaskProjectService {
         return id
     }
 
-    async tasksTagsFindAll(
+    async findAllTasksTags(
         dto: {
             readonly projectId: string
         },
@@ -212,7 +207,7 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         return await client.taskTag.extFindMany(
             {
@@ -222,7 +217,7 @@ export class TaskProjectService {
         )
     }
 
-    async tasksTagsInitialize(
+    async initializeTasksTags(
         dto: {
             projectId: string
         },
@@ -230,12 +225,12 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        for (const item of TASK_DEFAULT_TASKS_TAGS) {
-            await this.tasksTagsUpsert({ ...item, projectId }, client)
+        for (const item of this.config.tags) {
+            await this.upsertTasksTags({ ...item, projectId }, client)
         }
     }
 
-    async tasksRelationsUpsert(
+    async upsertTasksRelations(
         dto: {
             readonly code: string
             readonly nameMain: string
@@ -247,7 +242,7 @@ export class TaskProjectService {
     ) {
         const { code, nameMain, nameForeign, description, projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const id = await client.taskRelation.extUpsert(
             {
@@ -263,7 +258,7 @@ export class TaskProjectService {
         return id
     }
 
-    async tasksRelationsFindAll(
+    async findAllTasksRelations(
         dto: {
             readonly projectId: string
         },
@@ -271,7 +266,7 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         return await client.taskRelation.extFindMany(
             {
@@ -281,7 +276,7 @@ export class TaskProjectService {
         )
     }
 
-    async tasksRelationsInitialize(
+    async initializeTasksRelations(
         dto: {
             projectId: string
         },
@@ -289,12 +284,12 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        for (const item of TASK_DEFAULT_TASKS_RELATIONS) {
-            await this.tasksRelationsUpsert({ ...item, projectId }, client)
+        for (const item of this.config.relations) {
+            await this.upsertTasksRelations({ ...item, projectId }, client)
         }
     }
 
-    async usersRolesUpsert(
+    async upsertUsersRoles(
         dto: {
             readonly code: string
             readonly name: string
@@ -305,7 +300,7 @@ export class TaskProjectService {
     ): Promise<string> {
         const { code, name, projectId, description } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const roleId = await client.taskUserRole.extUpsert(
             {
@@ -320,7 +315,7 @@ export class TaskProjectService {
         return roleId
     }
 
-    async usersRolesFindAll(
+    async findAllUsersRoles(
         dto: {
             readonly projectId: string
         },
@@ -328,12 +323,12 @@ export class TaskProjectService {
     ) {
         const { projectId } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         return await client.taskUserRole.extFindMany({ projectId })
     }
 
-    async usersRolesInitialize(
+    async initializeUsersRoles(
         dto: {
             projectId: string
         },
@@ -341,13 +336,11 @@ export class TaskProjectService {
     ): Promise<void> {
         const { projectId } = dto
 
-        for (const roleCode of getObjectValues(TASK_DEFAULT_USER_ROLE_CODES)) {
-            const role = TASK_DEFAULT_USERS_ROLES[roleCode]
-
-            await this.usersRolesUpsert(
+        for (const role of this.config.roles) {
+            await this.upsertUsersRoles(
                 {
                     projectId,
-                    code: roleCode,
+                    code: role.code,
                     name: role.name,
                     description: role.description,
                 },

@@ -11,7 +11,7 @@ import {
 export class TaskService {
     constructor(
         @Inject(PrismaService)
-        private readonly _prismaService: PrismaServiceWithExtentionsType,
+        private readonly prisma: PrismaServiceWithExtentionsType,
     ) {}
 
     async create(
@@ -32,7 +32,7 @@ export class TaskService {
         },
         prisma?: PrismaTransactionClientType,
     ) {
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const id = await client.task.extCreate(dto, client)
 
@@ -58,7 +58,7 @@ export class TaskService {
         },
         prisma?: PrismaTransactionClientType,
     ) {
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const { taskTagIds } = dto
 
@@ -111,10 +111,10 @@ export class TaskService {
             order: OrderEnum
         }
     }) {
-        return await this._prismaService.task.extFindMany(dto)
+        return await this.prisma.task.extFindMany(dto)
     }
 
-    async customFieldValueTypeUpsert(
+    async upsertCustomFieldValueType(
         dto: {
             readonly code: string
             readonly name: string
@@ -123,7 +123,7 @@ export class TaskService {
     ) {
         const { code, name } = dto
 
-        const client = prisma || this._prismaService
+        const client = prisma || this.prisma
 
         const id = await client.taskCustomFieldValueType.extUpsert(
             {

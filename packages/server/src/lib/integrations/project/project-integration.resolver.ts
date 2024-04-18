@@ -41,7 +41,7 @@ export class ProjectIntegrationResolver {
     ) {}
 
     @Mutation(() => String)
-    async projectCreate(
+    async createProject(
         @Args('input') input: ProjectIntegrationCreateProjectInput,
     ): Promise<string> {
         const { name, budget, deadline, description } = input
@@ -70,7 +70,7 @@ export class ProjectIntegrationResolver {
                 client,
             )
 
-            await this._taskProjectService.usersAdd(
+            await this._taskProjectService.addUsers(
                 {
                     projectId,
                     userIds,
@@ -83,7 +83,7 @@ export class ProjectIntegrationResolver {
     }
 
     @Mutation(() => String)
-    async projectUpdate(
+    async updateProject(
         @Args('input') input: ProjectIntegrationProjectUpdateInput,
     ) {
         return await this._taskProjectService.update(input)
@@ -103,7 +103,7 @@ export class ProjectIntegrationResolver {
     }
 
     @Query(() => ProjectIntegrationProjectsOfCurrentUserOutput)
-    async projectsOfCurrentUser(
+    async myProjects(
         @CurrentUser() { userId }: CurrentUserPayload,
     ): Promise<ProjectIntegrationProjectsOfCurrentUserOutput> {
         const { data, meta } = await this._taskProjectService.findMany({
@@ -158,27 +158,27 @@ export class ProjectIntegrationResolver {
     async projectUsersRoles(
         @Args('input') input: ProjectIntegrationProjectUsersRolesInput,
     ): Promise<ProjectIntegrationUsersRoleObject[]> {
-        return await this._taskProjectService.usersRolesFindAll(input)
+        return await this._taskProjectService.findAllUsersRoles(input)
     }
 
     @Query(() => [ProjectIntegrationTasksTagObject])
     async projectTasksTags(
         @Args('input') input: ProjectIntegrationProjectTasksTagsInput,
     ): Promise<ProjectIntegrationTasksTagObject[]> {
-        return await this._taskProjectService.tasksTagsFindAll(input)
+        return await this._taskProjectService.findAllTasksTags(input)
     }
 
     @Query(() => [ProjectIntegrationTasksStatusObject])
     async projectTasksStatuses(
         @Args('input') input: ProjectIntegrationProjectTasksStatusesInput,
     ): Promise<ProjectIntegrationTasksStatusObject[]> {
-        return await this._taskProjectService.tasksStatusesFindAll(input)
+        return await this._taskProjectService.findAllTasksStatuses(input)
     }
 
     @Query(() => [ProjectIntegrationTasksRelationObject])
     async projectTasksRelations(
         @Args('input') input: ProjectIntegrationProjectTasksRelationsInput,
     ): Promise<ProjectIntegrationTasksRelationObject[]> {
-        return await this._taskProjectService.tasksRelationsFindAll(input)
+        return await this._taskProjectService.findAllTasksRelations(input)
     }
 }
