@@ -12,18 +12,20 @@ export const useRoles = () => {
                 input: {
                 },
             },
-            // editable: true,
-            // id: true,
-            // name: true,
-            // superuser: true,
-            // methods: {
-            //     allowed: true,
-            //     description: true,
-            //     editable: true,
-            //     group: true,
-            //     id: true,
-            //     name: true,
-            // }
+            data: {
+                editable: true,
+                id: true,
+                name: true,
+                superuser: true,
+                methods: {
+                    allowed: true,
+                    description: true,
+                    editable: true,
+                    group: true,
+                    id: true,
+                    name: true,
+                }
+            }
         },
     })
 
@@ -31,7 +33,7 @@ export const useRoles = () => {
         variables
     })
     return {
-        data: data?.getRoles,
+        data: data?.getRoles.data,
         loading,
         error,
     }
