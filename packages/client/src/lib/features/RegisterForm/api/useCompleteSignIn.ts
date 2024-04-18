@@ -3,8 +3,8 @@ import { generateMutationOp } from '../../../sdk'
 import gql from 'graphql-tag'
 
 export interface CompleteSignInInput {
-    userId: string,
-    code: string,
+    userId: string
+    code: string
     password: string
 }
 

@@ -1,5 +1,10 @@
 version: '3.9'
 
+# For data persistance
+# volumes:
+#   volt-local-volume-postgres:
+#     external: true
+
 services:
   postgres:
     image: postgres:15.5
@@ -10,7 +15,8 @@ services:
       POSTGRES_PASSWORD: 'postgres'
     ports:
       - '5432:5432'
-
+    # volumes:
+    #   - volt-local-volume-postgres:/var/lib/postgresql/data
   maildev:
     image: soulteary/maildev:latest
     container_name: maildev
@@ -21,7 +27,6 @@ services:
       - 1080:1080
       - 1025:1025
     tty: true
-
   minio:
     image: quay.io/minio/minio:latest
     container_name: minio

@@ -2,6 +2,7 @@ import { Type } from '@nestjs/common'
 import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 
 import { OrderEnum, PaginatedResponse } from '../interfaces/shared.interfaces'
+import { TPaginatedMeta } from '../types/paginated-meta.type'
 
 registerEnumType(OrderEnum, { name: 'OrderEnum' })
 
@@ -15,7 +16,16 @@ export class OrderByInput {
 }
 
 @ObjectType()
-export class PaginatedMetaType {
+export class PaginatedMetaInput {
+    @Field()
+    curPage?: number | null
+
+    @Field()
+    perPage?: number | null
+}
+
+@ObjectType()
+export class PaginatedMetaType implements TPaginatedMeta {
     @Field()
     curPage: number
 

@@ -1,6 +1,5 @@
 import { Table } from 'shared'
 
-
 export const TasksOverview = () => {
     const columns = [
         {
@@ -44,7 +43,9 @@ export const TasksOverview = () => {
             dataIndex: 'type',
             key: 'type',
             width: '10%',
-            render: (_: any, { type }: { type: string }) => <p style={{margin:0}}>{type}</p>,
+            render: (_: any, { type }: { type: string }) => (
+                <p style={{ margin: 0 }}>{type}</p>
+            ),
         },
     ]
     const data = [

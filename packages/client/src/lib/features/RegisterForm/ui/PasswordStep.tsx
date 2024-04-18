@@ -49,7 +49,7 @@ export const PasswordStep = () => {
                 variant="primary"
                 placeholder="password"
                 register={register}
-                type='password'
+                type="password"
                 validationSchema={{
                     name: 'password',
                     schema: {
@@ -65,7 +65,7 @@ export const PasswordStep = () => {
             <Input
                 label="Repeat password"
                 variant="primary"
-                type='password'
+                type="password"
                 placeholder="repeat password"
                 register={register}
                 validationSchema={{

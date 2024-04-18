@@ -19,6 +19,7 @@ export interface GetUsers {
         order: OrderEnum
     }
     filter?: {
+        ids?: string[]
         email?: string
         firstname?: string
         lastname?: string

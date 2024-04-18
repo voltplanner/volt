@@ -153,7 +153,7 @@ export class AuthRoleService {
 
         const queryOptions: {
             where?: Prisma.AuthRoleWhereInput
-            orderBy?: Prisma.AuthRoleOrderByWithRelationInput
+            orderBy?: Prisma.AuthRoleOrderByWithRelationAndSearchRelevanceInput
         } = {
             where: {
                 name: undefined,
