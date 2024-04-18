@@ -8,6 +8,24 @@ import {
 import { PrismaClient } from 'generatedprisma'
 
 import { PRISMA_CONFIG, PrismaConfig } from './prisma.config'
+import { taskModelExtentions } from './repositories/task.repository'
+import { taskAttachmentModelExtentions } from './repositories/task-attachment.repository'
+import { taskChangeModelExtentions } from './repositories/task-change.repository'
+import { taskCommentModelExtentions } from './repositories/task-comment.repository'
+import { taskCustomFieldModelExtentions } from './repositories/task-custom-field.repository'
+import { taskCustomFieldTypeModelExtentions } from './repositories/task-custom-field-type.repository'
+import { taskCustomFieldValueTypeModelExtentions } from './repositories/task-custom-field-value-type.repository'
+import { taskEffortModelExtentions } from './repositories/task-effort.repository'
+import { taskProjectModelExtentions } from './repositories/task-project.repository'
+import { taskRelationModelExtentions } from './repositories/task-relation.repository'
+import { taskStatusModelExtentions } from './repositories/task-status.repository'
+import { taskTagModelExtentions } from './repositories/task-tag.repository'
+import { taskUserModelExtentions } from './repositories/task-user.repository'
+import { taskUserRoleModelExtentions } from './repositories/task-user-role.repository'
+
+export type PrismaServiceWithExtentionsType = ReturnType<
+    PrismaService['_withExtensions']
+>
 
 @Injectable()
 export class PrismaService
@@ -15,6 +33,7 @@ export class PrismaService
     implements OnModuleInit, OnModuleDestroy
 {
     public static instance: PrismaService
+    public static instanceWithExtentions: PrismaServiceWithExtentionsType
 
     private logger = new Logger(PrismaService.name)
 
@@ -39,7 +58,31 @@ export class PrismaService
                 },
             ],
         })
+
         PrismaService.instance = this
+        PrismaService.instanceWithExtentions = this._withExtensions()
+    }
+
+    private _withExtensions() {
+        return this.$extends({
+            model: {
+                task: taskModelExtentions,
+                taskTag: taskTagModelExtentions,
+                taskUser: taskUserModelExtentions,
+                taskStatus: taskStatusModelExtentions,
+                taskChange: taskChangeModelExtentions,
+                taskEffort: taskEffortModelExtentions,
+                taskProject: taskProjectModelExtentions,
+                taskComment: taskCommentModelExtentions,
+                taskUserRole: taskUserRoleModelExtentions,
+                taskRelation: taskRelationModelExtentions,
+                taskAttachment: taskAttachmentModelExtentions,
+                taskCustomField: taskCustomFieldModelExtentions,
+                taskCustomFieldType: taskCustomFieldTypeModelExtentions,
+                taskCustomFieldValueType:
+                    taskCustomFieldValueTypeModelExtentions,
+            },
+        })
     }
 
     async onModuleInit(): Promise<void> {
@@ -47,7 +90,7 @@ export class PrismaService
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-extra-semi
-            ;(this as any).$on('query', (e) => {
+            ;(PrismaService.instance as any).$on('query', (e: any) => {
                 if (logging === 'all_queries') {
                     if (e.query !== 'SELECT 1') {
                         this.logger.log(
@@ -56,7 +99,10 @@ export class PrismaService
                     }
                 }
                 if (logging === 'long_queries') {
-                    if (e.duration >= maxQueryExecutionTime) {
+                    if (
+                        maxQueryExecutionTime &&
+                        e.duration >= maxQueryExecutionTime
+                    ) {
                         this.logger.warn(
                             `query is slow: ${e.query}, params: ${e.params}, execution time: ${e.duration}`,
                         )
@@ -83,4 +129,59 @@ export class PrismaService
     async onModuleDestroy(): Promise<void> {
         await this.$disconnect()
     }
+
+    // private async _defineExtentionSoftDelete() {
+    //     this.$extends({
+    //         query: {
+    //             $allModels: {
+    //                 // ----------------------------------------------------
+    //                 // SOFT DELETE EXTENTION
+    //                 // ----------------------------------------------------
+    //                 async delete({ model, args, query }) {
+    //                     if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
+    //                         const clientModelName = PrismaService.instance._getClientModelName(model)
+
+    //                         return await PrismaService.instance[clientModelName].update({
+    //                             ...args,
+    //                             data: { isDeleted: true },
+    //                         })
+    //                     }
+
+    //                     return await query(args)
+    //                 },
+    //                 // ----------------------------------------------------
+    //                 // SOFT DELETE EXTENTION
+    //                 // ----------------------------------------------------
+    //                 async deleteMany({ model, args, query }) {
+    //                     if (PrismaService.instance._isModelHasSomeFields(model, ['isDeleted', 'is_deleted'])) {
+    //                         const clientModelName = PrismaService.instance._getClientModelName(model)
+
+    //                         return await PrismaService.instance[clientModelName].updateMany({
+    //                             ...args,
+    //                             data: { isDeleted: true },
+    //                         })
+    //                     }
+
+    //                     return await query(args)
+    //                 },
+    //             }
+    //         }
+    //     })
+    // }
+
+    // private _getClientModelName<T extends Prisma.ModelName>(
+    //     modelName: T,
+    // ): Uncapitalize<T> {
+    //     return (modelName.charAt(0).toLowerCase() +
+    //         modelName.slice(1)) as Uncapitalize<T>
+    // }
+
+    // private _isModelHasSomeFields(
+    //     modelName: Prisma.ModelName,
+    //     fieldNames: string[],
+    // ): boolean {
+    //     const clientModelName = this._getClientModelName(modelName)
+
+    //     return fieldNames.some((i) => i in this[clientModelName].fields)
+    // }
 }

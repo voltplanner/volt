@@ -30,13 +30,13 @@ export const Table = (props: TasksOverviewProps<any>) => {
             <TitleStyled>My tasks overview</TitleStyled>
             <TableStyled>
                 <thead>
-                <THeadStyled>
+                    <THeadStyled>
                         {columns.map(({ title, key, width }) => (
                             <Th width={width} key={key}>
                                 {title}
                             </Th>
                         ))}
-                </THeadStyled>
+                    </THeadStyled>
                 </thead>
                 <TBodyStyled>
                     {data?.map((elem) => (

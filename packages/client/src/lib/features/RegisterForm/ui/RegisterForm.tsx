@@ -4,5 +4,9 @@ import { PasswordStep } from './PasswordStep'
 
 export const RegisterForm = () => {
     const { setData, data, step } = useFormStore()
-    return <div><PasswordStep /></div>
+    return (
+        <div>
+            <PasswordStep />
+        </div>
+    )
 }

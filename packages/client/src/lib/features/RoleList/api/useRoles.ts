@@ -2,15 +2,12 @@ import { useQuery } from '@apollo/client'
 import { generateQueryOp } from '../../../sdk'
 import gql from 'graphql-tag'
 
-
-
 export const useRoles = () => {
     const { query, variables } = generateQueryOp({
         __name: 'getRoles',
         getRoles: {
             __args: {
-                input: {
-                },
+                input: {},
             },
             data: {
                 editable: true,
@@ -30,7 +27,7 @@ export const useRoles = () => {
     })
 
     const { data, loading, error } = useQuery(gql(query), {
-        variables
+        variables,
     })
     return {
         data: data?.getRoles.data,

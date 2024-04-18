@@ -1,5 +1,10 @@
 import { InputHTMLAttributes, memo, useEffect, useRef, useState } from 'react'
-import { FieldValues, RegisterOptions, UseFormRegister, UseFormReturn } from 'react-hook-form'
+import {
+    FieldValues,
+    RegisterOptions,
+    UseFormRegister,
+    UseFormReturn,
+} from 'react-hook-form'
 import styled from 'styled-components'
 
 type HTMLInputProps = Omit<
@@ -14,7 +19,7 @@ interface InputProps extends HTMLInputProps {
     autofocus?: boolean
     readonly?: boolean
     variant?: 'primary' | 'secondary'
-    register?: UseFormRegister<any>;
+    register?: UseFormRegister<any>
     validationSchema?: {
         name: string
         schema: RegisterOptions<FieldValues, string>

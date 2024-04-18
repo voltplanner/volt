@@ -26,7 +26,7 @@ export const useFormStore = create<FormState>()(
             nickname: '',
             email: '',
             password: '',
-            passwordRepeat: ''
+            passwordRepeat: '',
         },
         step: 1,
         setStep: (value) => set({ step: value }),

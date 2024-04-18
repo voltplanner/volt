@@ -67,9 +67,10 @@ export class AuthUserService {
 
         const queryOptions: {
             where?: Prisma.AuthUserWhereInput
-            orderBy?: Prisma.AuthUserOrderByWithRelationInput
+            orderBy?: Prisma.AuthUserOrderByWithRelationAndSearchRelevanceInput
         } = {
             where: {
+                id: undefined,
                 email: undefined,
                 OR: undefined,
                 role: undefined,
@@ -80,6 +81,10 @@ export class AuthUserService {
 
         if (filter?.email) {
             queryOptions.where['email'] = { contains: filter.email }
+        }
+
+        if (filter?.ids) {
+            queryOptions.where.id = { in: filter.ids }
         }
 
         if (filter?.firstname) {

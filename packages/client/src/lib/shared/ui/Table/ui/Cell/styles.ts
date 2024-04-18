@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const WrapperStyled = styled.td<{ $width: string }>`
 width: ${({ $width }) => $width};

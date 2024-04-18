@@ -4,22 +4,33 @@ import {
     patchPrismaConfig,
     PRISMA_CONFIG,
     PRISMA_OPTIONS_TYPE,
+    PrismaConfig,
     PrismaConfigurableModuleClass,
 } from './prisma.config'
-import { PrismaService } from './prisma.service'
+import {
+    PrismaService,
+    PrismaServiceWithExtentionsType,
+} from './prisma.service'
 
 @Module({})
 export class PrismaModule extends PrismaConfigurableModuleClass {
     static forRoot(options: typeof PRISMA_OPTIONS_TYPE): DynamicModule {
         const providers: Provider[] = [
-            PrismaService.instance
+            PrismaService.instanceWithExtentions
                 ? {
                       provide: PrismaService,
-                      useValue: PrismaService.instance,
+                      useValue: PrismaService.instanceWithExtentions,
                   }
                 : {
                       provide: PrismaService,
-                      useClass: PrismaService,
+                      useFactory: (
+                          config: PrismaConfig,
+                      ): PrismaServiceWithExtentionsType => {
+                          new PrismaService(config)
+
+                          return PrismaService.instanceWithExtentions
+                      },
+                      inject: [PRISMA_CONFIG],
                   },
             {
                 provide: PRISMA_CONFIG,
