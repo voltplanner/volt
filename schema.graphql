@@ -1,7 +1,81 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
 type PaginatedMetaType {
   curPage: Float!
   perPage: Float!
   total: Float!
+}
+
+type MethodsType {
+  id: ID!
+  name: String!
+  group: String!
+  editable: Boolean!
+  description: String!
+  allowed: Boolean!
+}
+
+type RoleType {
+  id: ID!
+  name: String!
+  editable: Boolean!
+  superuser: Boolean!
+  methods: [MethodsType!]!
+}
+
+type PaginatedRoles {
+  data: [RoleType!]!
+  meta: PaginatedMetaType!
+}
+
+type UserType {
+  id: ID!
+  firstname: String!
+  lastname: String!
+  email: String!
+  status: AuthUserStatusEnum!
+  createdAt: DateTime!
+  deletedAt: DateTime
+}
+
+enum AuthUserStatusEnum {
+  WAITING_COMPLETE
+  ACTIVE
+  BLOCKED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type PaginatedUsers {
+  data: [UserType!]!
+  meta: PaginatedMetaType!
+}
+
+type AuthorizationResponse {
+  refreshToken: String!
+  accessToken: String!
+  userId: ID!
+  expiresAt: Float!
+}
+
+type GetNotificationPreferences {
+  emailEnabled: Boolean!
+  email: String
+  webEnabled: Boolean!
+  telegramEnabled: Boolean!
+  telegramAccount: Float
+}
+
+type NotificationWebResponse {
+  userId: String!
+  topic: String!
+  message: String!
+  link: String
 }
 
 type ProjectIntegrationTasksRelationObject {
@@ -100,111 +174,38 @@ type TaskIntegrationTasksOfCurrentUserOutput {
   meta: PaginatedMetaType!
 }
 
-type MethodsType {
-  id: ID!
-  name: String!
-  group: String!
-  editable: Boolean!
-  description: String!
-  allowed: Boolean!
-}
-
-type RoleType {
-  id: ID!
-  name: String!
-  editable: Boolean!
-  superuser: Boolean!
-  methods: [MethodsType!]!
-}
-
-type PaginatedRoles {
-  data: [RoleType!]!
-  meta: PaginatedMetaType!
-}
-
-type UserType {
-  id: ID!
-  firstname: String!
-  lastname: String!
-  email: String!
-  status: AuthUserStatusEnum!
-  createdAt: DateTime!
-  deletedAt: DateTime
-}
-
-enum AuthUserStatusEnum {
-  WAITING_COMPLETE
-  ACTIVE
-  BLOCKED
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type PaginatedUsers {
-  data: [UserType!]!
-  meta: PaginatedMetaType!
-}
-
-type AuthorizationResponse {
-  refreshToken: String!
-  accessToken: String!
-  userId: ID!
-  expiresAt: Float!
-}
-
-type GetNotificationPreferences {
-  emailEnabled: Boolean!
-  email: String
-  webEnabled: Boolean!
-  telegramEnabled: Boolean!
-  telegramAccount: Float
-}
-
-type NotificationWebResponse {
-  userId: String!
-  topic: String!
-  message: String!
-  link: String
-}
-
 type Query {
+  tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
+  myTasks(input: TaskIntegrationTasksOfCurrentUserInput): TaskIntegrationTasksOfCurrentUserOutput!
+  projects: ProjectIntegrationProjectsOutput!
+  myProjects: ProjectIntegrationProjectsOfCurrentUserOutput!
+  projectUsers(input: ProjectIntegrationProjectUsersInput!): ProjectIntegrationProjectUsersOutput!
+  projectUsersRoles(input: ProjectIntegrationProjectUsersRolesInput!): [ProjectIntegrationUsersRoleObject!]!
+  projectTasksTags(input: ProjectIntegrationProjectTasksTagsInput!): [ProjectIntegrationTasksTagObject!]!
+  projectTasksStatuses(input: ProjectIntegrationProjectTasksStatusesInput!): [ProjectIntegrationTasksStatusObject!]!
+  projectTasksRelations(input: ProjectIntegrationProjectTasksRelationsInput!): [ProjectIntegrationTasksRelationObject!]!
   getUsers(input: GetUsersInput!): PaginatedUsers!
   getRoles(input: GetRolesInput!): PaginatedRoles!
   getMyRole: RoleType!
   getUser(input: GetUserInput!): UserType!
   getMyNotificationPreferences: GetNotificationPreferences!
-  projects: ProjectIntegrationProjectsOutput!
-  myProjects: ProjectIntegrationProjectsOfCurrentUserOutput!
-  projectUsers(
-    input: ProjectIntegrationProjectUsersInput!
-  ): ProjectIntegrationProjectUsersOutput!
-  projectUsersRoles(
-    input: ProjectIntegrationProjectUsersRolesInput!
-  ): [ProjectIntegrationUsersRoleObject!]!
-  projectTasksTags(
-    input: ProjectIntegrationProjectTasksTagsInput!
-  ): [ProjectIntegrationTasksTagObject!]!
-  projectTasksStatuses(
-    input: ProjectIntegrationProjectTasksStatusesInput!
-  ): [ProjectIntegrationTasksStatusObject!]!
-  projectTasksRelations(
-    input: ProjectIntegrationProjectTasksRelationsInput!
-  ): [ProjectIntegrationTasksRelationObject!]!
-  tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
-  myTasks(
-    input: TaskIntegrationTasksOfCurrentUserInput
-  ): TaskIntegrationTasksOfCurrentUserOutput!
   getFile(input: GetFileInput!): String!
 }
 
-input GetUsersInput {
+input TaskIntegrationTasksInput {
   curPage: Float
   perPage: Float
+}
+
+input TaskIntegrationTasksOfCurrentUserInput {
+  curPage: Float
+  perPage: Float
+}
+
+input ProjectIntegrationProjectUsersInput {
+  projectId: String!
+  filterByName: String
   orderBy: OrderByInput
-  filter: GetUsersFilterInput
 }
 
 input OrderByInput {
@@ -215,6 +216,29 @@ input OrderByInput {
 enum OrderEnum {
   ASC
   DESC
+}
+
+input ProjectIntegrationProjectUsersRolesInput {
+  projectId: String!
+}
+
+input ProjectIntegrationProjectTasksTagsInput {
+  projectId: String!
+}
+
+input ProjectIntegrationProjectTasksStatusesInput {
+  projectId: String!
+}
+
+input ProjectIntegrationProjectTasksRelationsInput {
+  projectId: String!
+}
+
+input GetUsersInput {
+  curPage: Float
+  perPage: Float
+  orderBy: OrderByInput
+  filter: GetUsersFilterInput
 }
 
 input GetUsersFilterInput {
@@ -239,43 +263,15 @@ input GetUserInput {
   userId: ID!
 }
 
-input ProjectIntegrationProjectUsersInput {
-  projectId: String!
-  filterByName: String
-  orderBy: OrderByInput
-}
-
-input ProjectIntegrationProjectUsersRolesInput {
-  projectId: String!
-}
-
-input ProjectIntegrationProjectTasksTagsInput {
-  projectId: String!
-}
-
-input ProjectIntegrationProjectTasksStatusesInput {
-  projectId: String!
-}
-
-input ProjectIntegrationProjectTasksRelationsInput {
-  projectId: String!
-}
-
-input TaskIntegrationTasksInput {
-  curPage: Float
-  perPage: Float
-}
-
-input TaskIntegrationTasksOfCurrentUserInput {
-  curPage: Float
-  perPage: Float
-}
-
 input GetFileInput {
   id: String!
 }
 
 type Mutation {
+  createTask(input: TaskIntegrationTaskCreateInput!): String!
+  updateTask(input: TaskIntegrationTaskUpdateInput!): String!
+  createProject(input: ProjectIntegrationCreateProjectInput!): String!
+  updateProject(input: ProjectIntegrationProjectUpdateInput!): String!
   updateRole(input: UpdateRoleInput!): Boolean!
   changeUserRole(input: ChangeUserRoleInput!): Boolean!
   createRole(input: CreateRoleInput!): Boolean!
@@ -287,14 +283,61 @@ type Mutation {
   createUser(input: CreateUserInput!): UserType!
   deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
-  changeMyNotificationPreferences(
-    input: ChangeMyNotificationPreferences!
-  ): Boolean!
-  createProject(input: ProjectIntegrationCreateProjectInput!): String!
-  updateProject(input: ProjectIntegrationProjectUpdateInput!): String!
-  createTask(input: TaskIntegrationTaskCreateInput!): String!
-  updateTask(input: TaskIntegrationTaskUpdateInput!): String!
+  changeMyNotificationPreferences(input: ChangeMyNotificationPreferences!): Boolean!
   uploadFile(input: UploadFileInput!): String!
+}
+
+input TaskIntegrationTaskCreateInput {
+  projectId: String!
+  name: String!
+  statusId: String!
+  description: String
+  estimatedDateStart: Float
+  estimatedDateEnd: Float
+  estimatedDuration: Float
+  assignedToId: String
+  parentId: String
+  tagsIds: [String!]
+}
+
+input TaskIntegrationTaskUpdateInput {
+  id: String!
+  version: Float!
+  name: String
+  description: String
+  estimatedDateEnd: Float
+  estimatedDateStart: Float
+  estimatedDuration: Float
+  parentId: String
+  statusId: String
+  assignedToId: String
+  taskTagIds: [String!]
+}
+
+input ProjectIntegrationCreateProjectInput {
+  name: String!
+
+  """Budget of the project in hours"""
+  budget: Float!
+
+  """Deadline of the project in timestampMs"""
+  deadline: Float!
+  description: String!
+  members: [ProjectIntegrationCreateProjectMemberInput!]
+}
+
+input ProjectIntegrationCreateProjectMemberInput {
+  userId: String!
+  roleCode: String!
+}
+
+input ProjectIntegrationProjectUpdateInput {
+  id: String!
+  version: Float!
+  name: String
+  description: String
+  budget: Float
+  deadline: Float
 }
 
 input UpdateRoleInput {
@@ -371,70 +414,11 @@ input ChangeMyNotificationPreferences {
   telegramAccount: Float
 }
 
-input ProjectIntegrationCreateProjectInput {
-  name: String!
-
-  """
-  Budget of the project in hours
-  """
-  budget: Float!
-
-  """
-  Deadline of the project in timestampMs
-  """
-  deadline: Float!
-  description: String!
-  members: [ProjectIntegrationCreateProjectMemberInput!]
-}
-
-input ProjectIntegrationCreateProjectMemberInput {
-  userId: String!
-  roleCode: String!
-}
-
-input ProjectIntegrationProjectUpdateInput {
-  id: String!
-  version: Float!
-  name: String
-  description: String
-  budget: Float
-  deadline: Float
-}
-
-input TaskIntegrationTaskCreateInput {
-  projectId: String!
-  name: String!
-  statusId: String!
-  description: String
-  estimatedDateStart: Float
-  estimatedDateEnd: Float
-  estimatedDuration: Float
-  assignedToId: String
-  parentId: String
-  tagsIds: [String!]
-}
-
-input TaskIntegrationTaskUpdateInput {
-  id: String!
-  version: Float!
-  name: String
-  description: String
-  estimatedDateEnd: Float
-  estimatedDateStart: Float
-  estimatedDuration: Float
-  parentId: String
-  statusId: String
-  assignedToId: String
-  taskTagIds: [String!]
-}
-
 input UploadFileInput {
   file: Upload!
 }
 
-"""
-The `Upload` scalar type represents a file upload.
-"""
+"""The `Upload` scalar type represents a file upload."""
 scalar Upload
 
 type Subscription {

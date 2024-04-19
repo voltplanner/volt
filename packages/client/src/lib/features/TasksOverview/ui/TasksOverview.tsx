@@ -1,7 +1,10 @@
-import { PriorityTag, Table } from 'shared'
+import { PriorityTag, ReversableProgress, Table } from 'shared'
 import { LinkStyled } from './styles'
+import styled from 'styled-components'
+import { useState } from 'react'
 
 export const TasksOverview = () => {
+    const [state, setState] = useState('80')
     const columns = [
         {
             title: 'Project',
@@ -60,11 +63,14 @@ export const TasksOverview = () => {
             key: 'progress',
             width: '10%',
             render: (_: any, { progress }: { progress: string }) => (
-                <progress
-                    style={{ backgroundColor: '#5A92FF' }}
-                    value={progress}
-                    max={'100'}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', width:'100%', height:'100%'}}>
+                    <ReversableProgress
+                        value={state}
+                        isReversable={true}
+                        callback={setState}
+                        max={'100'}
+                    />
+                </div>
             ),
         },
         {
@@ -159,5 +165,5 @@ export const TasksOverview = () => {
             type: 'Docs',
         },
     ]
-    return <Table styles={{ width: 1353 }} columns={columns} data={data} />
+    return <Table height='450px' styles={{ width: 1353 }} columns={columns} data={data} />
 }

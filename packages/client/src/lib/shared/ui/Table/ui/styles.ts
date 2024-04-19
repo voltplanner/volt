@@ -18,10 +18,11 @@ export const TBodyStyled = styled.tbody`
 export const PStyled = styled.p`
     margin: 0;
 `
-export const TableStyled = styled.table`
+export const TableStyled = styled.table<{ $height: string }>`
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: ${({ $height }) => $height};
     overflow: auto;
     background: #fff;
     position: relative;

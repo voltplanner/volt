@@ -7,5 +7,5 @@ export const WrapperStyled = styled.td<{ $width: string }>`
     align-items: center;
     flex-wrap: wrap;
     overflow-wrap: break-word;
-    height: fit-content;
+    height: 100%;
 `
