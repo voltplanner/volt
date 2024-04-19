@@ -21,8 +21,8 @@ export const useRoles = () => {
                     group: true,
                     id: true,
                     name: true,
-                }
-            }
+                },
+            },
         },
     })
 
