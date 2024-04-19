@@ -5,6 +5,7 @@ export const WrapperStyled = styled.tr`
     width: 100%;
     background: #fff;
     padding: 13px 16px;
-    height: fit-content;
+    height: 50px;
+    max-height: 100%;
     border-bottom: 1px solid #e9e9e9;
 `

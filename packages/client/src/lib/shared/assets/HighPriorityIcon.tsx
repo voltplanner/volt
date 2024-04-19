@@ -9,19 +9,19 @@ export const HighPriorityIcon = () => {
         >
             <path
                 d="M8 3.33333V12.6667"
-                stroke="#FF8800"
+                stroke="#D8226A"
                 stroke-linecap="round"
                 stroke-linejoin="round"
             />
             <path
                 d="M12 7.33333L8 3.33333"
-                stroke="#FF8800"
+                stroke="#D8226A"
                 stroke-linecap="round"
                 stroke-linejoin="round"
             />
             <path
                 d="M4 7.33333L8 3.33333"
-                stroke="#FF8800"
+                stroke="#D8226A"
                 stroke-linecap="round"
                 stroke-linejoin="round"
             />

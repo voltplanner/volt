@@ -22,13 +22,14 @@ interface TasksOverviewProps<T> {
     data: any[]
     styles?: CSSProperties | undefined
     width?: string
+    height: string
 }
 export const Table = (props: TasksOverviewProps<any>) => {
-    const { columns, data, styles, width } = props
+    const { columns, data, styles, width, height } = props
     return (
         <WrapperStyled style={styles}>
             <TitleStyled>My tasks overview</TitleStyled>
-            <TableStyled>
+            <TableStyled $height={height}>
                 <thead>
                     <THeadStyled>
                         {columns.map(({ title, key, width }) => (
