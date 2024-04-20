@@ -57,6 +57,10 @@ export type TaskFindManyRepositoryDto = {
     }
 }
 
+export type TaskGetByIdRepositoryDto = {
+    id: string
+}
+
 export type TaskFindOneRepositoryDto = {
     id: string
 }

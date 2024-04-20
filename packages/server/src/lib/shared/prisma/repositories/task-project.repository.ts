@@ -2,7 +2,7 @@ import { DefaultError } from '../../errors/default.error'
 import { UnexpectedError } from '../../errors/unexpected.error'
 import { TPaginatedMeta } from '../../types/paginated-meta.type'
 import { parseMetaArgs } from '../../utils'
-import { Prisma } from '..'
+import { Prisma, TaskProject } from '..'
 import { PrismaService } from '../prisma.service'
 import {
     TaskProjectConnectUsersRepositoryDto,
@@ -10,6 +10,7 @@ import {
     TaskProjectDeleteRepositoryDto,
     TaskProjectDisconnectUsersRepositoryDto,
     TaskProjectFindManyRepositoryDto,
+    TaskProjectGetByIdRepositoryDto,
     TaskProjectUpdateRepositoryDto,
 } from '../repositories-dto/task-project.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
@@ -66,6 +67,7 @@ export const taskProjectModelExtentions = {
                     budget,
                     deadline,
                     description,
+                    version: { increment: 1 },
                 },
                 select: { id: true },
             })
@@ -102,6 +104,33 @@ export const taskProjectModelExtentions = {
             })
 
             return deletedId
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
+    async extGetById(
+        dto: TaskProjectGetByIdRepositoryDto,
+        prisma?: any,
+    ): Promise<TaskProject> {
+        const { id } = dto
+
+        try {
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
+
+            const data = await client.taskProject.findFirstOrThrow({
+                where: { id, isDeleted: false },
+            })
+
+            return data ?? undefined
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e

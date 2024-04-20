@@ -37,6 +37,10 @@ export type TaskProjectFindManyRepositoryDto = {
     }
 }
 
+export type TaskProjectGetByIdRepositoryDto = {
+    id: string
+}
+
 export type TaskProjectConnectUsersRepositoryDto = {
     projectId: string
     userIds: string[]

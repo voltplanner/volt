@@ -7,6 +7,7 @@ import {
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
 import { TASK_CONFIG, TaskConfig } from '../configs/task-module.config'
+import { TaskProjectUpdateConflictError } from '../errors/task-project-update-conflict.error'
 
 @Injectable()
 export class TaskProjectService {
@@ -61,16 +62,22 @@ export class TaskProjectService {
     ) {
         const client = prisma || this.prisma
 
-        return await client.taskProject.extUpdate(
-            {
-                ...dto,
-                deadline:
-                    typeof dto.deadline === 'number'
-                        ? new Date(dto.deadline)
-                        : dto.deadline,
-            },
-            client,
-        )
+        try {
+            return await client.taskProject.extUpdate(
+                {
+                    ...dto,
+                    deadline:
+                        typeof dto.deadline === 'number'
+                            ? new Date(dto.deadline)
+                            : dto.deadline,
+                },
+                client,
+            )
+        } catch (e) {
+            const conflictingProps = await this._findConflictingProps(dto)
+
+            throw new TaskProjectUpdateConflictError({ id: dto.id, conflictingProps })
+        }
     }
 
     async findMany(dto?: {
@@ -347,5 +354,51 @@ export class TaskProjectService {
                 client,
             )
         }
+    }
+
+    private async _findConflictingProps(dto: {
+        readonly id: string
+        readonly name?: string
+        readonly budget?: number | null
+        readonly deadline?: number | null
+        readonly description?: string | null
+    }, prisma?: PrismaTransactionClientType,
+    ): Promise<{
+        name?: { old?: string; new: string }
+        description?: { old?: string; new: string | null }
+        deadline?: { old?: number; new: number | null }
+        budget?: { old?: number; new: number | null }
+    }> {
+        const client = prisma || this.prisma
+
+        const project = await client.taskProject.extGetById(
+            { id: dto.id },
+            client,
+        )
+
+        const conflictingProps: {
+            name?: { old?: string; new: string }
+            description?: { old?: string; new: string | null }
+            deadline?: { old?: number; new: number | null }
+            budget?: { old?: number; new: number | null }
+        } = {}
+
+        if (dto.name !== undefined && project.name !== dto.name) {
+            conflictingProps.name = { old: project.name ?? undefined, new: dto.name }
+        }
+
+        if (dto.description !== undefined && project.description !== dto.description) {
+            conflictingProps.description = { old: project.description ?? undefined, new: dto.description }
+        }
+
+        if (dto.deadline !== undefined && +project.deadline !== dto.deadline) {
+            conflictingProps.deadline = { old: +project.deadline ?? undefined, new: dto.deadline }
+        }
+
+        if (dto.budget !== undefined && project.budget !== dto.budget) {
+            conflictingProps.budget = { old: project.budget ?? undefined, new: dto.budget }
+        }
+
+        return conflictingProps
     }
 }

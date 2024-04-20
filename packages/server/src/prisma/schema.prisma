@@ -160,7 +160,7 @@ model TaskUser {
 
 model TaskUserRole {
     id          String  @id @default(uuid()) @db.Uuid
-    code        String  @unique @db.VarChar(36)
+    code        String  @db.VarChar(36)
     name        String  @db.VarChar(64)
     position    Int     @db.SmallInt
     description String?
@@ -175,7 +175,7 @@ model TaskUserRole {
 
     users       TaskUser[]
 
-    @@unique([code, isDeleted])
+    @@unique([code, projectId, isDeleted])
     @@map("task_user_role")
     @@schema("tasks")
 }
@@ -259,7 +259,7 @@ model Task {
 
 model TaskStatus {
     id          String  @id @default(uuid()) @db.Uuid
-    code        String  @unique @db.VarChar(36)
+    code        String  @db.VarChar(36)
     name        String  @db.VarChar(64)
     position    Int     @db.SmallInt
     description String?
@@ -275,8 +275,8 @@ model TaskStatus {
 
     tasks Task[]
 
-    @@unique([code, isDeleted])
-    @@unique([position, isDeleted])
+    @@unique([code, projectId, isDeleted])
+    @@unique([position, projectId, isDeleted])
     @@map("task_status")
     @@schema("tasks")
 }
@@ -302,7 +302,7 @@ model TaskEffort {
 
 model TaskTag {
     id          String  @id @default(uuid()) @db.Uuid
-    code        String  @unique @db.VarChar(36)
+    code        String  @db.VarChar(36)
     name        String  @db.VarChar(64)
     position    Int     @db.SmallInt
     description String?
@@ -317,8 +317,8 @@ model TaskTag {
 
     tasks TaskOnTaskTag[]
 
-    @@unique([code, isDeleted])
-    @@unique([position, isDeleted])
+    @@unique([code, projectId, isDeleted])
+    @@unique([position, projectId, isDeleted])
     @@map("task_tag")
     @@schema("tasks")
 }
@@ -419,7 +419,7 @@ model TaskOnTaskRelation {
 
 model TaskRelation {
     id          String  @id @default(uuid()) @db.Uuid
-    code        String  @unique @db.VarChar(36)
+    code        String  @db.VarChar(36)
     nameMain    String  @map("name_main") @db.VarChar(64)
     nameForeign String  @map("name_foreign") @db.VarChar(64)
     position    Int     @db.SmallInt
@@ -435,8 +435,8 @@ model TaskRelation {
 
     tasks TaskOnTaskRelation[]
 
-    @@unique([code, isDeleted])
-    @@unique([position, isDeleted])
+    @@unique([code, projectId,isDeleted])
+    @@unique([position, projectId,isDeleted])
     @@map("task_relation")
     @@schema("tasks")
 }

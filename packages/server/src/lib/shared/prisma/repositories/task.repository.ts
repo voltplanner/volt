@@ -2,7 +2,7 @@ import { DefaultError } from '../../errors/default.error'
 import { UnexpectedError } from '../../errors/unexpected.error'
 import { TPaginatedMeta } from '../../types/paginated-meta.type'
 import { parseMetaArgs } from '../../utils'
-import { Prisma, Task, TaskProject, TaskStatus } from '..'
+import { Prisma, Task, TaskProject, TaskStatus, TaskTag } from '..'
 import { PrismaService } from '../prisma.service'
 import {
     TaskCreateRepositoryDto,
@@ -10,6 +10,7 @@ import {
     TaskFindManyRepositoryDto,
     TaskFindOneRepositoryDto,
     TaskFindSubtasksRepositoryDto,
+    TaskGetByIdRepositoryDto,
     TaskUpdateRepositoryDto,
 } from '../repositories-dto/task.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
@@ -234,6 +235,8 @@ export const taskModelExtentions = {
                     parentId,
                     statusId,
                     assignedToId,
+
+                    version: { increment: 1 },
                 },
             })
 
@@ -327,11 +330,60 @@ export const taskModelExtentions = {
         }
     },
 
+    async extGetById(
+        dto: TaskGetByIdRepositoryDto,
+        prisma?: any,
+    ): Promise<Task & {
+        tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
+    }> {
+        const { id } = dto
+
+        try {
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
+
+            const data = await client.task.findFirstOrThrow({
+                where: { id, isDeleted: false },
+                include: {
+                    tags: {
+                        include: {
+                            taskTag: {
+                                select: {
+                                    id: true,
+                                    code: true,
+                                    name: true,
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+
+            return data ? { ...data, tags: data.tags.map(i => ({
+                id: i.taskTag.id,
+                code: i.taskTag.code,
+                name: i.taskTag.name,
+            }))} : undefined
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
     async extFindMany(
         dto: TaskFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: (Task & { status: Pick<TaskStatus, 'id' | 'code' | 'name'> })[]
+        data: (Task & {
+            status: Pick<TaskStatus, 'id' | 'code' | 'name'>
+            tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
+        })[]
         meta: TPaginatedMeta
     }> {
         try {
@@ -412,11 +464,29 @@ export const taskModelExtentions = {
                             name: true,
                         },
                     },
+                    tags: {
+                        include: {
+                            taskTag: {
+                                select: {
+                                    id: true,
+                                    code: true,
+                                    name: true,
+                                }
+                            }
+                        }
+                    }
                 },
             })
 
             return {
-                data,
+                data: data.map(i => ({
+                    ...i,
+                    tags: i.tags.map(i => ({
+                        id: i.taskTag.id,
+                        code: i.taskTag.code,
+                        name: i.taskTag.name,
+                    }))
+                })),
                 meta: {
                     curPage,
                     perPage,

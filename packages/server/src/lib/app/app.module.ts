@@ -8,6 +8,7 @@ import {
     createEventEmitterListener,
     createEventEmitterPublisher,
 } from '@shelfjs/events/src/lib/services/event-emitter-events.service'
+import { GraphQLFormattedError } from 'graphql'
 import { join } from 'path'
 
 import { environment } from '../../environments/environment'
@@ -42,6 +43,17 @@ import { PrismaModule } from '../shared/prisma'
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
             subscriptions: {
                 'graphql-ws': true,
+            },
+            formatError: (formattedError: GraphQLFormattedError, error: any) => {
+                console.log(error?.originalError)
+                if (error?.originalError?.code && formattedError?.extensions) {
+                    formattedError.extensions.stacktrace = undefined
+                    formattedError.extensions.metadata = error.originalError.metadata
+                    formattedError.extensions.code = error.originalError.code
+                    formattedError.extensions.name = error.originalError.name
+                }
+
+                return formattedError
             },
         }),
         AuthModule.forRoot({

@@ -6,7 +6,10 @@
     "nx": "nx",
     "lint:fix": "nx run client:sdk:generate && nx run-many --t lint --fix && nx format:write --all",
     "prepare": "husky",
-    "postinstall": "npm run lint:fix"
+    "postinstall": "npm run lint:fix",
+    "infra:local:up": "docker-compose -f ./packages/devops/local/docker-compose.yaml up -d",
+    "infra:local:down": "docker-compose -f ./packages/devops/local/docker-compose.yaml down",
+    "infra:local:reset": "npm run infra:local:down && npm run infra:local:up"
   },
   "private": true,
   "devDependencies": {

@@ -145,8 +145,9 @@ export const taskTagModelExtentions = {
 
             const { id } = await client.taskTag.upsert({
                 where: {
-                    code_isDeleted: {
+                    code_projectId_isDeleted: {
                         code,
+                        projectId,
                         isDeleted: false,
                     },
                 },

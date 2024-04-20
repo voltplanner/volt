@@ -30,8 +30,9 @@ export const taskUserRoleModelExtentions = {
 
             const { id } = await client.taskUserRole.upsert({
                 where: {
-                    code_isDeleted: {
+                    code_projectId_isDeleted: {
                         code,
+                        projectId,
                         isDeleted: false,
                     },
                 },
@@ -208,15 +209,16 @@ export const taskUserRoleModelExtentions = {
         >
     > {
         try {
-            const { code } = dto
+            const { code, projectId } = dto
 
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
             const data = await client.taskUserRole.findUniqueOrThrow({
                 where: {
-                    code_isDeleted: {
+                    code_projectId_isDeleted: {
                         code,
+                        projectId,
                         isDeleted: false,
                     },
                 },
