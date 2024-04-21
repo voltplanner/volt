@@ -1,3 +1,5 @@
+import { NotificationTypeEnum } from '../../../shared/prisma'
+
 export interface SendNotificationPayload {
     userId: string
     topic: string
@@ -42,4 +44,22 @@ export interface ChangePreferences {
     webEnabled?: boolean
     telegramEnabled?: boolean
     telegramAccount?: number
+}
+
+export interface GetNotificationsPayload {
+    userId?: string
+    cursor?: string
+    take?: number
+    type: NotificationTypeEnum
+    seen?: boolean
+}
+
+export interface MarkAsReadPayload {
+    userId: string
+    notificationId: string
+}
+
+export interface MarkAllAsReadPayload {
+    type: NotificationTypeEnum
+    userId: string
 }

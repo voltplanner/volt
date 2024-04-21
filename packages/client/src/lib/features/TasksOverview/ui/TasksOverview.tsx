@@ -63,7 +63,14 @@ export const TasksOverview = () => {
             key: 'progress',
             width: '10%',
             render: (_: any, { progress }: { progress: string }) => (
-                <div style={{ display: 'flex', alignItems: 'center', width:'100%', height:'100%'}}>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                >
                     <ReversableProgress
                         value={state}
                         isReversable={true}
@@ -165,5 +172,12 @@ export const TasksOverview = () => {
             type: 'Docs',
         },
     ]
-    return <Table height='450px' styles={{ width: 1353 }} columns={columns} data={data} />
+    return (
+        <Table
+            height="450px"
+            styles={{ width: 1353 }}
+            columns={columns}
+            data={data}
+        />
+    )
 }

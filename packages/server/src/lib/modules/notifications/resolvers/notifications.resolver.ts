@@ -8,8 +8,13 @@ import { CurrentUserPayload } from '../../../shared/interfaces/shared.interfaces
 import {
     ChangeMyNotificationPreferences,
     GetNotificationPreferences,
-    NotificationWebResponse,
+    GetNotificationsInput,
+    GetNotificationsResponse,
+    MarkAllAsSeenInput,
+    MarkAsSeenInput,
+    OnNewNotification,
 } from '../interfaces/notifications.graphql'
+import { NotificationsService } from '../services/notifications.service'
 import { NotificationsPreferencesService } from '../services/preferences.service'
 import { NotificationsWebService } from '../services/web.service'
 
@@ -18,6 +23,7 @@ export class NotificationsResolver {
     constructor(
         private readonly preferencesService: NotificationsPreferencesService,
         private readonly webService: NotificationsWebService,
+        private readonly notificationsService: NotificationsService,
     ) {}
 
     @UseGuards(ACLGuard)
@@ -51,12 +57,64 @@ export class NotificationsResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Subscription(() => NotificationWebResponse)
+    @Subscription(() => OnNewNotification)
     @AccessControl({
         group: 'notifications',
-        description: `Get web notifications`,
+        description: `Get web notifications (WS)`,
     })
-    async getNotifications(@CurrentUser() user: CurrentUserPayload) {
+    async onNewNotification(@CurrentUser() user: CurrentUserPayload) {
         return this.webService.subscribe(user.userId)
+    }
+
+    @UseGuards(ACLGuard)
+    @Query(() => [GetNotificationsResponse])
+    @AccessControl({
+        group: 'notifications',
+        description: `Get notifications`,
+    })
+    async getMyNotifications(
+        @CurrentUser() user: CurrentUserPayload,
+        @Args('input') input: GetNotificationsInput,
+    ) {
+        return this.notificationsService.getNotifications({
+            ...input,
+            userId: user.userId,
+        })
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({
+        group: 'notifications',
+        description: `Mark notification as seen`,
+    })
+    async markAsSeen(
+        @Args('input') input: MarkAsSeenInput,
+        @CurrentUser() user: CurrentUserPayload,
+    ): Promise<boolean> {
+        await this.notificationsService.markAsSeen({
+            ...input,
+            userId: user.userId,
+        })
+
+        return true
+    }
+
+    @UseGuards(ACLGuard)
+    @Mutation(() => Boolean)
+    @AccessControl({
+        group: 'notifications',
+        description: `Mark all notification as seen`,
+    })
+    async markAllAsSeen(
+        @Args('input') input: MarkAllAsSeenInput,
+        @CurrentUser() user: CurrentUserPayload,
+    ): Promise<boolean> {
+        await this.notificationsService.markAllAsSeen({
+            ...input,
+            userId: user.userId,
+        })
+
+        return true
     }
 }

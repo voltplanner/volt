@@ -1,7 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common'
 
-import { NotificationTypeEnum, PrismaService } from '../../../shared/prisma'
-import { SendNotificationPayload } from '../interfaces/notifications.interfaces'
+import {
+    NotificationTypeEnum,
+    Prisma,
+    PrismaService,
+} from '../../../shared/prisma'
+import {
+    GetNotificationsPayload,
+    MarkAllAsReadPayload,
+    MarkAsReadPayload,
+    SendNotificationPayload,
+} from '../interfaces/notifications.interfaces'
 import { NotificationsEmailService } from './email.service'
 import { NotificationsPreferencesService } from './preferences.service'
 import { NotificationsTelegramService } from './telegram.service'
@@ -46,6 +55,7 @@ export class NotificationsService {
                     topic,
                     message,
                     link,
+                    seen: false,
                     Preferences: {
                         connect: {
                             externalUserId: userId,
@@ -122,6 +132,7 @@ export class NotificationsService {
                 topic,
                 message,
                 link,
+                seen: false,
                 Preferences: {
                     connect: {
                         externalUserId: userId,
@@ -158,6 +169,72 @@ export class NotificationsService {
             data: {
                 sent: true,
                 sentAt: new Date(),
+            },
+        })
+    }
+
+    async getNotifications(payload: GetNotificationsPayload) {
+        const query: Prisma.NotificationFindManyArgs = {
+            where: {
+                type: payload.type,
+            },
+        }
+
+        if (payload.userId) {
+            query['where']['Preferences']['externalUserId'] = payload.userId
+        }
+
+        if (payload.seen) {
+            query['where']['seen'] = payload.seen
+        }
+
+        if (payload.cursor) {
+            query['cursor'] = { id: payload.cursor }
+            query['skip'] = 1
+        }
+
+        query['take'] = payload.take ?? 10
+
+        const notifications = await this.prisma.notification.findMany(query)
+
+        return {
+            meta: {
+                cursor: notifications.slice(-1)[0].id,
+                take: query.take,
+            },
+            data: notifications,
+        }
+    }
+
+    async markAsSeen(payload: MarkAsReadPayload) {
+        const { notificationId, userId } = payload
+
+        await this.prisma.notification.update({
+            where: {
+                Preferences: {
+                    externalUserId: userId,
+                },
+                id: notificationId,
+            },
+            data: {
+                seen: true,
+            },
+        })
+    }
+
+    async markAllAsSeen(payload: MarkAllAsReadPayload) {
+        const { userId, type } = payload
+
+        await this.prisma.notification.updateMany({
+            where: {
+                Preferences: {
+                    externalUserId: userId,
+                },
+                seen: false,
+                type,
+            },
+            data: {
+                seen: true,
             },
         })
     }

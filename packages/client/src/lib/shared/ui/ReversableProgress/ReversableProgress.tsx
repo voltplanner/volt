@@ -92,7 +92,10 @@ export const ReversableProgress = (props: IReversableProps) => {
                     <ButtonSaveStyled onMouseDown={handleSave} ref={refSave}>
                         save
                     </ButtonSaveStyled>
-                    <ButtonCancelStyled onMouseDown={handleCancel} ref={refCancel}>
+                    <ButtonCancelStyled
+                        onMouseDown={handleCancel}
+                        ref={refCancel}
+                    >
                         cancel
                     </ButtonCancelStyled>
                 </PopupStyled>

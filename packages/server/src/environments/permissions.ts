@@ -73,4 +73,14 @@ export const defaultAllowPermissions: AuthDefaultPermissions[] = [
         roleName: 'member',
         editable: false,
     },
+    {
+        methodName: NotificationsResolver.prototype.getMyNotifications.name,
+        roleName: 'admin',
+        editable: false,
+    },
+    {
+        methodName: NotificationsResolver.prototype.getMyNotifications.name,
+        roleName: 'member',
+        editable: false,
+    },
 ]
