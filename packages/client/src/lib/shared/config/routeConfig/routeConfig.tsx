@@ -3,6 +3,7 @@ import { AuthPage } from 'pages'
 import { MainPage } from 'pages'
 import { NotFoundPage } from 'pages'
 import { SettingsPage } from 'pages'
+import { CreateTicketPage } from 'pages'
 import { RouteProps } from 'react-router-dom'
 
 type AppRoutesProps = RouteProps & {
@@ -17,6 +18,7 @@ export enum AppRoutes {
     SETTINGS = 'settings',
     AUTH = 'auth',
     NOT_FOUND = 'not_found',
+    CREATE_TICKET = 'create_ticket',
 }
 
 export const RoutePath: Record<AppRoutes, string> = {
@@ -26,6 +28,7 @@ export const RoutePath: Record<AppRoutes, string> = {
     [AppRoutes.ROLE_DETAILS]: '/roles/',
     [AppRoutes.ABOUT]: '/about',
     [AppRoutes.SETTINGS]: '/settings',
+    [AppRoutes.CREATE_TICKET]: '/create-ticket',
     [AppRoutes.NOT_FOUND]: '*',
 }
 
@@ -61,5 +64,9 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     [AppRoutes.AUTH]: {
         path: RoutePath.auth,
         element: <AuthPage />,
+    },
+    [AppRoutes.CREATE_TICKET]: {
+        path: RoutePath.create_ticket,
+        element: <CreateTicketPage />,
     },
 }

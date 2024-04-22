@@ -5,6 +5,7 @@ import RolesPage from './RolesPage/RolesPage'
 import NotFoundPage from './NotFoundPage/NotFoundPage'
 import SettingsPage from './SettingsPage/SettingsPage'
 import EditRolePage from './EditRolePage'
+import CreateTicketPage from './CreateTicketPage/CreateTicketPage'
 export {
     AboutPage,
     AuthPage,
@@ -13,4 +14,5 @@ export {
     NotFoundPage,
     SettingsPage,
     EditRolePage,
+    CreateTicketPage,
 }
