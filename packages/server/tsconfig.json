@@ -11,6 +11,7 @@
     }
   ],
   "compilerOptions": {
+    "allowJs": true,
     "esModuleInterop": true,
     "paths": {
       "@shared/decorators": [

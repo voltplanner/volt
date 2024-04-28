@@ -6,7 +6,8 @@
     "nx": "nx",
     "lint:fix": "nx run client:sdk:generate && nx run-many --t lint --fix && nx format:write --all",
     "prepare": "husky",
-    "postinstall": "npm run lint:fix"
+    "postinstall": "npm run lint:fix",
+    "jest": "jest --config=\"/home/unvios/Documents/projects/volt/packages/server/jest.config.ts\""
   },
   "private": true,
   "devDependencies": {
@@ -68,5 +69,11 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "execa": "^8.0.1",
+    "pg": "^8.11.5",
+    "testcontainers": "^10.9.0"
+  }
 }
