@@ -1,27 +1,79 @@
 
 import { setup as setupTest } from './support/global-setup'
-import { teardownEthereum } from './support/global-teardown'
+import { teardown } from './support/global-teardown'
+import { GlobalUtils } from './support/global-utils'
 
 let setup: Awaited<ReturnType<typeof setupTest>>
+let utils: GlobalUtils
 
 describe('ETH', () => {
     jest.setTimeout(5 * 60 * 1000)
 
     beforeAll(async () => {
         setup = await setupTest()
+        utils = new GlobalUtils(setup)
     })
 
     afterEach(async () => {
-        // await setup.prisma.paymentSystemCryptoWatcherEthBlock.deleteMany()
+        await setup.prisma.taskOnTaskTag.deleteMany()
+        await setup.prisma.taskProjectOnUser.deleteMany()
+        await setup.prisma.taskOnTaskRelation.deleteMany()
+
+        await setup.prisma.taskUser.deleteMany()
+        await setup.prisma.taskUserRole.deleteMany()
+        await setup.prisma.taskTag.deleteMany()
+        await setup.prisma.taskStatus.deleteMany()
+        await setup.prisma.taskRelation.deleteMany()
+        await setup.prisma.taskProject.deleteMany()
     })
 
     afterAll(async () => {
-        await teardownEthereum(setup)
+        await teardown(setup)
     })
 
     describe('', () => {
-        it('', async () => {
-            console.log(123)
+        it('Must create project', async () => {
+            const { createProject } = await utils.gqlCreateProject({
+                name: "Test Name 1",
+                description: "Test Description 1",
+                deadline: 1714332185805,
+                budget: 100,
+            })
+
+            expect(createProject).toBeDefined()
+        })
+
+        it('Must create project with users', async () => {
+            const { adminUser } = await utils.gqlGetAdminUser()
+
+            const { createProject } = await utils.gqlCreateProject({
+                name: "Test Name 1",
+                description: "Test Description 1",
+                deadline: 1714332185805,
+                budget: 100,
+                members: [{
+                    userId: adminUser.id,
+                    roleCode: 'MANAGER',
+                }],
+            })
+
+            const { projectUsers } = await utils.gqlProjectUsers({ projectId: createProject })
+
+            expect(projectUsers?.data?.[0]?.id).toBe(adminUser.id)
+        })
+
+        it('Must return projects', async () => {
+            const { createProject } = await utils.gqlCreateProject({
+                name: "Test Name 1",
+                description: "Test Description 1",
+                deadline: 1714332185805,
+                budget: 100,
+            })
+
+            const { projects } = await utils.gqlProjects()
+
+            expect(projects.data).toHaveLength(1)
+            expect(projects.data[0].id).toBe(createProject)
         })
     })
 

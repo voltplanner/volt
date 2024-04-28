@@ -110,7 +110,7 @@ export async function setup() {
 
     app.useLogger(new Logger())
 
-    await app.listen(0)
+    await app.listen(9999)
 
     const prisma = app.get<PrismaServiceWithExtentionsType>(PrismaService)
 

@@ -51,15 +51,6 @@ export class ProjectIntegrationResolver {
         const userIds: string[] = []
 
         return await this._prismaService.$transaction(async (client) => {
-            for (const member of members) {
-                const userId = await this._taskUserService.upsert(
-                    member,
-                    client,
-                )
-
-                userIds.push(userId)
-            }
-
             const projectId = await this._taskProjectService.create(
                 {
                     name,
@@ -69,6 +60,15 @@ export class ProjectIntegrationResolver {
                 },
                 client,
             )
+
+            for (const member of members) {
+                const userId = await this._taskUserService.upsert(
+                    member,
+                    client,
+                )
+
+                userIds.push(userId)
+            }
 
             await this._taskProjectService.addUsers(
                 {
