@@ -45,7 +45,7 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     },
     [AppRoutes.USERS]: {
         path: RoutePath.users,
-        element: <UsersPage/>,
+        element: <UsersPage />,
         authOnly: true,
     },
     [AppRoutes.ROLE_DETAILS]: {

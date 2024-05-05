@@ -1,36 +1,31 @@
-import { useQuery } from '@apollo/client'
-import { generateQueryOp } from '../../../sdk'
+import { useMutation } from '@apollo/client'
+import { CreateUserInput, generateMutationOp, generateQueryOp } from '../../../sdk'
 import gql from 'graphql-tag'
 
-export const useInvite = () => {
-    const { query, variables } = generateQueryOp({
-        __name: 'getRoles',
-        getRoles: {
+export const useInvite = (payload: CreateUserInput) => {
+    const { query, variables } = generateMutationOp({
+        createUser: {
             __args: {
-                input: {},
-            },
-            data: {
-                editable: true,
-                id: true,
-                name: true,
-                superuser: true,
-                methods: {
-                    allowed: true,
-                    description: true,
-                    editable: true,
-                    group: true,
-                    id: true,
-                    name: true,
+                input: {
+                    ...payload
                 },
             },
-        },
+            id: true,
+            firstname: true,
+            lastname: true,
+            email: true,
+            status: true,
+            createdAt: true,
+            deletedAt: true,
+        }
     })
 
-    const { data, loading, error } = useQuery(gql(query), {
+    const [createUser, { data, loading, error }] = useMutation(gql(query), {
         variables,
     })
     return {
-        data: data?.getRoles.data,
+        createUser,
+        data,
         loading,
         error,
     }

@@ -1,10 +1,11 @@
-import { Button, Header, Table } from 'shared'
+import { Button, Header, Modal, Table } from 'shared'
 import {
     ButtonsContainer,
     ContentStyled,
     PageContainerStyled,
     WrapperStyled,
 } from './styles'
+import { InviteUser } from 'features'
 
 export const UsersPage = () => {
     const columns = [
@@ -92,7 +93,7 @@ export const UsersPage = () => {
     return (
         <PageContainerStyled>
             <ButtonsContainer>
-                <Button>+ Invite user</Button>
+                <InviteUser />
             </ButtonsContainer>
             <WrapperStyled>
                 <ContentStyled>
