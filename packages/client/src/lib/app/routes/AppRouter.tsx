@@ -18,7 +18,6 @@ const AppRouter = () => {
         await getLocalSession()
         try {
             const { data } = await refreshToken()
-            console.log('Refreshed token data:', data)
             login(data.refreshToken)
             setIsAuth(true)
         } catch (error) {

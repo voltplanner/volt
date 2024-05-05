@@ -11,7 +11,6 @@ export const InviteModal = ({ onClose }: { onClose: () => void }) => {
     })
     const onInput = (key: string, value: string) => {
         setState((prev) => ({ ...prev, [key]: value }))
-        console.log(value, state)
     }
     const onCreate = async () => {
         if (
