@@ -8,6 +8,11 @@ type PaginatedMetaType {
   total: Float!
 }
 
+type CursorBasedMetaType {
+  cursor: String!
+  take: Float!
+}
+
 type MethodsType {
   id: ID!
   name: String!
@@ -63,6 +68,28 @@ type AuthorizationResponse {
   expiresAt: Float!
 }
 
+type GetNotificationData {
+  id: String!
+  topic: String!
+  message: String!
+  link: String!
+  type: NotificationTypeEnum!
+  sent: Boolean!
+  sentAt: DateTime!
+  seen: Boolean!
+}
+
+enum NotificationTypeEnum {
+  EMAIL
+  WEB
+  TELEGRAM
+}
+
+type GetNotificationsResponse {
+  data: [GetNotificationData!]!
+  meta: CursorBasedMetaType!
+}
+
 type GetNotificationPreferences {
   emailEnabled: Boolean!
   email: String
@@ -71,11 +98,21 @@ type GetNotificationPreferences {
   telegramAccount: Float
 }
 
-type NotificationWebResponse {
+type OnNewNotification {
   userId: String!
   topic: String!
   message: String!
   link: String
+}
+
+type ProjectIntegrationProjectObject {
+  id: String!
+  name: String!
+  description: String
+  deadline: Float
+  budget: Float
+  version: Float!
+  createdAt: Float!
 }
 
 type ProjectIntegrationTasksRelationObject {
@@ -123,16 +160,6 @@ type ProjectIntegrationProjectUsersOutput {
   meta: PaginatedMetaType!
 }
 
-type ProjectIntegrationProjectObject {
-  id: String!
-  name: String!
-  description: String
-  deadline: Float
-  budget: Float
-  version: Float!
-  createdAt: Float!
-}
-
 type ProjectIntegrationProjectsOutput {
   data: [ProjectIntegrationProjectObject!]!
   meta: PaginatedMetaType!
@@ -141,6 +168,18 @@ type ProjectIntegrationProjectsOutput {
 type ProjectIntegrationProjectsOfCurrentUserOutput {
   data: [ProjectIntegrationProjectObject!]!
   meta: PaginatedMetaType!
+}
+
+type TaskIntegrationTaskStatusObject {
+  id: String!
+  code: String!
+  name: String!
+}
+
+type TaskIntegrationTaskTagObject {
+  id: String!
+  code: String!
+  name: String!
 }
 
 type TaskIntegrationUserObject {
@@ -159,7 +198,8 @@ type TaskIntegrationTaskObject {
   estimatedDuration: Float
   version: Float!
   createdAt: Float!
-  status: String!
+  status: TaskIntegrationTaskStatusObject!
+  tags: [TaskIntegrationTaskTagObject!]!
   createdBy: TaskIntegrationUserObject!
   assignedTo: TaskIntegrationUserObject
 }
@@ -175,10 +215,12 @@ type TaskIntegrationTasksOfCurrentUserOutput {
 }
 
 type Query {
+  task(input: TaskIntegrationTaskInput!): TaskIntegrationTaskObject!
   tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
-  myTasks(input: TaskIntegrationTasksOfCurrentUserInput): TaskIntegrationTasksOfCurrentUserOutput!
+  tasksOfCurrentUser(input: TaskIntegrationTasksOfCurrentUserInput): TaskIntegrationTasksOfCurrentUserOutput!
+  project(input: ProjectIntegrationProjectInput!): ProjectIntegrationProjectObject!
   projects: ProjectIntegrationProjectsOutput!
-  myProjects: ProjectIntegrationProjectsOfCurrentUserOutput!
+  projectsOfCurrentUser: ProjectIntegrationProjectsOfCurrentUserOutput!
   projectUsers(input: ProjectIntegrationProjectUsersInput!): ProjectIntegrationProjectUsersOutput!
   projectUsersRoles(input: ProjectIntegrationProjectUsersRolesInput!): [ProjectIntegrationUsersRoleObject!]!
   projectTasksTags(input: ProjectIntegrationProjectTasksTagsInput!): [ProjectIntegrationTasksTagObject!]!
@@ -189,17 +231,28 @@ type Query {
   getMyRole: RoleType!
   getUser(input: GetUserInput!): UserType!
   getMyNotificationPreferences: GetNotificationPreferences!
+  getMyNotifications(input: GetNotificationsInput!): [GetNotificationsResponse!]!
   getFile(input: GetFileInput!): String!
 }
 
+input TaskIntegrationTaskInput {
+  id: String!
+}
+
 input TaskIntegrationTasksInput {
+  projectId: String
   curPage: Float
   perPage: Float
 }
 
 input TaskIntegrationTasksOfCurrentUserInput {
+  projectId: String
   curPage: Float
   perPage: Float
+}
+
+input ProjectIntegrationProjectInput {
+  id: String!
 }
 
 input ProjectIntegrationProjectUsersInput {
@@ -263,6 +316,14 @@ input GetUserInput {
   userId: ID!
 }
 
+input GetNotificationsInput {
+  userId: String
+  cursor: String
+  take: Float
+  type: NotificationTypeEnum!
+  seen: Boolean
+}
+
 input GetFileInput {
   id: String!
 }
@@ -284,6 +345,8 @@ type Mutation {
   deleteUser(input: DeleteUserInput!): Boolean!
   completeSignIn(input: CompleteSignInInput!): AuthorizationResponse!
   changeMyNotificationPreferences(input: ChangeMyNotificationPreferences!): Boolean!
+  markAsSeen(input: MarkAsSeenInput!): Boolean!
+  markAllAsSeen(input: MarkAllAsSeenInput!): Boolean!
   uploadFile(input: UploadFileInput!): String!
 }
 
@@ -311,7 +374,7 @@ input TaskIntegrationTaskUpdateInput {
   parentId: String
   statusId: String
   assignedToId: String
-  taskTagIds: [String!]
+  tagIds: [String!]
 }
 
 input ProjectIntegrationCreateProjectInput {
@@ -414,6 +477,14 @@ input ChangeMyNotificationPreferences {
   telegramAccount: Float
 }
 
+input MarkAsSeenInput {
+  notificationId: String!
+}
+
+input MarkAllAsSeenInput {
+  type: NotificationTypeEnum!
+}
+
 input UploadFileInput {
   file: Upload!
 }
@@ -422,5 +493,5 @@ input UploadFileInput {
 scalar Upload
 
 type Subscription {
-  getNotifications: NotificationWebResponse!
+  onNewNotification: OnNewNotification!
 }

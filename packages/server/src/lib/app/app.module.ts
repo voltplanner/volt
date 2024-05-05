@@ -45,7 +45,6 @@ import { PrismaModule } from '../shared/prisma'
                 'graphql-ws': true,
             },
             formatError: (formattedError: GraphQLFormattedError, error: any) => {
-                console.log(error?.originalError)
                 if (error?.originalError?.code && formattedError?.extensions) {
                     formattedError.extensions.stacktrace = undefined
                     formattedError.extensions.metadata = error.originalError.metadata

@@ -55,14 +55,14 @@ export class TaskService {
             statusId?: string
             assignedToId?: string | null
 
-            taskTagIds?: string[]
+            tagIds?: string[]
         },
         prisma?: PrismaTransactionClientType,
     ) {
         const client = prisma || this.prisma
 
         try {
-            const { taskTagIds } = dto
+            const { tagIds } = dto
 
             await client.task.extUpdate(
                 {
@@ -79,11 +79,11 @@ export class TaskService {
                 client,
             )
 
-            if (taskTagIds?.length) {
+            if (tagIds?.length) {
                 await client.task.extSetTags(
                     {
                         taskId: dto.id,
-                        taskTagIds: taskTagIds,
+                        tagIds: tagIds,
                     },
                     client,
                 )
@@ -119,6 +119,12 @@ export class TaskService {
         }
     }) {
         return await this.prisma.task.extFindMany(dto)
+    }
+
+    async getById(dto: {
+        id: string
+    }) {
+        return await this.prisma.task.extGetById(dto)
     }
 
     async upsertCustomFieldValueType(

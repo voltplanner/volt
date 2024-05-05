@@ -28,7 +28,7 @@ export class TaskUserService {
         const role = await client.taskUserRole.extGetOneByCode({
             code: roleCode,
             projectId,
-        })
+        }, client)
 
         const id = await client.taskUser.extUpsert(
             {

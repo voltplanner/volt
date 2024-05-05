@@ -113,6 +113,8 @@ model Notification {
     error         String?
     Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
     preferencesId String? @db.Uuid
+    seen          Boolean
+    
 
     @@schema("notifications")
 }
@@ -435,8 +437,8 @@ model TaskRelation {
 
     tasks TaskOnTaskRelation[]
 
-    @@unique([code, projectId,isDeleted])
-    @@unique([position, projectId,isDeleted])
+    @@unique([code, projectId, isDeleted])
+    @@unique([position, projectId, isDeleted])
     @@map("task_relation")
     @@schema("tasks")
 }

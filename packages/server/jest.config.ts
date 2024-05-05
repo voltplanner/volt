@@ -9,6 +9,9 @@ export default {
             { tsconfig: '<rootDir>/tsconfig.spec.json' },
         ],
     },
+    transformIgnorePatterns: [
+        '.*volt\/node_modules\/(?!(@apollo)|(execa)|(human-signals)\/.*)',
+    ],
     moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/packages/server',
 }

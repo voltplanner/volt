@@ -2,7 +2,7 @@ import { DefaultError } from '../../errors/default.error'
 import { UnexpectedError } from '../../errors/unexpected.error'
 import { TPaginatedMeta } from '../../types/paginated-meta.type'
 import { parseMetaArgs } from '../../utils'
-import { Prisma, Task, TaskProject, TaskStatus, TaskTag } from '..'
+import { Prisma, Task, TaskStatus, TaskTag } from '..'
 import { PrismaService } from '../prisma.service'
 import {
     TaskCreateRepositoryDto,
@@ -81,11 +81,19 @@ export const taskModelExtentions = {
                 },
             })
 
+            const {
+                _max: { number: maxNumber },
+            } = await client.task.aggregate({
+                _max: { number: true },
+            })
+
             const { id } = await client.task.create({
                 data: {
                     lft: newLft,
                     rgt: newLft + 1,
                     level: newLevel,
+
+                    number: typeof maxNumber === 'number' ? maxNumber + 1 : 1,
 
                     name,
                     description,
@@ -335,6 +343,7 @@ export const taskModelExtentions = {
         prisma?: any,
     ): Promise<Task & {
         tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
+        status: Pick<TaskStatus, 'id' | 'code' | 'name'>
     }> {
         const { id } = dto
 
@@ -345,6 +354,13 @@ export const taskModelExtentions = {
             const data = await client.task.findFirstOrThrow({
                 where: { id, isDeleted: false },
                 include: {
+                    status: {
+                        select: {
+                            id: true,
+                            code: true,
+                            name: true,
+                        },
+                    },
                     tags: {
                         include: {
                             taskTag: {
@@ -356,7 +372,7 @@ export const taskModelExtentions = {
                             }
                         }
                     }
-                }
+                },
             })
 
             return data ? { ...data, tags: data.tags.map(i => ({
@@ -575,21 +591,21 @@ export const taskModelExtentions = {
     },
 
     async extSetTags(
-        dto: { taskId: string; taskTagIds: string[] },
+        dto: { taskId: string; tagIds: string[] },
         prisma?: any,
     ): Promise<void> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { taskId, taskTagIds } = dto
+            const { taskId, tagIds } = dto
 
             await client.taskOnTaskTag.deleteMany({
                 where: { taskId },
             })
 
             await client.taskOnTaskTag.createMany({
-                data: taskTagIds.map((i) => ({
+                data: tagIds.map((i) => ({
                     taskId,
                     taskTagId: i,
                 })),

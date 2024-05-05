@@ -1,5 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql'
 
+import { TaskIntegrationTaskStatusObject } from './task-integration-task-status.object-type'
+import { TaskIntegrationTaskTagObject } from './task-integration-task-tag.object-type'
 import { TaskIntegrationUserObject } from './task-integration-user.object-type'
 
 @ObjectType()
@@ -31,8 +33,11 @@ export class TaskIntegrationTaskObject {
     @Field(() => Number)
     readonly createdAt: number
 
-    @Field(() => String)
-    readonly status: string
+    @Field(() => TaskIntegrationTaskStatusObject)
+    readonly status: TaskIntegrationTaskStatusObject
+
+    @Field(() => [TaskIntegrationTaskTagObject])
+    readonly tags: TaskIntegrationTaskTagObject[]
 
     @Field(() => TaskIntegrationUserObject)
     readonly createdBy: TaskIntegrationUserObject

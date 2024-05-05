@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
 import { CurrentUserPayload, OrderEnum } from '@shared/interfaces'
@@ -6,11 +6,13 @@ import { CurrentUserPayload, OrderEnum } from '@shared/interfaces'
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskProjectService } from '../../modules/task/services/task-project.service'
 import { TaskUserService } from '../../modules/task/services/task-user.service'
+import { ACLGuard } from '../../shared/guards/acl.guard'
 import {
     AuthUserStatusEnum,
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
+import { ProjectIntegrationProjectInput } from './types-input/project-integration-project.input-type'
 import {
     ProjectIntegrationCreateProjectInput,
     ProjectIntegrationCreateProjectMemberInput,
@@ -89,6 +91,19 @@ export class ProjectIntegrationResolver {
         return await this._taskProjectService.update(input)
     }
 
+    @Query(() => ProjectIntegrationProjectObject)
+    async project(
+        @Args('input') input: ProjectIntegrationProjectInput,
+    ): Promise<ProjectIntegrationProjectObject> {
+        const project = await this._taskProjectService.getById(input)
+
+        return {
+            ...project,
+            deadline: Number(project.deadline),
+            createdAt: Number(project.createdAt),
+        }
+    }
+
     @Query(() => ProjectIntegrationProjectsOutput)
     async projects(): Promise<ProjectIntegrationProjectsOutput> {
         const { data, meta } = await this._taskProjectService.findMany()
@@ -102,8 +117,9 @@ export class ProjectIntegrationResolver {
         return { meta, data: projects }
     }
 
+    @UseGuards(ACLGuard)
     @Query(() => ProjectIntegrationProjectsOfCurrentUserOutput)
-    async myProjects(
+    async projectsOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
     ): Promise<ProjectIntegrationProjectsOfCurrentUserOutput> {
         const { data, meta } = await this._taskProjectService.findMany({

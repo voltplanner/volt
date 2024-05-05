@@ -27,3 +27,8 @@ Volt is [BUSL 1.1](./LICENSE.md)
 ## Activity
 
 ![Alt](https://repobeats.axiom.co/api/embed/ab9e069a7bd2d20ce915817f836c66a893cd0492.svg 'Repobeats analytics image')
+
+## Testing
+
+Test only file
+npx nx run server:test --test-file task.test.ts

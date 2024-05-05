@@ -7,6 +7,14 @@ export interface PaginatedResponse<T> {
     data: T[]
 }
 
+export interface CursorBasedResponse<T> {
+    meta: {
+        cursor: string
+        take: number
+    }
+    data: T[]
+}
+
 export type NullableListOptions = { nullable?: true | 'itemsAndList' }
 
 export enum OrderEnum {

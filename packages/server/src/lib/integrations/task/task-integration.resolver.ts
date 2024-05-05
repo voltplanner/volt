@@ -1,14 +1,16 @@
-import { Inject } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
 import { CurrentUserPayload } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskService } from '../../modules/task/services/task.service'
+import { ACLGuard } from '../../shared/guards/acl.guard'
 import {
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
+import { TaskIntegrationTaskInput } from './types-input/task-integration-task.input-type'
 import { TaskIntegrationTaskCreateInput } from './types-input/task-integration-task-create.input-type'
 import { TaskIntegrationTaskUpdateInput } from './types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from './types-input/task-integration-tasks.input-type'
@@ -26,6 +28,7 @@ export class TaskIntegrationResolver {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
+    @UseGuards(ACLGuard)
     @Mutation(() => String)
     async createTask(
         @CurrentUser() { userId }: CurrentUserPayload,
@@ -81,16 +84,49 @@ export class TaskIntegrationResolver {
         return await this._taskService.update(input)
     }
 
+    @Query(() => TaskIntegrationTaskObject)
+    async task(
+        @Args('input') input: TaskIntegrationTaskInput,
+    ): Promise<TaskIntegrationTaskObject> {
+        const task = await this._taskService.getById(input)
+
+        const userAssigned = await this._authUserService.getUser(
+            task.assignedToId,
+        )
+        const userCreated = await this._authUserService.getUser(
+            task.createdById,
+        )
+
+        return {
+            ...task,
+            createdBy: {
+                id: userCreated.id,
+                lastname: userCreated.lastname,
+                firstname: userCreated.firstname,
+            },
+            assignedTo: {
+                id: userAssigned.id,
+                lastname: userAssigned.lastname,
+                firstname: userAssigned.firstname,
+            },
+            createdAt: Number(task.createdAt),
+            estimatedDateEnd: Number(task.estimatedDateEnd),
+            estimatedDateStart: Number(task.estimatedDateStart),
+            estimatedDuration: Number(task.estimatedDuration.toString()),
+        }
+    }
+
     @Query(() => TaskIntegrationTasksOutput)
     async tasks(
         @Args('input', { nullable: true })
         input?: TaskIntegrationTasksInput | null,
     ): Promise<TaskIntegrationTasksOutput> {
-        const { curPage, perPage } = input || {}
+        const { projectId, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.findMany({
-            curPage,
-            perPage,
+            filterByProjectId: projectId || undefined,
+            curPage: curPage || undefined,
+            perPage: perPage || undefined,
         })
 
         const tasks: TaskIntegrationTaskObject[] = []
@@ -105,7 +141,6 @@ export class TaskIntegrationResolver {
 
             tasks.push({
                 ...task,
-                status: task.status.name,
                 createdBy: {
                     id: userCreated.id,
                     lastname: userCreated.lastname,
@@ -126,18 +161,20 @@ export class TaskIntegrationResolver {
         return { meta, data: tasks }
     }
 
+    @UseGuards(ACLGuard)
     @Query(() => TaskIntegrationTasksOfCurrentUserOutput)
-    async myTasks(
+    async tasksOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input', { nullable: true })
         input?: TaskIntegrationTasksOfCurrentUserInput | null,
     ): Promise<TaskIntegrationTasksOfCurrentUserOutput> {
-        const { curPage, perPage } = input || {}
+        const { projectId, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.findMany({
             filterByAssignedToId: userId,
-            curPage,
-            perPage,
+            filterByProjectId: projectId || undefined,
+            curPage: curPage || undefined,
+            perPage: perPage || undefined,
         })
 
         const tasks: TaskIntegrationTaskObject[] = []
@@ -152,7 +189,6 @@ export class TaskIntegrationResolver {
 
             tasks.push({
                 ...task,
-                status: task.status.name,
                 createdBy: {
                     id: userCreated.id,
                     lastname: userCreated.lastname,

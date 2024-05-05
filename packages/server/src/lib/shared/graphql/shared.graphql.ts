@@ -1,7 +1,11 @@
 import { Type } from '@nestjs/common'
 import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
 
-import { OrderEnum, PaginatedResponse } from '../interfaces/shared.interfaces'
+import {
+    CursorBasedResponse,
+    OrderEnum,
+    PaginatedResponse,
+} from '../interfaces/shared.interfaces'
 import { TPaginatedMeta } from '../types/paginated-meta.type'
 
 registerEnumType(OrderEnum, { name: 'OrderEnum' })
@@ -49,4 +53,28 @@ export const PaginatedResponseType = <T>(
     }
 
     return PaginatedResponseType
+}
+
+@ObjectType()
+export class CursorBasedMetaType {
+    @Field()
+    cursor: string
+
+    @Field()
+    take: number
+}
+
+export const CursorBasedResponseType = <T>(
+    classRef: Type<T>,
+): Type<CursorBasedResponse<T>> => {
+    @ObjectType({ isAbstract: true })
+    class CursorBasedResponseType implements CursorBasedResponse<T> {
+        @Field(() => [classRef])
+        data: T[]
+
+        @Field(() => CursorBasedMetaType)
+        meta: CursorBasedMetaType
+    }
+
+    return CursorBasedResponseType
 }

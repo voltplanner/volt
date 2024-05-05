@@ -33,5 +33,5 @@ export class TaskIntegrationTaskUpdateInput {
     readonly assignedToId?: string | null
 
     @Field(() => [String], { nullable: true })
-    readonly taskTagIds?: string[] | null
+    readonly tagIds?: string[] | null
 }

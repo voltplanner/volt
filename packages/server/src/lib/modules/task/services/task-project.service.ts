@@ -80,6 +80,12 @@ export class TaskProjectService {
         }
     }
 
+    async getById(dto?: {
+        id: string
+    }) {
+        return await this.prisma.taskProject.extGetById(dto)
+    }
+
     async findMany(dto?: {
         curPage?: number
         perPage?: number

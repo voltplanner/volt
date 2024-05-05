@@ -19,6 +19,12 @@ export interface PaginatedMetaType {
     __typename: 'PaginatedMetaType'
 }
 
+export interface CursorBasedMetaType {
+    cursor: Scalars['String']
+    take: Scalars['Float']
+    __typename: 'CursorBasedMetaType'
+}
+
 export interface ProjectIntegrationTasksRelationObject {
     id: Scalars['String']
     code: Scalars['String']
@@ -180,6 +186,26 @@ export interface AuthorizationResponse {
     __typename: 'AuthorizationResponse'
 }
 
+export interface GetNotificationData {
+    id: Scalars['String']
+    topic: Scalars['String']
+    message: Scalars['String']
+    link: Scalars['String']
+    type: NotificationTypeEnum
+    sent: Scalars['Boolean']
+    sentAt: Scalars['DateTime']
+    seen: Scalars['Boolean']
+    __typename: 'GetNotificationData'
+}
+
+export type NotificationTypeEnum = 'EMAIL' | 'WEB' | 'TELEGRAM'
+
+export interface GetNotificationsResponse {
+    data: GetNotificationData[]
+    meta: CursorBasedMetaType
+    __typename: 'GetNotificationsResponse'
+}
+
 export interface GetNotificationPreferences {
     emailEnabled: Scalars['Boolean']
     email: Scalars['String'] | null
@@ -189,12 +215,12 @@ export interface GetNotificationPreferences {
     __typename: 'GetNotificationPreferences'
 }
 
-export interface NotificationWebResponse {
+export interface OnNewNotification {
     userId: Scalars['String']
     topic: Scalars['String']
     message: Scalars['String']
     link: Scalars['String'] | null
-    __typename: 'NotificationWebResponse'
+    __typename: 'OnNewNotification'
 }
 
 export interface Query {
@@ -203,6 +229,7 @@ export interface Query {
     getMyRole: RoleType
     getUser: UserType
     getMyNotificationPreferences: GetNotificationPreferences
+    getMyNotifications: GetNotificationsResponse[]
     projects: ProjectIntegrationProjectsOutput
     myProjects: ProjectIntegrationProjectsOfCurrentUserOutput
     projectUsers: ProjectIntegrationProjectUsersOutput
@@ -231,6 +258,8 @@ export interface Mutation {
     deleteUser: Scalars['Boolean']
     completeSignIn: AuthorizationResponse
     changeMyNotificationPreferences: Scalars['Boolean']
+    markAsSeen: Scalars['Boolean']
+    markAllAsSeen: Scalars['Boolean']
     createProject: Scalars['String']
     updateProject: Scalars['String']
     createTask: Scalars['String']
@@ -240,7 +269,7 @@ export interface Mutation {
 }
 
 export interface Subscription {
-    getNotifications: NotificationWebResponse
+    onNewNotification: OnNewNotification
     __typename: 'Subscription'
 }
 
@@ -248,6 +277,13 @@ export interface PaginatedMetaTypeGenqlSelection {
     curPage?: boolean | number
     perPage?: boolean | number
     total?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface CursorBasedMetaTypeGenqlSelection {
+    cursor?: boolean | number
+    take?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -430,6 +466,26 @@ export interface AuthorizationResponseGenqlSelection {
     __scalar?: boolean | number
 }
 
+export interface GetNotificationDataGenqlSelection {
+    id?: boolean | number
+    topic?: boolean | number
+    message?: boolean | number
+    link?: boolean | number
+    type?: boolean | number
+    sent?: boolean | number
+    sentAt?: boolean | number
+    seen?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface GetNotificationsResponseGenqlSelection {
+    data?: GetNotificationDataGenqlSelection
+    meta?: CursorBasedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface GetNotificationPreferencesGenqlSelection {
     emailEnabled?: boolean | number
     email?: boolean | number
@@ -440,7 +496,7 @@ export interface GetNotificationPreferencesGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface NotificationWebResponseGenqlSelection {
+export interface OnNewNotificationGenqlSelection {
     userId?: boolean | number
     topic?: boolean | number
     message?: boolean | number
@@ -459,6 +515,9 @@ export interface QueryGenqlSelection {
     getMyRole?: RoleTypeGenqlSelection
     getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
     getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
+    getMyNotifications?: GetNotificationsResponseGenqlSelection & {
+        __args: { input: GetNotificationsInput }
+    }
     projects?: ProjectIntegrationProjectsOutputGenqlSelection
     myProjects?: ProjectIntegrationProjectsOfCurrentUserOutputGenqlSelection
     projectUsers?: ProjectIntegrationProjectUsersOutputGenqlSelection & {
@@ -521,6 +580,14 @@ export interface GetUserInput {
     userId: Scalars['ID']
 }
 
+export interface GetNotificationsInput {
+    userId?: Scalars['String'] | null
+    cursor?: Scalars['String'] | null
+    take?: Scalars['Float'] | null
+    type: NotificationTypeEnum
+    seen?: Scalars['Boolean'] | null
+}
+
 export interface ProjectIntegrationProjectUsersInput {
     projectId: Scalars['String']
     filterByName?: Scalars['String'] | null
@@ -578,6 +645,8 @@ export interface MutationGenqlSelection {
     changeMyNotificationPreferences?: {
         __args: { input: ChangeMyNotificationPreferences }
     }
+    markAsSeen?: { __args: { input: MarkAsSeenInput } }
+    markAllAsSeen?: { __args: { input: MarkAllAsSeenInput } }
     createProject?: { __args: { input: ProjectIntegrationCreateProjectInput } }
     updateProject?: { __args: { input: ProjectIntegrationProjectUpdateInput } }
     createTask?: { __args: { input: TaskIntegrationTaskCreateInput } }
@@ -661,6 +730,14 @@ export interface ChangeMyNotificationPreferences {
     telegramAccount?: Scalars['Float'] | null
 }
 
+export interface MarkAsSeenInput {
+    notificationId: Scalars['String']
+}
+
+export interface MarkAllAsSeenInput {
+    type: NotificationTypeEnum
+}
+
 export interface ProjectIntegrationCreateProjectInput {
     name: Scalars['String']
     /** Budget of the project in hours */
@@ -717,7 +794,7 @@ export interface UploadFileInput {
 }
 
 export interface SubscriptionGenqlSelection {
-    getNotifications?: NotificationWebResponseGenqlSelection
+    onNewNotification?: OnNewNotificationGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -729,6 +806,15 @@ export const isPaginatedMetaType = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isPaginatedMetaType"')
     return PaginatedMetaType_possibleTypes.includes(obj.__typename)
+}
+
+const CursorBasedMetaType_possibleTypes: string[] = ['CursorBasedMetaType']
+export const isCursorBasedMetaType = (
+    obj?: { __typename?: any } | null,
+): obj is CursorBasedMetaType => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isCursorBasedMetaType"')
+    return CursorBasedMetaType_possibleTypes.includes(obj.__typename)
 }
 
 const ProjectIntegrationTasksRelationObject_possibleTypes: string[] = [
@@ -972,6 +1058,26 @@ export const isAuthorizationResponse = (
     return AuthorizationResponse_possibleTypes.includes(obj.__typename)
 }
 
+const GetNotificationData_possibleTypes: string[] = ['GetNotificationData']
+export const isGetNotificationData = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationData => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isGetNotificationData"')
+    return GetNotificationData_possibleTypes.includes(obj.__typename)
+}
+
+const GetNotificationsResponse_possibleTypes: string[] = [
+    'GetNotificationsResponse',
+]
+export const isGetNotificationsResponse = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationsResponse => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isGetNotificationsResponse"')
+    return GetNotificationsResponse_possibleTypes.includes(obj.__typename)
+}
+
 const GetNotificationPreferences_possibleTypes: string[] = [
     'GetNotificationPreferences',
 ]
@@ -985,15 +1091,13 @@ export const isGetNotificationPreferences = (
     return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
 }
 
-const NotificationWebResponse_possibleTypes: string[] = [
-    'NotificationWebResponse',
-]
-export const isNotificationWebResponse = (
+const OnNewNotification_possibleTypes: string[] = ['OnNewNotification']
+export const isOnNewNotification = (
     obj?: { __typename?: any } | null,
-): obj is NotificationWebResponse => {
+): obj is OnNewNotification => {
     if (!obj?.__typename)
-        throw new Error('__typename is missing in "isNotificationWebResponse"')
-    return NotificationWebResponse_possibleTypes.includes(obj.__typename)
+        throw new Error('__typename is missing in "isOnNewNotification"')
+    return OnNewNotification_possibleTypes.includes(obj.__typename)
 }
 
 const Query_possibleTypes: string[] = ['Query']
@@ -1024,6 +1128,12 @@ export const enumAuthUserStatusEnum = {
     WAITING_COMPLETE: 'WAITING_COMPLETE' as const,
     ACTIVE: 'ACTIVE' as const,
     BLOCKED: 'BLOCKED' as const,
+}
+
+export const enumNotificationTypeEnum = {
+    EMAIL: 'EMAIL' as const,
+    WEB: 'WEB' as const,
+    TELEGRAM: 'TELEGRAM' as const,
 }
 
 export const enumOrderEnum = {
