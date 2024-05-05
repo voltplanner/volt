@@ -2,11 +2,16 @@ import { useFormStore } from '../model/useFormStore'
 import { AboutStep } from './AboutStep'
 import { PasswordStep } from './PasswordStep'
 
-export const RegisterForm = () => {
-    const { setData, data, step } = useFormStore()
+export type RegisterData = {
+    code: string
+    userId: string
+    email: string
+}
+
+export const RegisterForm = ({ code, userId, email }: RegisterData) => {
     return (
         <div>
-            <PasswordStep />
+            <PasswordStep code={code} email={email} userId={userId} />
         </div>
     )
 }

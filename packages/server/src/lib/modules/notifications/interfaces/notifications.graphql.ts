@@ -1,4 +1,11 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql'
+import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql'
+
+import { CursorBasedResponseType } from '../../../shared/graphql/shared.graphql'
+import { NotificationTypeEnum } from '../../../shared/prisma'
+
+registerEnumType(NotificationTypeEnum, {
+    name: 'NotificationTypeEnum',
+})
 
 @InputType()
 export class ChangeMyNotificationPreferences {
@@ -17,6 +24,68 @@ export class ChangeMyNotificationPreferences {
     @Field({ nullable: true })
     telegramAccount?: number
 }
+
+@InputType()
+export class MarkAsSeenInput {
+    @Field()
+    notificationId: string
+}
+
+@InputType()
+export class MarkAllAsSeenInput {
+    @Field(() => NotificationTypeEnum)
+    type: NotificationTypeEnum
+}
+
+@InputType()
+export class GetNotificationsInput {
+    @Field({ nullable: true })
+    userId?: string
+
+    @Field({ nullable: true })
+    cursor?: string
+
+    @Field({ nullable: true })
+    take?: number
+
+    @Field(() => NotificationTypeEnum)
+    type: NotificationTypeEnum
+
+    @Field({ nullable: true })
+    seen?: boolean
+}
+
+@ObjectType()
+export class GetNotificationData {
+    @Field()
+    id: string
+
+    @Field()
+    topic: string
+
+    @Field()
+    message: string
+
+    @Field()
+    link: string
+
+    @Field(() => NotificationTypeEnum)
+    type: NotificationTypeEnum
+
+    @Field()
+    sent: boolean
+
+    @Field()
+    sentAt: Date
+
+    @Field()
+    seen: boolean
+}
+
+@ObjectType()
+export class GetNotificationsResponse extends CursorBasedResponseType(
+    GetNotificationData,
+) {}
 
 @ObjectType()
 export class GetNotificationPreferences {
@@ -37,7 +106,7 @@ export class GetNotificationPreferences {
 }
 
 @ObjectType()
-export class NotificationWebResponse {
+export class OnNewNotification {
     @Field()
     userId: string
 
