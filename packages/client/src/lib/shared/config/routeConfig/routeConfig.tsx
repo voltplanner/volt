@@ -3,6 +3,7 @@ import { AuthPage } from 'pages'
 import { MainPage } from 'pages'
 import { NotFoundPage } from 'pages'
 import { SettingsPage } from 'pages'
+import { UsersPage } from 'pages/UsersPage/UsersPage'
 import { RouteProps } from 'react-router-dom'
 
 type AppRoutesProps = RouteProps & {
@@ -12,6 +13,7 @@ type AppRoutesProps = RouteProps & {
 export enum AppRoutes {
     MAIN = 'main',
     ROLES = 'roles',
+    USERS = 'users',
     ROLE_DETAILS = 'role_details',
     ABOUT = 'about',
     SETTINGS = 'settings',
@@ -20,9 +22,10 @@ export enum AppRoutes {
 }
 
 export const RoutePath: Record<AppRoutes, string> = {
-    [AppRoutes.AUTH]: '/',
-    [AppRoutes.MAIN]: '/main',
+    [AppRoutes.AUTH]: '/register',
+    [AppRoutes.MAIN]: '/',
     [AppRoutes.ROLES]: '/roles',
+    [AppRoutes.USERS]: '/users',
     [AppRoutes.ROLE_DETAILS]: '/roles/',
     [AppRoutes.ABOUT]: '/about',
     [AppRoutes.SETTINGS]: '/settings',
@@ -38,6 +41,11 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     [AppRoutes.ROLES]: {
         path: RoutePath.roles,
         element: <RolesPage />,
+        authOnly: true,
+    },
+    [AppRoutes.USERS]: {
+        path: RoutePath.users,
+        element: <UsersPage />,
         authOnly: true,
     },
     [AppRoutes.ROLE_DETAILS]: {

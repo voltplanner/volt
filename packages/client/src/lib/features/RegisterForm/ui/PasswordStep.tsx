@@ -2,12 +2,16 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { Button, Input } from 'shared'
 import { FormStyled } from './styles'
 import { useCompleteSignIn } from '../api/useCompleteSignIn'
-import { useSearchParams } from 'react-router-dom'
+import { RegisterData } from './RegisterForm'
+import { useSessionStore } from 'entities'
+import { useNavigate } from 'react-router-dom'
+
 type FormData = {
     password: string
     passwordRepeat: string
 }
-export const PasswordStep = () => {
+
+export const PasswordStep = ({ code, userId, email }: RegisterData) => {
     const {
         register,
         watch,
@@ -19,21 +23,23 @@ export const PasswordStep = () => {
             passwordRepeat: '',
         },
     })
+    const navigate = useNavigate()
+    const { login } = useSessionStore()
     const password = watch('password')
     // const { data, setStep } = useFormStore()
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         // setData(data)
         try {
-            await completeSignIn()
+            const { data } = await completeSignIn()
+            login(data.completeSignIn)
+            navigate('/')
         } catch (e) {
             console.log(e)
         }
     }
-    const [searchParams] = useSearchParams()
-    console.log(searchParams.get('code')) // 'name'
     const { completeSignIn } = useCompleteSignIn({
-        userId: searchParams.get('userId') ?? '',
-        code: searchParams.get('code') ?? '',
+        userId: userId,
+        code: code,
         password: password,
     })
     // useEffect(() => {
@@ -44,6 +50,12 @@ export const PasswordStep = () => {
     // }
     return (
         <FormStyled onSubmit={handleSubmit(onSubmit)}>
+            <Input
+                variant="primary"
+                placeholder={email}
+                type="email"
+                disabled
+            />
             <Input
                 label="Password"
                 variant="primary"

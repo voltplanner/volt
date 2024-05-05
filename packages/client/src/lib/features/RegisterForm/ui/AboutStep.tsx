@@ -27,9 +27,7 @@ export const AboutStep = () => {
         setData(data)
         setStep(2)
     }
-    useEffect(() => {
-        console.log('state', data)
-    }, [data])
+
     return (
         <FormStyled onSubmit={handleSubmit(onSubmit)}>
             <Input
