@@ -161,7 +161,7 @@ export class TaskService {
         
         readonly assignedToId?: string | null
 
-        readonly taskTagIds?: string[]
+        readonly tagIds?: string[]
     }, prisma?: PrismaTransactionClientType,
     ): Promise<{
         name?: { old?: string; new: string | null }
@@ -184,15 +184,15 @@ export class TaskService {
             estimatedDuration?: { old?: number; new: number | null }
             estimatedDateEnd?: { old?: number; new: number | null }
             estimatedDateStart?: { old?: number; new: number | null }
-            taskTagIds?: { old?: string[]; new: string[] }
+            tagIds?: { old?: string[]; new: string[] }
         } = {}
 
-        if (dto.taskTagIds !== undefined) {
-            const newTaskTags = [...dto.taskTagIds].sort().join()
+        if (dto.tagIds !== undefined) {
+            const newTaskTags = [...dto.tagIds].sort().join()
             const oldTaskTags = [...task.tags.map(i => i.id)].sort().join()
 
             if (newTaskTags !== oldTaskTags) {
-                conflictingProps.taskTagIds = { old: task.tags.map(i => i.id) ?? undefined, new: dto.taskTagIds }
+                conflictingProps.tagIds = { old: task.tags.map(i => i.id) ?? undefined, new: dto.tagIds }
             }
         }
 

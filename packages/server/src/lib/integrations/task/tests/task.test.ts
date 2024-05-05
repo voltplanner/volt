@@ -286,12 +286,12 @@ describe('Task', () => {
 
             await utils.gqlUpdateTask({
                 id: createdTask.id,
+                version: createdTask.version,
                 name: 'Test Task 2',
                 description: 'Test Description 2',
                 estimatedDateEnd: 2,
                 estimatedDateStart: 2,
                 estimatedDuration: 2,
-                version: createdTask.version,
                 tagIds: [projectTasksTags_2.id],
                 statusId: projectTasksStatuses_2.id,
             }, adminAccessToken)
@@ -319,6 +319,108 @@ describe('Task', () => {
                 code: projectTasksTags_2.code,
                 name: projectTasksTags_2.name,
             }])
+        })
+    })
+
+    describe('GQL API Errors', () => {
+        it('Must not update task', async () => {
+            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
+
+            const { createProject } = await utils.gqlCreateProject({
+                name: "Test Name 1",
+                description: "Test Description 1",
+                deadline: 1,
+                budget: 1,
+                members: [{
+                    userId: adminUser.id,
+                    roleCode: 'MANAGER',
+                }],
+            })
+
+            const { projectTasksTags } = await utils.gqlProjectTasksTags({ projectId: createProject })
+            const { projectTasksStatuses } = await utils.gqlProjectTasksStatuses({ projectId: createProject })
+
+            const projectTasksTags_1 = projectTasksTags[0]
+            const projectTasksTags_2 = projectTasksTags[1]
+            const projectTasksTags_3 = projectTasksTags[2]
+
+            const projectTasksStatuses_1 = projectTasksStatuses[0]
+            const projectTasksStatuses_2 = projectTasksStatuses[1]
+            const projectTasksStatuses_3 = projectTasksStatuses[2]
+
+            const { createTask } = await utils.gqlCreateTask({
+                projectId: createProject,
+                name: 'Test Task 1',
+                description: 'Test Description 1',
+                estimatedDateEnd: 1,
+                estimatedDateStart: 1,
+                estimatedDuration: 1,
+                assignedToId: adminUser.id,
+                tagsIds: [projectTasksTags_1.id],
+                statusId: projectTasksStatuses_1.id,
+            }, adminAccessToken)
+
+            const { task: createdTask } = await utils.gqlTask({
+                id: createTask,
+            })
+
+            await utils.gqlUpdateTask({
+                id: createdTask.id,
+                version: createdTask.version,
+                name: 'Test Task 2',
+                description: 'Test Description 2',
+                estimatedDateEnd: 2,
+                estimatedDateStart: 2,
+                estimatedDuration: 2,
+                tagIds: [projectTasksTags_2.id],
+                statusId: projectTasksStatuses_2.id,
+            }, adminAccessToken)
+
+            let error: any
+
+            // Try to update task with same version
+            try {
+                await utils.gqlUpdateTask({
+                    id: createdTask.id,
+                    version: createdTask.version,
+                    name: 'Test Task 3',
+                    description: 'Test Description 3',
+                    estimatedDateEnd: 3,
+                    estimatedDateStart: 3,
+                    estimatedDuration: 3,
+                    tagIds: [projectTasksTags_3.id],
+                    statusId: projectTasksStatuses_3.id,
+                }, adminAccessToken)
+            } catch (e) {
+                error = e
+            }
+
+            const extensions = error?.response?.errors?.[0]?.extensions
+
+            expect(extensions).toBeDefined()
+
+            expect(extensions.code).toBe('TASK_001')
+            expect(extensions.name).toBe('TASK_UPDATE_CONFLICT_ERROR')
+
+            expect(extensions.metadata.id).toBeDefined()
+            expect(extensions.metadata.conflictingProps).toBeDefined()
+
+            const conflictingProps = extensions.metadata.conflictingProps
+
+            expect(conflictingProps.name.old).toBe('Test Task 2')
+            expect(conflictingProps.name.new).toBe('Test Task 3')
+            expect(conflictingProps.description.old).toBe('Test Description 2')
+            expect(conflictingProps.description.new).toBe('Test Description 3')
+            expect(conflictingProps.estimatedDateEnd.old).toBe(2)
+            expect(conflictingProps.estimatedDateEnd.new).toBe(3)
+            expect(conflictingProps.estimatedDateStart.old).toBe(2)
+            expect(conflictingProps.estimatedDateStart.new).toBe(3)
+            expect(conflictingProps.estimatedDuration.old).toBe(2)
+            expect(conflictingProps.estimatedDuration.new).toBe(3)
+            expect(conflictingProps.statusId.old).toBe(projectTasksStatuses_2.id)
+            expect(conflictingProps.statusId.new).toBe(projectTasksStatuses_3.id)
+            expect(conflictingProps.tagIds.old).toEqual([projectTasksTags_2.id])
+            expect(conflictingProps.tagIds.new).toEqual([projectTasksTags_3.id])
         })
     })
 })
