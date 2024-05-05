@@ -39,7 +39,7 @@ export const LoginForm = (props: LoginFormProps) => {
             e.preventDefault()
             const { data } = await signIn()
             login(data.signIn)
-            navigate('/main')
+            navigate('/')
         } catch (e) {
             console.log('error => ', e)
         }
