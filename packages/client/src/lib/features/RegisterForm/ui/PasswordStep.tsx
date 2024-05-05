@@ -32,7 +32,7 @@ export const PasswordStep = ({ code, userId, email }: RegisterData) => {
         try {
             const { data } = await completeSignIn()
             login(data.completeSignIn)
-            navigate('/main')
+            navigate('/')
         } catch (e) {
             console.log(e)
         }

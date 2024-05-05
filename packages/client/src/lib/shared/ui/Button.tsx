@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { OptionsIcon } from 'shared/assets/OptionsIcon'
 import styled, { css } from 'styled-components'
 const baseButtonStyles = css`
     padding: 8px 16px;
@@ -57,6 +58,14 @@ const variants = {
             filter: invert(50%);
         }
     `,
+    context: css`
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
+        &:hover {
+            filter: invert(50%);
+        }
+    `,
 }
 const sizes = {
     auto: css`
@@ -99,7 +108,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     square?: boolean
     disabled?: boolean
     children?: ReactNode
-    variant?: 'primary' | 'secondary' | 'ghost' | 'image'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'image' | 'context'
     image?: any
     altImage?: string
     width?: string
@@ -137,6 +146,13 @@ export const Button = (props: ButtonProps) => {
                 >
                     {image}
                 </div>
+            </ButtonStyled>
+        )
+    }
+    if (variant === 'context') {
+        return (
+            <ButtonStyled variant={variant}>
+                <OptionsIcon />
             </ButtonStyled>
         )
     }
