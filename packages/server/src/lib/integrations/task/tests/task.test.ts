@@ -190,6 +190,65 @@ describe('Task', () => {
             expect(tasks.data).toHaveLength(2)
         })
 
+        it('Must filter tasks by full text', async () => {
+            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
+
+            const { createProject } = await utils.gqlCreateProject({
+                name: "Test Name 1",
+                description: "Test Description 1",
+                deadline: 1,
+                budget: 1,
+                members: [{
+                    userId: adminUser.id,
+                    roleCode: 'MANAGER',
+                }],
+            })
+
+            const { projectTasksStatuses } = await utils.gqlProjectTasksStatuses({ projectId: createProject })
+           
+            const taskPayloadStatus = projectTasksStatuses.find((i: any) => i.code === 'OPENED')
+
+            const taskPayload_1 = {
+                projectId: createProject,
+                name: 'Lorem ipsum pariatur velit',
+                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
+                statusId: taskPayloadStatus.id,
+            }
+            const taskPayload_2 = {
+                projectId: createProject,
+                name: 'Lorem perspiciatis tempora',
+                description: 'velit ipsum dolor sit amet, iste natus error',
+                statusId: taskPayloadStatus.id,
+            }
+            const taskPayload_3 = {
+                projectId: createProject,
+                name: 'Task Name 3',
+                description: 'Task Description 3',
+                statusId: taskPayloadStatus.id,
+            }
+
+            await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
+            await utils.gqlCreateTask(taskPayload_2, adminAccessToken)
+            await utils.gqlCreateTask(taskPayload_3, adminAccessToken)
+
+            const { tasks: tasks_1_by_name } = await utils.gqlTasks({ fulltext: ['lorem iPsum'] })
+            const { tasks: tasks_1_by_description } = await utils.gqlTasks({ fulltext: ['ConsectEtur'] })
+            const { tasks: tasks_by_name } = await utils.gqlTasks({ fulltext: ['loRem'] })
+            const { tasks: tasks_by_description } = await utils.gqlTasks({ fulltext: ['doLor'] })
+            const { tasks: tasks_by_different } = await utils.gqlTasks({ fulltext: ['veLit'] })
+            const { tasks: tasks_by_name_combined } = await utils.gqlTasks({ fulltext: ['pariaTUr', 'temPora'] })
+            const { tasks: tasks_by_descriptions_combined } = await utils.gqlTasks({ fulltext: ['consectetur', 'natus'] })
+
+            expect(tasks_1_by_name.data.map(i => i.name)).toEqual([taskPayload_1.name])
+            expect(tasks_1_by_description.data.map(i => i.name)).toEqual([taskPayload_1.name])
+            expect(tasks_by_name.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_description.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_different.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_name_combined.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_descriptions_combined.data.map(i => i.name))
+                .toEqual([taskPayload_2.name, taskPayload_1.name])
+        })
+
         it('Must return tasks of user', async () => {
             const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
 

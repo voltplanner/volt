@@ -65,9 +65,16 @@
       "executor": "@tinybudgie/schematics:prisma-migrate-dev"
     },
     "prisma:db:push": {
+      "dependsOn": ["prisma:db:push:prepare"],
       "executor": "nx:run-commands",
       "options": {
         "command": "npx prisma db push --schema packages/server/src/prisma/schema.prisma"
+      }
+    },
+    "prisma:db:push:prepare": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node packages/server/prepare-db.js"
       }
     },
     "prisma:migrate:deploy": {

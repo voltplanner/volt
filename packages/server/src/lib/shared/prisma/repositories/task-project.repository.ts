@@ -163,6 +163,7 @@ export const taskProjectModelExtentions = {
 
             const delegateWhere: Prisma.TaskProjectWhereInput = {
                 name: undefined,
+                fulltext: undefined,
                 isDeleted: false,
             }
 
@@ -170,6 +171,26 @@ export const taskProjectModelExtentions = {
                 dto.orderBy
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { createdAt: 'desc' }
+
+            if (dto.filterByFulltext) {
+                if (typeof dto.filterByFulltext === 'string') {
+                    delegateWhere.fulltext = {
+                        contains: dto.filterByFulltext,
+                        mode: 'insensitive',
+                    }
+                } else if (dto.filterByFulltext.length) {
+                    delegateWhere.OR = delegateWhere.OR || []
+
+                    dto.filterByFulltext.forEach((i) => {
+                        delegateWhere.OR.push({
+                            fulltext: {
+                                contains: i,
+                                mode: 'insensitive',
+                            },
+                        })
+                    })
+                }
+            }
 
             if (dto.filterByName) {
                 delegateWhere.name = {

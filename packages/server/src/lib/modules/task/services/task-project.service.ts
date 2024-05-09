@@ -92,6 +92,7 @@ export class TaskProjectService {
 
         filterByName?: string
         filterByUserId?: string
+        filterByFulltext?: string | string[]
         filterByCreatedAt?: {
             from?: Date
             to?: Date

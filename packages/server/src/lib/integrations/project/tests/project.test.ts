@@ -165,6 +165,52 @@ describe('Project', () => {
 
         })
 
+        it('Must filter projects by full text', async () => {
+            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
+
+            const projectPayload_1 = {
+                name: 'Lorem ipsum pariatur velit',
+                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
+                deadline: 1,
+                budget: 1,
+            }
+            const projectPayload_2 = {
+                name: 'Lorem perspiciatis tempora',
+                description: 'velit ipsum dolor sit amet, iste natus error',
+                deadline: 1,
+                budget: 1,
+            }
+            const projectPayload_3 = {
+                name: 'Project Name 3',
+                description: 'Project Description 3',
+                deadline: 1,
+                budget: 1,
+            }
+
+            await utils.gqlCreateProject(projectPayload_1)
+            await utils.gqlCreateProject(projectPayload_2)
+            await utils.gqlCreateProject(projectPayload_3)
+
+            const { projects: projects_1_by_name } = await utils.gqlProjects({ fulltext: ['lorem iPsum'] })
+            const { projects: projects_1_by_description } = await utils.gqlProjects({ fulltext: ['ConsectEtur'] })
+            const { projects: projects_by_name } = await utils.gqlProjects({ fulltext: ['loRem'] })
+            const { projects: projects_by_description } = await utils.gqlProjects({ fulltext: ['doLor'] })
+            const { projects: projects_by_different } = await utils.gqlProjects({ fulltext: ['veLit'] })
+            const { projects: projects_by_name_combined } = await utils.gqlProjects({ fulltext: ['pariaTUr', 'temPora'] })
+            const { projects: projects_by_descriptions_combined } = await utils.gqlProjects({ fulltext: ['consectetur', 'natus'] })
+
+            expect(projects_1_by_name.data.map(i => i.name)).toEqual([projectPayload_1.name])
+            expect(projects_1_by_description.data.map(i => i.name)).toEqual([projectPayload_1.name])
+            expect(projects_by_name.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_description.data.map(i => i.name))
+                .toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_different.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_name_combined.data.map(i => i.name))
+                .toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_descriptions_combined.data.map(i => i.name))
+                .toEqual([projectPayload_2.name, projectPayload_1.name])
+        })
+
         it('Must return users of project', async () => {
             const { adminUser } = await utils.gqlGetAdminUser()
 

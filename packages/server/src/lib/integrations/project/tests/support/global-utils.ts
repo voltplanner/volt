@@ -9,6 +9,7 @@ import { ProjectIntegrationProjectTasksTagsInput } from '../../types-input/proje
 import { ProjectIntegrationProjectUpdateInput } from '../../types-input/project-integration-project-update.input-type'
 import { ProjectIntegrationProjectUsersInput } from '../../types-input/project-integration-project-users.input-type'
 import { ProjectIntegrationProjectUsersRolesInput } from '../../types-input/project-integration-project-users-roles.input-type'
+import { ProjectIntegrationProjectsInput } from '../../types-input/project-integration-projects.input-type'
 import { setup } from './global-setup'
 
 export class GlobalUtils {
@@ -61,10 +62,10 @@ export class GlobalUtils {
         })
     }
 
-    async gqlProjects(): Promise<Record<string, any>> {
+    async gqlProjects(dto?: ProjectIntegrationProjectsInput): Promise<Record<string, any>> {
         const doc = gql`
-            query projects {
-                projects {
+            query projects${dto ? '($projectsInput: ProjectIntegrationProjectsInput!)' : ''} {
+                projects${dto ? '(input: $projectsInput)' : ''} {
                     data {
                         id
                         name
@@ -83,7 +84,9 @@ export class GlobalUtils {
             }
         `
 
-        return await request(this.gqlApiUrl, doc)
+        return await request(this.gqlApiUrl, doc, {
+            "projectsInput": dto,
+        })
     }
 
     async gqlProjectsOfCurrentUser(accessToken: string): Promise<Record<string, any>> {

@@ -419,12 +419,33 @@ export const taskModelExtentions = {
                 projectId: undefined,
                 createdById: undefined,
                 assignedToId: undefined,
+                fulltext: undefined,
                 isDeleted: false,
             }
 
             const delegateOrderBy: Prisma.TaskOrderByWithRelationAndSearchRelevanceInput =
                 { createdAt: 'desc' }
 
+            if (dto.filterByFulltext) {
+                if (typeof dto.filterByFulltext === 'string') {
+                    delegateWhere.fulltext = {
+                        contains: dto.filterByFulltext,
+                        mode: 'insensitive',
+                    }
+                } else if (dto.filterByFulltext.length) {
+                    delegateWhere.OR = delegateWhere.OR || []
+
+                    dto.filterByFulltext.forEach((i) => {
+                        delegateWhere.OR.push({
+                            fulltext: {
+                                contains: i,
+                                mode: 'insensitive',
+                            },
+                        })
+                    })
+                }
+            }
+            
             if (dto.filterByName) {
                 delegateWhere.name = {
                     contains: dto.filterByName,

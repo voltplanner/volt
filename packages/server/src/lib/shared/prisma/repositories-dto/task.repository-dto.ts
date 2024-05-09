@@ -43,6 +43,7 @@ export type TaskFindManyRepositoryDto = {
     filterByNumber?: number
     filterByStatusId?: string
     filterByParentId?: string
+    filterByFulltext?: string | string[]
     filterByProjectId?: string
     filterByCreatedById?: string
     filterByAssignedToId?: string
@@ -50,7 +51,7 @@ export type TaskFindManyRepositoryDto = {
         from?: Date
         to?: Date
     }
-
+    
     orderBy?: {
         field: 'name' | 'status' | 'createdAt'
         order: OrderEnum

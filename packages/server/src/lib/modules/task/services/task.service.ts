@@ -108,6 +108,7 @@ export class TaskService {
         filterByProjectId?: string
         filterByCreatedById?: string
         filterByAssignedToId?: string
+        filterByFulltext?: string | string[]
         filterByCreatedAt?: {
             from?: Date
             to?: Date
