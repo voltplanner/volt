@@ -1,4 +1,5 @@
 
+import { ProjectIntegrationCreateProjectInput } from '../types-input/project-integration-project-create.input-type'
 import { setup as setupTest } from './support/global-setup'
 import { teardown } from './support/global-teardown'
 import { GlobalUtils } from './support/global-utils'
@@ -14,24 +15,24 @@ describe('Project', () => {
         utils = new GlobalUtils(setup)
     })
 
-    afterEach(async () => {
-        await setup.prisma.taskOnTaskTag.deleteMany()
-        await setup.prisma.taskProjectOnUser.deleteMany()
-        await setup.prisma.taskOnTaskRelation.deleteMany()
-
-        await setup.prisma.taskUser.deleteMany()
-        await setup.prisma.taskUserRole.deleteMany()
-        await setup.prisma.taskTag.deleteMany()
-        await setup.prisma.taskStatus.deleteMany()
-        await setup.prisma.taskRelation.deleteMany()
-        await setup.prisma.taskProject.deleteMany()
-    })
-
     afterAll(async () => {
         await teardown(setup)
     })
 
     describe('GQL API', () => {
+        afterEach(async () => {
+            await setup.prisma.taskOnTaskTag.deleteMany()
+            await setup.prisma.taskProjectOnUser.deleteMany()
+            await setup.prisma.taskOnTaskRelation.deleteMany()
+    
+            await setup.prisma.taskUser.deleteMany()
+            await setup.prisma.taskUserRole.deleteMany()
+            await setup.prisma.taskTag.deleteMany()
+            await setup.prisma.taskStatus.deleteMany()
+            await setup.prisma.taskRelation.deleteMany()
+            await setup.prisma.taskProject.deleteMany()
+        })
+
         it('Must create project', async () => {
             const { createProject } = await utils.gqlCreateProject({
                 name: "Test Name 1",
@@ -113,138 +114,6 @@ describe('Project', () => {
             expect(project.deadline).toBe(1714332185805)
             expect(project.budget).toBe(100)
             expect(project.version).toBe(0)
-        })
-
-        it('Must return projects', async () => {
-            const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
-                deadline: 1714332185805,
-                budget: 100,
-            })
-
-            const { projects } = await utils.gqlProjects()
-
-            expect(projects.data).toHaveLength(1)
-            expect(projects.data[0].id).toBe(createProject)
-        })
-
-        it('Must return projects of user', async () => {
-            const { adminUser } = await utils.gqlGetAdminUser()
-
-            await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
-                deadline: 1714332185805,
-                budget: 100,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
-            })
-
-            const accessToken = await utils.adminGetAccessToken()
-            const { projectsOfCurrentUser } = await utils.gqlProjectsOfCurrentUser(accessToken)
-
-            expect(projectsOfCurrentUser instanceof Object).toBeTruthy()
-            expect(projectsOfCurrentUser.data instanceof Array).toBeTruthy()
-            expect(projectsOfCurrentUser.data).toHaveLength(1)
-
-            expect(typeof projectsOfCurrentUser.data[0].id).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].name).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].description).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].deadline).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].budget).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].version).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].createdAt).toBe('number')
-
-            expect(projectsOfCurrentUser.meta instanceof Object).toBeTruthy()
-            expect(typeof projectsOfCurrentUser.meta.curPage).toBe('number')
-            expect(typeof projectsOfCurrentUser.meta.perPage).toBe('number')
-            expect(typeof projectsOfCurrentUser.meta.total).toBe('number')
-
-        })
-
-        it('Must filter projects by full text', async () => {
-            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
-
-            const projectPayload_1 = {
-                name: 'Lorem ipsum pariatur velit',
-                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
-                deadline: 1,
-                budget: 1,
-            }
-            const projectPayload_2 = {
-                name: 'Lorem perspiciatis tempora',
-                description: 'velit ipsum dolor sit amet, iste natus error',
-                deadline: 1,
-                budget: 1,
-            }
-            const projectPayload_3 = {
-                name: 'Project Name 3',
-                description: 'Project Description 3',
-                deadline: 1,
-                budget: 1,
-            }
-
-            await utils.gqlCreateProject(projectPayload_1)
-            await utils.gqlCreateProject(projectPayload_2)
-            await utils.gqlCreateProject(projectPayload_3)
-
-            const { projects: projects_1_by_name } = await utils.gqlProjects({ fulltext: ['lorem iPsum'] })
-            const { projects: projects_1_by_description } = await utils.gqlProjects({ fulltext: ['ConsectEtur'] })
-            const { projects: projects_by_name } = await utils.gqlProjects({ fulltext: ['loRem'] })
-            const { projects: projects_by_description } = await utils.gqlProjects({ fulltext: ['doLor'] })
-            const { projects: projects_by_different } = await utils.gqlProjects({ fulltext: ['veLit'] })
-            const { projects: projects_by_name_combined } = await utils.gqlProjects({ fulltext: ['pariaTUr', 'temPora'] })
-            const { projects: projects_by_descriptions_combined } = await utils.gqlProjects({ fulltext: ['consectetur', 'natus'] })
-
-            expect(projects_1_by_name.data.map(i => i.name)).toEqual([projectPayload_1.name])
-            expect(projects_1_by_description.data.map(i => i.name)).toEqual([projectPayload_1.name])
-            expect(projects_by_name.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_description.data.map(i => i.name))
-                .toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_different.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_name_combined.data.map(i => i.name))
-                .toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_descriptions_combined.data.map(i => i.name))
-                .toEqual([projectPayload_2.name, projectPayload_1.name])
-        })
-
-        it('Must return users of project', async () => {
-            const { adminUser } = await utils.gqlGetAdminUser()
-
-            await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
-                deadline: 1714332185805,
-                budget: 100,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
-            })
-
-            const accessToken = await utils.adminGetAccessToken()
-            const { projectsOfCurrentUser } = await utils.gqlProjectsOfCurrentUser(accessToken)
-
-            expect(projectsOfCurrentUser instanceof Object).toBeTruthy()
-            expect(projectsOfCurrentUser.data instanceof Array).toBeTruthy()
-            expect(projectsOfCurrentUser.data).toHaveLength(1)
-
-            expect(typeof projectsOfCurrentUser.data[0].id).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].name).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].description).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].deadline).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].budget).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].version).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].createdAt).toBe('number')
-
-            expect(projectsOfCurrentUser.meta instanceof Object).toBeTruthy()
-            expect(typeof projectsOfCurrentUser.meta.curPage).toBe('number')
-            expect(typeof projectsOfCurrentUser.meta.perPage).toBe('number')
-            expect(typeof projectsOfCurrentUser.meta.total).toBe('number')
-
         })
 
         it('Must return project user roles', async () => {
@@ -378,7 +247,136 @@ describe('Project', () => {
         })
     })
 
+    describe('GQL API Projects', () => {
+        let projectPayload_1: ProjectIntegrationCreateProjectInput = {} as any
+        let projectPayload_2: ProjectIntegrationCreateProjectInput = {} as any
+        let projectPayload_3: ProjectIntegrationCreateProjectInput = {} as any
+        let adminUserId = ''
+        
+        afterAll(async () => {
+            await setup.prisma.taskOnTaskTag.deleteMany()
+            await setup.prisma.taskProjectOnUser.deleteMany()
+            await setup.prisma.taskOnTaskRelation.deleteMany()
+    
+            await setup.prisma.taskUser.deleteMany()
+            await setup.prisma.taskUserRole.deleteMany()
+            await setup.prisma.taskTag.deleteMany()
+            await setup.prisma.taskStatus.deleteMany()
+            await setup.prisma.taskRelation.deleteMany()
+            await setup.prisma.taskProject.deleteMany()
+        })
+
+        beforeAll(async () => {
+            const { adminUser } = await utils.gqlGetAdminUser()
+
+            projectPayload_1 = {
+                name: 'Lorem ipsum pariatur velit',
+                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
+                deadline: 1,
+                budget: 1,
+            }
+            projectPayload_2 = {
+                name: 'Lorem perspiciatis tempora',
+                description: 'velit ipsum dolor sit amet, iste natus error',
+                deadline: 1,
+                budget: 1,
+                members: [{ userId: adminUser.id, roleCode: 'PERFORMER' }],
+            }
+            projectPayload_3 = {
+                name: 'Project Name 3',
+                description: 'Project Description 3',
+                deadline: 1,
+                budget: 1,
+                members: [{ userId: adminUser.id, roleCode: 'MANAGER' }],
+            }
+
+            await utils.gqlCreateProject(projectPayload_1)
+            await utils.gqlCreateProject(projectPayload_2)
+            await utils.gqlCreateProject(projectPayload_3)
+
+            adminUserId = adminUser.id
+        })
+
+        it('Must return projects', async () => {
+            const { projects } = await utils.gqlProjects()
+
+            expect(projects).toBeDefined()
+            expect(projects.data).toBeDefined()
+            expect(projects.meta).toBeDefined()
+            expect(projects.data).toHaveLength(3)
+        })
+
+        it('Must return projects of current user', async () => {
+            const accessToken = await utils.adminGetAccessToken()
+            const { projectsOfCurrentUser } = await utils.gqlProjectsOfCurrentUser(accessToken)
+
+            expect(projectsOfCurrentUser instanceof Object).toBeTruthy()
+            expect(projectsOfCurrentUser.data instanceof Array).toBeTruthy()
+            expect(projectsOfCurrentUser.data).toHaveLength(2)
+
+            expect(typeof projectsOfCurrentUser.data[0].id).toBe('string')
+            expect(typeof projectsOfCurrentUser.data[0].name).toBe('string')
+            expect(typeof projectsOfCurrentUser.data[0].description).toBe('string')
+            expect(typeof projectsOfCurrentUser.data[0].deadline).toBe('number')
+            expect(typeof projectsOfCurrentUser.data[0].budget).toBe('number')
+            expect(typeof projectsOfCurrentUser.data[0].version).toBe('number')
+            expect(typeof projectsOfCurrentUser.data[0].createdAt).toBe('number')
+
+            expect(projectsOfCurrentUser.meta instanceof Object).toBeTruthy()
+            expect(typeof projectsOfCurrentUser.meta.curPage).toBe('number')
+            expect(typeof projectsOfCurrentUser.meta.perPage).toBe('number')
+            expect(typeof projectsOfCurrentUser.meta.total).toBe('number')
+
+        })
+
+        it('Must return filtered projects by name', async () => {
+            const { projects } = await utils.gqlProjects({ filterBy: { name: ['Lorem'] } })
+
+            expect(projects?.data?.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
+        })
+
+        it('Must return filtered projects by user', async () => {
+            const { projects } = await utils.gqlProjects({ filterBy: { userId: [adminUserId] } })
+
+            expect(projects?.data?.map(i => i.name)).toEqual([projectPayload_3.name, projectPayload_2.name])
+        })
+
+        it('Must return filtered projects by full text', async () => {
+            const { projects: projects_1_by_name } = await utils.gqlProjects({ filterBy: { fulltext: ['lorem iPsum'] } })
+            const { projects: projects_1_by_description } = await utils.gqlProjects({ filterBy: { fulltext: ['ConsectEtur'] } })
+            const { projects: projects_by_name } = await utils.gqlProjects({ filterBy: { fulltext: ['loRem'] } })
+            const { projects: projects_by_description } = await utils.gqlProjects({ filterBy: { fulltext: ['doLor'] } })
+            const { projects: projects_by_different } = await utils.gqlProjects({ filterBy: { fulltext: ['veLit'] } })
+            const { projects: projects_by_name_combined } = await utils.gqlProjects({ filterBy: { fulltext: ['pariaTUr', 'temPora'] } })
+            const { projects: projects_by_descriptions_combined } = await utils.gqlProjects({ filterBy: { fulltext: ['consectetur', 'natus'] } })
+
+            expect(projects_1_by_name.data.map(i => i.name)).toEqual([projectPayload_1.name])
+            expect(projects_1_by_description.data.map(i => i.name)).toEqual([projectPayload_1.name])
+            expect(projects_by_name.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_description.data.map(i => i.name))
+                .toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_different.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_name_combined.data.map(i => i.name))
+                .toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_by_descriptions_combined.data.map(i => i.name))
+                .toEqual([projectPayload_2.name, projectPayload_1.name])
+        })
+    })
+
     describe('GQL API Errors', () => {
+        afterEach(async () => {
+            await setup.prisma.taskOnTaskTag.deleteMany()
+            await setup.prisma.taskProjectOnUser.deleteMany()
+            await setup.prisma.taskOnTaskRelation.deleteMany()
+    
+            await setup.prisma.taskUser.deleteMany()
+            await setup.prisma.taskUserRole.deleteMany()
+            await setup.prisma.taskTag.deleteMany()
+            await setup.prisma.taskStatus.deleteMany()
+            await setup.prisma.taskRelation.deleteMany()
+            await setup.prisma.taskProject.deleteMany()
+        })
+
         it('Must not update project', async () => {
             const { createProject } = await utils.gqlCreateProject({
                 name: "Test Name 1",

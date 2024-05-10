@@ -90,8 +90,8 @@ export class TaskProjectService {
         curPage?: number
         perPage?: number
 
-        filterByName?: string
-        filterByUserId?: string
+        filterByName?: string | string[]
+        filterByUserId?: string | string[]
         filterByFulltext?: string | string[]
         filterByCreatedAt?: {
             from?: Date

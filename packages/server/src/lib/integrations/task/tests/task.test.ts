@@ -1,4 +1,5 @@
 
+import { TaskIntegrationTaskCreateInput } from '../types-input/task-integration-task-create.input-type'
 import { setup as setupTest } from './support/global-setup'
 import { teardown } from './support/global-teardown'
 import { GlobalUtils } from './support/global-utils'
@@ -14,31 +15,31 @@ describe('Task', () => {
         utils = new GlobalUtils(setup)
     })
 
-    afterEach(async () => {
-        await setup.prisma.taskOnTaskTag.deleteMany()
-        await setup.prisma.taskProjectOnUser.deleteMany()
-        await setup.prisma.taskOnTaskRelation.deleteMany()
-
-        await setup.prisma.taskAttachment.deleteMany()
-        await setup.prisma.taskChange.deleteMany()
-        await setup.prisma.taskComment.deleteMany()
-        await setup.prisma.taskCustomField.deleteMany()
-        await setup.prisma.taskEffort.deleteMany()
-        await setup.prisma.task.deleteMany()
-
-        await setup.prisma.taskUser.deleteMany()
-        await setup.prisma.taskUserRole.deleteMany()
-        await setup.prisma.taskTag.deleteMany()
-        await setup.prisma.taskStatus.deleteMany()
-        await setup.prisma.taskRelation.deleteMany()
-        await setup.prisma.taskProject.deleteMany()
-    })
-
     afterAll(async () => {
         await teardown(setup)
     })
 
     describe('GQL API', () => {
+        afterEach(async () => {
+            await setup.prisma.taskOnTaskTag.deleteMany()
+            await setup.prisma.taskProjectOnUser.deleteMany()
+            await setup.prisma.taskOnTaskRelation.deleteMany()
+    
+            await setup.prisma.taskAttachment.deleteMany()
+            await setup.prisma.taskChange.deleteMany()
+            await setup.prisma.taskComment.deleteMany()
+            await setup.prisma.taskCustomField.deleteMany()
+            await setup.prisma.taskEffort.deleteMany()
+            await setup.prisma.task.deleteMany()
+    
+            await setup.prisma.taskUser.deleteMany()
+            await setup.prisma.taskUserRole.deleteMany()
+            await setup.prisma.taskTag.deleteMany()
+            await setup.prisma.taskStatus.deleteMany()
+            await setup.prisma.taskRelation.deleteMany()
+            await setup.prisma.taskProject.deleteMany()
+        })
+
         it('Must create task', async () => {
             const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
 
@@ -135,175 +136,6 @@ describe('Task', () => {
             }
         })
 
-        it('Must return tasks', async () => {
-            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
-
-            const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
-                deadline: 1,
-                budget: 1,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
-            })
-
-            const { projectTasksTags } = await utils.gqlProjectTasksTags({ projectId: createProject })
-            const { projectTasksStatuses } = await utils.gqlProjectTasksStatuses({ projectId: createProject })
-           
-            const taskPayloadStatus = projectTasksStatuses.find((i: any) => i.code === 'OPENED')
-            const taskPayloadTags = projectTasksTags
-
-            const taskPayload_1 = {
-                projectId: createProject,
-                name: 'Test Task 1',
-                description: 'Test Description 1',
-                estimatedDateEnd: 1,
-                estimatedDateStart: 1,
-                estimatedDuration: 1,
-                assignedToId: adminUser.id,
-                tagsIds: taskPayloadTags.map((i: any) => i.id),
-                statusId: taskPayloadStatus.id,
-            }
-            const taskPayload_2 = {
-                projectId: createProject,
-                name: 'Test Task 2',
-                description: 'Test Description 2',
-                estimatedDateEnd: 2,
-                estimatedDateStart: 2,
-                estimatedDuration: 2,
-                assignedToId: adminUser.id,
-                tagsIds: taskPayloadTags.map((i: any) => i.id),
-                statusId: taskPayloadStatus.id,
-            }
-
-            await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
-            await utils.gqlCreateTask(taskPayload_2, adminAccessToken)
-
-            const { tasks } = await utils.gqlTasks()
-
-            expect(tasks).toBeDefined()
-            expect(tasks.data).toBeDefined()
-            expect(tasks.meta).toBeDefined()
-
-            expect(tasks.data).toHaveLength(2)
-        })
-
-        it('Must filter tasks by full text', async () => {
-            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
-
-            const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
-                deadline: 1,
-                budget: 1,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
-            })
-
-            const { projectTasksStatuses } = await utils.gqlProjectTasksStatuses({ projectId: createProject })
-           
-            const taskPayloadStatus = projectTasksStatuses.find((i: any) => i.code === 'OPENED')
-
-            const taskPayload_1 = {
-                projectId: createProject,
-                name: 'Lorem ipsum pariatur velit',
-                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
-                statusId: taskPayloadStatus.id,
-            }
-            const taskPayload_2 = {
-                projectId: createProject,
-                name: 'Lorem perspiciatis tempora',
-                description: 'velit ipsum dolor sit amet, iste natus error',
-                statusId: taskPayloadStatus.id,
-            }
-            const taskPayload_3 = {
-                projectId: createProject,
-                name: 'Task Name 3',
-                description: 'Task Description 3',
-                statusId: taskPayloadStatus.id,
-            }
-
-            await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
-            await utils.gqlCreateTask(taskPayload_2, adminAccessToken)
-            await utils.gqlCreateTask(taskPayload_3, adminAccessToken)
-
-            const { tasks: tasks_1_by_name } = await utils.gqlTasks({ fulltext: ['lorem iPsum'] })
-            const { tasks: tasks_1_by_description } = await utils.gqlTasks({ fulltext: ['ConsectEtur'] })
-            const { tasks: tasks_by_name } = await utils.gqlTasks({ fulltext: ['loRem'] })
-            const { tasks: tasks_by_description } = await utils.gqlTasks({ fulltext: ['doLor'] })
-            const { tasks: tasks_by_different } = await utils.gqlTasks({ fulltext: ['veLit'] })
-            const { tasks: tasks_by_name_combined } = await utils.gqlTasks({ fulltext: ['pariaTUr', 'temPora'] })
-            const { tasks: tasks_by_descriptions_combined } = await utils.gqlTasks({ fulltext: ['consectetur', 'natus'] })
-
-            expect(tasks_1_by_name.data.map(i => i.name)).toEqual([taskPayload_1.name])
-            expect(tasks_1_by_description.data.map(i => i.name)).toEqual([taskPayload_1.name])
-            expect(tasks_by_name.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
-            expect(tasks_by_description.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
-            expect(tasks_by_different.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
-            expect(tasks_by_name_combined.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
-            expect(tasks_by_descriptions_combined.data.map(i => i.name))
-                .toEqual([taskPayload_2.name, taskPayload_1.name])
-        })
-
-        it('Must return tasks of user', async () => {
-            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
-
-            const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
-                deadline: 1,
-                budget: 1,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
-            })
-
-            const { projectTasksTags } = await utils.gqlProjectTasksTags({ projectId: createProject })
-            const { projectTasksStatuses } = await utils.gqlProjectTasksStatuses({ projectId: createProject })
-           
-            const taskPayloadStatus = projectTasksStatuses.find((i: any) => i.code === 'OPENED')
-            const taskPayloadTags = projectTasksTags
-
-            const taskPayload_1 = {
-                projectId: createProject,
-                name: 'Test Task 1',
-                description: 'Test Description 1',
-                estimatedDateEnd: 1,
-                estimatedDateStart: 1,
-                estimatedDuration: 1,
-                assignedToId: adminUser.id,
-                tagsIds: taskPayloadTags.map((i: any) => i.id),
-                statusId: taskPayloadStatus.id,
-            }
-            const taskPayload_2 = {
-                projectId: createProject,
-                name: 'Test Task 2',
-                description: 'Test Description 2',
-                estimatedDateEnd: 2,
-                estimatedDateStart: 2,
-                estimatedDuration: 2,
-                assignedToId: adminUser.id,
-                tagsIds: taskPayloadTags.map((i: any) => i.id),
-                statusId: taskPayloadStatus.id,
-            }
-
-            await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
-            await utils.gqlCreateTask(taskPayload_2, adminAccessToken)
-
-            const { tasksOfCurrentUser } = await utils.gqlTasksOfCurrentUser(undefined, adminAccessToken)
-
-            expect(tasksOfCurrentUser).toBeDefined()
-            expect(tasksOfCurrentUser.data).toBeDefined()
-            expect(tasksOfCurrentUser.meta).toBeDefined()
-
-            expect(tasksOfCurrentUser.data).toHaveLength(2)
-        })
-
         it('Must update task', async () => {
             const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
 
@@ -381,7 +213,233 @@ describe('Task', () => {
         })
     })
 
+    describe('GQL API Tasks', () => {
+        let projectId = ''
+        let adminUserId = ''
+
+        let taskPayload_1: TaskIntegrationTaskCreateInput = {} as any
+        let taskPayload_2: TaskIntegrationTaskCreateInput = {} as any
+        let taskPayload_3: TaskIntegrationTaskCreateInput = {} as any
+        let createdAtBefore_2: Date
+        let createdAtAfter_2: Date
+
+        let projectTasksTags: any
+        let projectTasksStatuses: any
+
+        afterAll(async () => {
+            await setup.prisma.taskOnTaskTag.deleteMany()
+            await setup.prisma.taskProjectOnUser.deleteMany()
+            await setup.prisma.taskOnTaskRelation.deleteMany()
+    
+            await setup.prisma.taskAttachment.deleteMany()
+            await setup.prisma.taskChange.deleteMany()
+            await setup.prisma.taskComment.deleteMany()
+            await setup.prisma.taskCustomField.deleteMany()
+            await setup.prisma.taskEffort.deleteMany()
+            await setup.prisma.task.deleteMany()
+    
+            await setup.prisma.taskUser.deleteMany()
+            await setup.prisma.taskUserRole.deleteMany()
+            await setup.prisma.taskTag.deleteMany()
+            await setup.prisma.taskStatus.deleteMany()
+            await setup.prisma.taskRelation.deleteMany()
+            await setup.prisma.taskProject.deleteMany()
+        })
+
+        beforeAll(async () => {
+            const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
+
+            const { createProject } = await utils.gqlCreateProject({
+                name: "Test Name 1",
+                description: "Test Description 1",
+                deadline: 1,
+                budget: 1,
+                members: [{
+                    userId: adminUser.id,
+                    roleCode: 'MANAGER',
+                }],
+            })
+
+            const gqlProjectTasksTags = await utils.gqlProjectTasksTags({ projectId: createProject })
+            const gqlProjectTasksStatuses = await utils.gqlProjectTasksStatuses({ projectId: createProject })
+
+            projectId = createProject
+            adminUserId = adminUser.id
+            projectTasksTags = gqlProjectTasksTags.projectTasksTags
+            projectTasksStatuses = gqlProjectTasksStatuses.projectTasksStatuses
+
+            taskPayload_1 = {
+                projectId,
+                name: 'Lorem ipsum pariatur velit',
+                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
+                statusId: projectTasksStatuses.find((i: any) => i.code === 'OPENED').id,
+                estimatedDateStart: 50,
+                estimatedDateEnd: 100,
+                estimatedDuration: 1,
+                assignedToId: adminUser.id,
+                tagsIds: projectTasksTags.filter(i => ['TASK', 'BUG'].includes(i.code)).map((i: any) => i.id),
+            }
+            taskPayload_2 = {
+                projectId,
+                name: 'Lorem perspiciatis tempora',
+                description: 'velit ipsum dolor sit amet, iste natus error',
+                statusId: projectTasksStatuses.find((i: any) => i.code === 'IN_PROGRESS').id,
+                estimatedDateStart: 10,
+                estimatedDateEnd: 60,
+                estimatedDuration: 2,
+                assignedToId: adminUser.id,
+                tagsIds: projectTasksTags.filter(i => ['BUG', 'STORY'].includes(i.code)).map((i: any) => i.id),
+            }
+            taskPayload_3 = {
+                projectId,
+                name: 'Task Name 3',
+                description: 'Task Description 3',
+                statusId: projectTasksStatuses.find((i: any) => i.code === 'CLOSED').id,
+                estimatedDateStart: 70,
+                estimatedDateEnd: 150,
+                estimatedDuration: 3,
+                tagsIds: projectTasksTags.filter(i => ['STORY', 'TASK'].includes(i.code)).map((i: any) => i.id),
+            }
+
+            await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
+            
+            await new Promise(r => setTimeout(r, 500))
+            createdAtBefore_2 = new Date()
+            await new Promise(r => setTimeout(r, 500))
+
+            await utils.gqlCreateTask(taskPayload_2, adminAccessToken)
+
+            await new Promise(r => setTimeout(r, 500))
+            createdAtAfter_2 = new Date()
+            await new Promise(r => setTimeout(r, 500))
+
+            await utils.gqlCreateTask(taskPayload_3, adminAccessToken)
+        })
+
+        it('Must return tasks', async () => {
+            const { tasks } = await utils.gqlTasks()
+
+            expect(tasks).toBeDefined()
+            expect(tasks.data).toBeDefined()
+            expect(tasks.meta).toBeDefined()
+            expect(tasks.data).toHaveLength(3)
+        })
+
+        it('Must return tasks of current user', async () => {
+            const accessToken = await utils.adminGetAccessToken()
+            const { tasksOfCurrentUser } = await utils.gqlTasksOfCurrentUser(undefined, accessToken)
+
+            expect(tasksOfCurrentUser).toBeDefined()
+            expect(tasksOfCurrentUser.data).toBeDefined()
+            expect(tasksOfCurrentUser.meta).toBeDefined()
+            expect(tasksOfCurrentUser.data).toHaveLength(2)
+        })
+
+        it('Must return filtered tasks by name', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: { name: ['Lorem'] } })
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by tag id', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: {
+                tagId: projectTasksTags.filter(i => ['TASK'].includes(i.code)).map((i: any) => i.id),
+            }})
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_3.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by number', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: { number: [2, 3] } })
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_3.name, taskPayload_2.name])
+        })
+
+        it('Must return filtered tasks by status', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: {
+                statusId: projectTasksStatuses.filter(i => ['OPENED', 'IN_PROGRESS'].includes(i.code)).map((i: any) => i.id),
+            }})
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by full text', async () => {
+            const { tasks: tasks_1_by_name } = await utils.gqlTasks({ filterBy: { fulltext: ['lorem iPsum'] } })
+            const { tasks: tasks_1_by_description } = await utils.gqlTasks({ filterBy: { fulltext: ['ConsectEtur'] } })
+            const { tasks: tasks_by_name } = await utils.gqlTasks({ filterBy: { fulltext: ['loRem'] } })
+            const { tasks: tasks_by_description } = await utils.gqlTasks({ filterBy: { fulltext: ['doLor'] } })
+            const { tasks: tasks_by_different } = await utils.gqlTasks({ filterBy: { fulltext: ['veLit'] } })
+            const { tasks: tasks_by_name_combined } = await utils.gqlTasks({ filterBy: { fulltext: ['pariaTUr', 'temPora'] } })
+            const { tasks: tasks_by_descriptions_combined } = await utils.gqlTasks({ filterBy: { fulltext: ['consectetur', 'natus'] } })
+
+            expect(tasks_1_by_name.data.map(i => i.name)).toEqual([taskPayload_1.name])
+            expect(tasks_1_by_description.data.map(i => i.name)).toEqual([taskPayload_1.name])
+            expect(tasks_by_name.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_description.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_different.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_name_combined.data.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+            expect(tasks_by_descriptions_combined.data.map(i => i.name))
+                .toEqual([taskPayload_2.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by project', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: {
+                projectId: [projectId],
+            }})
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_3.name, taskPayload_2.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by created by', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: {
+                createdById: [adminUserId],
+            }})
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_3.name, taskPayload_2.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by assigned to', async () => {
+            const { tasks } = await utils.gqlTasks({ filterBy: {
+                assignedToId: [adminUserId],
+            }})
+
+            expect(tasks?.data?.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+        })
+
+        it('Must return filtered tasks by created at', async () => {
+            const { tasks: tasks_1 } = await utils.gqlTasks({ filterBy: {
+                createdAtFrom: Number(createdAtBefore_2),
+            }})
+            const { tasks: tasks_2 } = await utils.gqlTasks({ filterBy: {
+                createdAtTo: Number(createdAtAfter_2),
+            }})
+
+            expect(tasks_1?.data?.map(i => i.name)).toEqual([taskPayload_3.name, taskPayload_2.name])
+            expect(tasks_2?.data?.map(i => i.name)).toEqual([taskPayload_2.name, taskPayload_1.name])
+        })
+    })
+
     describe('GQL API Errors', () => {
+        afterEach(async () => {
+            await setup.prisma.taskOnTaskTag.deleteMany()
+            await setup.prisma.taskProjectOnUser.deleteMany()
+            await setup.prisma.taskOnTaskRelation.deleteMany()
+    
+            await setup.prisma.taskAttachment.deleteMany()
+            await setup.prisma.taskChange.deleteMany()
+            await setup.prisma.taskComment.deleteMany()
+            await setup.prisma.taskCustomField.deleteMany()
+            await setup.prisma.taskEffort.deleteMany()
+            await setup.prisma.task.deleteMany()
+    
+            await setup.prisma.taskUser.deleteMany()
+            await setup.prisma.taskUserRole.deleteMany()
+            await setup.prisma.taskTag.deleteMany()
+            await setup.prisma.taskStatus.deleteMany()
+            await setup.prisma.taskRelation.deleteMany()
+            await setup.prisma.taskProject.deleteMany()
+        })
+
         it('Must not update task', async () => {
             const { adminUser, adminAccessToken } = await utils.gqlGetAdminUser()
 

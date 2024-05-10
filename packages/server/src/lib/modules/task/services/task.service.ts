@@ -101,14 +101,15 @@ export class TaskService {
         curPage?: number
         perPage?: number
 
-        filterByName?: string
-        filterByNumber?: number
-        filterByStatusId?: string
-        filterByParentId?: string
-        filterByProjectId?: string
-        filterByCreatedById?: string
-        filterByAssignedToId?: string
+        filterByName?: string | string[]
+        filterByTagId?: string | string[]
+        filterByNumber?: number | number[]
+        filterByStatusId?: string | string[]
+        filterByParentId?: string | string[]
         filterByFulltext?: string | string[]
+        filterByProjectId?: string | string[]
+        filterByCreatedById?: string | string[]
+        filterByAssignedToId?: string | string[]
         filterByCreatedAt?: {
             from?: Date
             to?: Date

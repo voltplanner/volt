@@ -109,12 +109,18 @@ export class ProjectIntegrationResolver {
     async projects(
         @Args('input', { nullable: true }) input: ProjectIntegrationProjectsInput,
     ): Promise<ProjectIntegrationProjectsOutput> {
-        const { fulltext, curPage, perPage } = input || {}
+        const { filterBy, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskProjectService.findMany({
-            filterByFulltext: fulltext || undefined,
             curPage: curPage || undefined,
             perPage: perPage || undefined,
+            filterByName: filterBy?.name || undefined,
+            filterByUserId: filterBy?.userId || undefined,
+            filterByFulltext: filterBy?.fulltext || undefined,
+            filterByCreatedAt: (filterBy?.createdAtFrom || filterBy?.createdAtTo) ? {
+                from: filterBy?.createdAtFrom ? new Date(filterBy.createdAtFrom) : undefined,
+                to: filterBy?.createdAtTo ? new Date(filterBy.createdAtTo) : undefined,
+            } : undefined,
         })
 
         const projects: ProjectIntegrationProjectObject[] = data.map((i) => ({

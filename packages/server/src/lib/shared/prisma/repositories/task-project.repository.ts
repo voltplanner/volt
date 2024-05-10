@@ -14,6 +14,7 @@ import {
     TaskProjectUpdateRepositoryDto,
 } from '../repositories-dto/task-project.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
+import { mutateFindManyDelegateWithFilterString } from '../utils/prisma-mutate-find-many-delegate-with-filter-string'
 
 export const taskProjectModelExtentions = {
     async extCreate(
@@ -192,16 +193,23 @@ export const taskProjectModelExtentions = {
                 }
             }
 
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive',
-                }
-            }
+            mutateFindManyDelegateWithFilterString(delegateWhere, 'name', dto.filterByName)
 
             if (dto.filterByUserId) {
-                delegateWhere.users = {
-                    some: { userId: dto.filterByUserId },
+                if (typeof dto.filterByUserId === 'string') {
+                    delegateWhere.users = {
+                        some: {
+                            userId: dto.filterByUserId,
+                        },
+                    }
+                } else if (dto.filterByUserId.length) {
+                    delegateWhere.users = {
+                        some: {
+                            userId: {
+                                in: dto.filterByUserId,
+                            },
+                        },
+                    }
                 }
             }
 
