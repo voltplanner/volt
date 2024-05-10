@@ -8,11 +8,13 @@ export type TaskCommentCreateRepositoryDto = {
 
 export type TaskCommentUpdateRepositoryDto = {
     id: string
-    text?: string
+    text: string
+    userId?: string
 }
 
 export type TaskCommentDeleteRepositoryDto = {
     id: string
+    userId?: string
 }
 
 export type TaskCommentFindManyRepositoryDto = {

@@ -119,14 +119,18 @@ export class TaskService {
             field: 'name' | 'status' | 'createdAt'
             order: OrderEnum
         }
-    }) {
-        return await this.prisma.task.extFindMany(dto)
+    }, prisma?: PrismaTransactionClientType) {
+        const client = prisma || this.prisma
+
+        return await client.task.extFindMany(dto, client)
     }
 
     async getById(dto: {
         id: string
-    }) {
-        return await this.prisma.task.extGetById(dto)
+    }, prisma?: PrismaTransactionClientType) {
+        const client = prisma || this.prisma
+
+        return await client.task.extGetById(dto, client)
     }
 
     async upsertCustomFieldValueType(

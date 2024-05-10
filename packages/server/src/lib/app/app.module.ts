@@ -16,6 +16,7 @@ import { defaultAllowPermissions } from '../../environments/permissions'
 import { NotificationsIntegration } from '../integrations/notifications.integration'
 import { ProjectIntegrationResolver } from '../integrations/project/project-integration.resolver'
 import { TaskIntegrationResolver } from '../integrations/task/task-integration.resolver'
+import { TaskCommentIntegrationResolver } from '../integrations/task-comment/task-comment-integration.resolver'
 import { AuthModule } from '../modules/auth/auth.module'
 import { AUTH_LISTENER } from '../modules/auth/configs/auth-events.config'
 import { FilesModule } from '../modules/files/files.module'
@@ -79,6 +80,7 @@ import { PrismaModule } from '../shared/prisma'
             injectionToken: AUTH_LISTENER,
         }),
         TaskIntegrationResolver,
+        TaskCommentIntegrationResolver,
         ProjectIntegrationResolver,
     ],
 })

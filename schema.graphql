@@ -214,10 +214,33 @@ type TaskIntegrationTasksOfCurrentUserOutput {
   meta: PaginatedMetaType!
 }
 
+type TaskCommentIntegrationUserObject {
+  id: String!
+  firstname: String!
+  lastname: String!
+}
+
+type TaskCommentIntegrationCommentObject {
+  id: String!
+  text: String!
+  taskId: String!
+  user: TaskCommentIntegrationUserObject!
+  isCanEdit: Boolean!
+  isCanDelete: Boolean!
+  createdAt: Float!
+  updatedAt: Float!
+}
+
+type TaskCommentIntegrationCommentsOutput {
+  data: [TaskCommentIntegrationCommentObject!]!
+  meta: PaginatedMetaType!
+}
+
 type Query {
   task(input: TaskIntegrationTaskInput!): TaskIntegrationTaskObject!
   tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
   tasksOfCurrentUser(input: TaskIntegrationTasksOfCurrentUserInput): TaskIntegrationTasksOfCurrentUserOutput!
+  taskComments(input: TaskCommentIntegrationCommentsInput!): TaskCommentIntegrationCommentsOutput!
   project(input: ProjectIntegrationProjectInput!): ProjectIntegrationProjectObject!
   projects(input: ProjectIntegrationProjectsInput): ProjectIntegrationProjectsOutput!
   projectsOfCurrentUser: ProjectIntegrationProjectsOfCurrentUserOutput!
@@ -240,14 +263,33 @@ input TaskIntegrationTaskInput {
 }
 
 input TaskIntegrationTasksInput {
-  projectId: String
-  fulltext: [String!]
   curPage: Float
   perPage: Float
+  filterBy: TaskIntegrationTasksFilterByInput
+}
+
+input TaskIntegrationTasksFilterByInput {
+  name: [String!]
+  number: [Float!]
+  statusId: [String!]
+  parentId: [String!]
+  projectId: [String!]
+  createdById: [String!]
+  assignedToId: [String!]
+  fulltext: [String!]
+  tagId: [String!]
+  createdAtFrom: Float
+  createdAtTo: Float
 }
 
 input TaskIntegrationTasksOfCurrentUserInput {
   projectId: String
+  curPage: Float
+  perPage: Float
+}
+
+input TaskCommentIntegrationCommentsInput {
+  taskId: String!
   curPage: Float
   perPage: Float
 }
@@ -257,9 +299,17 @@ input ProjectIntegrationProjectInput {
 }
 
 input ProjectIntegrationProjectsInput {
-  fulltext: [String!]
   curPage: Float
   perPage: Float
+  filterBy: ProjectIntegrationProjectsFilterByInput
+}
+
+input ProjectIntegrationProjectsFilterByInput {
+  name: [String!]
+  userId: [String!]
+  fulltext: [String!]
+  createdAtFrom: Float
+  createdAtTo: Float
 }
 
 input ProjectIntegrationProjectUsersInput {
@@ -338,6 +388,9 @@ input GetFileInput {
 type Mutation {
   createTask(input: TaskIntegrationTaskCreateInput!): String!
   updateTask(input: TaskIntegrationTaskUpdateInput!): String!
+  taskCommentCreate(input: TaskCommentIntegrationCommentCreateInput!): String!
+  taskCommentUpdate(input: TaskCommentIntegrationCommentUpdateInput!): String!
+  taskCommentDelete(input: TaskCommentIntegrationCommentDeleteInput!): String!
   createProject(input: ProjectIntegrationCreateProjectInput!): String!
   updateProject(input: ProjectIntegrationProjectUpdateInput!): String!
   updateRole(input: UpdateRoleInput!): Boolean!
@@ -382,6 +435,20 @@ input TaskIntegrationTaskUpdateInput {
   statusId: String
   assignedToId: String
   tagIds: [String!]
+}
+
+input TaskCommentIntegrationCommentCreateInput {
+  taskId: String!
+  text: String!
+}
+
+input TaskCommentIntegrationCommentUpdateInput {
+  id: String!
+  text: String!
+}
+
+input TaskCommentIntegrationCommentDeleteInput {
+  id: String!
 }
 
 input ProjectIntegrationCreateProjectInput {
