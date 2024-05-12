@@ -78,9 +78,9 @@ describe('Task Comment', () => {
                 assignedToId: adminUser.id,
             }
 
-            const { createTask } = await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
+            const { taskCreate } = await utils.gqlTaskCreate(taskPayload_1, adminAccessToken)
 
-            taskId_1 = createTask
+            taskId_1 = taskCreate
         })
 
         it('Must create task comment', async () => {

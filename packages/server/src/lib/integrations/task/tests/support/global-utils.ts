@@ -10,6 +10,7 @@ import { TaskIntegrationTaskCreateInput } from '../../types-input/task-integrati
 import { TaskIntegrationTaskUpdateInput } from '../../types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from '../../types-input/task-integration-tasks.input-type'
 import { TaskIntegrationTasksOfCurrentUserInput } from '../../types-input/task-integration-tasks-of-current-user.input-type'
+import { TaskIntegrationTaskObject } from '../../types-object/task-integration-task.object-type'
 import { setup } from './global-setup'
 
 export class GlobalUtils {
@@ -21,35 +22,35 @@ export class GlobalUtils {
     constructor(private readonly _setup: Awaited<ReturnType<typeof setup>>) {}
 
 
-    async gqlCreateTask(dto: TaskIntegrationTaskCreateInput, accessToken: string): Promise<Record<string, any>> {
+    async gqlTaskCreate(dto: TaskIntegrationTaskCreateInput, accessToken: string): Promise<Record<string, any>> {
         const doc = gql`
-        mutation createTask($createTaskInput: TaskIntegrationTaskCreateInput!) {
-            createTask(input: $createTaskInput)
+        mutation taskCreate($taskCreateInput: TaskIntegrationTaskCreateInput!) {
+            taskCreate(input: $taskCreateInput)
         }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "createTaskInput": dto,
+            "taskCreateInput": dto,
         }, {
             Authorization: `Bearer ${accessToken}`
         })
     }
 
-    async gqlUpdateTask(dto: TaskIntegrationTaskUpdateInput, accessToken: string): Promise<Record<string, any>> {
+    async gqlTaskUpdate(dto: TaskIntegrationTaskUpdateInput, accessToken: string): Promise<{ taskUpdate: string }> {
         const doc = gql`
-        mutation updateTask($updateTaskInput: TaskIntegrationTaskUpdateInput!) {
-            updateTask(input: $updateTaskInput)
+        mutation taskUpdate($taskUpdateInput: TaskIntegrationTaskUpdateInput!) {
+            taskUpdate(input: $taskUpdateInput)
         }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "updateTaskInput": dto,
+            "taskUpdateInput": dto,
         }, {
             Authorization: `Bearer ${accessToken}`
         })
     }
 
-    async gqlTask(dto: TaskIntegrationTaskInput): Promise<Record<string, any>> {
+    async gqlTask(dto: TaskIntegrationTaskInput): Promise<{ task: TaskIntegrationTaskObject }> {
         const doc = gql`
         query task($taskInput: TaskIntegrationTaskInput!) {
             task(input: $taskInput) {

@@ -386,8 +386,8 @@ input GetFileInput {
 }
 
 type Mutation {
-  createTask(input: TaskIntegrationTaskCreateInput!): String!
-  updateTask(input: TaskIntegrationTaskUpdateInput!): String!
+  taskCreate(input: TaskIntegrationTaskCreateInput!): String!
+  taskUpdate(input: TaskIntegrationTaskUpdateInput!): String!
   taskCommentCreate(input: TaskCommentIntegrationCommentCreateInput!): String!
   taskCommentUpdate(input: TaskCommentIntegrationCommentUpdateInput!): String!
   taskCommentDelete(input: TaskCommentIntegrationCommentDeleteInput!): String!

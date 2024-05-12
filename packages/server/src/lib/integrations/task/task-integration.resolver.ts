@@ -30,7 +30,7 @@ export class TaskIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async createTask(
+    async taskCreate(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskIntegrationTaskCreateInput,
     ): Promise<string> {
@@ -41,7 +41,7 @@ export class TaskIntegrationResolver {
             statusId,
             assignedToId,
             estimatedDuration,
-            tagsIds,
+            tagIds,
             parentId,
         } = input
 
@@ -70,7 +70,7 @@ export class TaskIntegrationResolver {
                     estimatedDateStart,
                     estimatedDuration,
                     parentId,
-                    tagsIds,
+                    tagIds,
                 },
                 tx,
             )
@@ -80,7 +80,7 @@ export class TaskIntegrationResolver {
     }
 
     @Mutation(() => String)
-    async updateTask(@Args('input') input: TaskIntegrationTaskUpdateInput) {
+    async taskUpdate(@Args('input') input: TaskIntegrationTaskUpdateInput) {
         return await this._taskService.update(input)
     }
 
@@ -90,9 +90,9 @@ export class TaskIntegrationResolver {
     ): Promise<TaskIntegrationTaskObject> {
         const task = await this._taskService.getById(input)
 
-        const userAssigned = await this._authUserService.getUser(
+        const userAssigned = task.assignedToId ? await this._authUserService.getUser(
             task.assignedToId,
-        )
+        ) : undefined
         const userCreated = await this._authUserService.getUser(
             task.createdById,
         )
@@ -104,15 +104,15 @@ export class TaskIntegrationResolver {
                 lastname: userCreated.lastname,
                 firstname: userCreated.firstname,
             },
-            assignedTo: {
+            assignedTo: userAssigned ? {
                 id: userAssigned.id,
                 lastname: userAssigned.lastname,
                 firstname: userAssigned.firstname,
-            },
+            } : undefined,
             createdAt: Number(task.createdAt),
-            estimatedDateEnd: Number(task.estimatedDateEnd),
-            estimatedDateStart: Number(task.estimatedDateStart),
-            estimatedDuration: Number(task.estimatedDuration.toString()),
+            estimatedDateEnd: task.estimatedDateEnd ? Number(task.estimatedDateEnd) : undefined,
+            estimatedDateStart: task.estimatedDateStart ? Number(task.estimatedDateStart) : undefined,
+            estimatedDuration: task.estimatedDuration ? Number(task.estimatedDuration.toString()) : undefined,
         }
     }
 

@@ -448,13 +448,13 @@ export default {
                     input: [67, 'ProjectIntegrationProjectUpdateInput!'],
                 },
             ],
-            createTask: [
+            taskCreate: [
                 3,
                 {
                     input: [68, 'TaskIntegrationTaskCreateInput!'],
                 },
             ],
-            updateTask: [
+            taskUpdate: [
                 3,
                 {
                     input: [69, 'TaskIntegrationTaskUpdateInput!'],

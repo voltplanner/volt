@@ -40,7 +40,7 @@ export const taskModelExtentions = {
 
                 parentId,
                 assignedToId,
-                tagsIds,
+                tagIds,
             } = dto
 
             // Default values, if we have empty DB
@@ -114,9 +114,9 @@ export const taskModelExtentions = {
                 },
             })
 
-            if (tagsIds?.length) {
+            if (tagIds?.length) {
                 await client.taskOnTaskTag.createMany({
-                    data: tagsIds.map((taskTagId) => ({
+                    data: tagIds.map((taskTagId) => ({
                         taskId: id,
                         taskTagId,
                     })),

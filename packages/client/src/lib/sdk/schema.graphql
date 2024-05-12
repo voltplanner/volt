@@ -332,8 +332,8 @@ type Mutation {
   markAllAsSeen(input: MarkAllAsSeenInput!): Boolean!
   createProject(input: ProjectIntegrationCreateProjectInput!): String!
   updateProject(input: ProjectIntegrationProjectUpdateInput!): String!
-  createTask(input: TaskIntegrationTaskCreateInput!): String!
-  updateTask(input: TaskIntegrationTaskUpdateInput!): String!
+  taskCreate(input: TaskIntegrationTaskCreateInput!): String!
+  taskUpdate(input: TaskIntegrationTaskUpdateInput!): String!
   uploadFile(input: UploadFileInput!): String!
 }
 

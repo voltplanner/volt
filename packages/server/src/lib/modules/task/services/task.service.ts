@@ -29,7 +29,7 @@ export class TaskService {
 
             readonly parentId?: string
             readonly assignedToId?: string
-            readonly tagsIds?: string[]
+            readonly tagIds?: string[]
         },
         prisma?: PrismaTransactionClientType,
     ) {
