@@ -85,28 +85,10 @@ export class PrismaService
         })
     }
 
-    async applyTmpMigrations() {
-        await this.$executeRawUnsafe(`
-            ALTER TABLE tasks.task_project DROP COLUMN fulltext;
-        `)
-        await this.$executeRawUnsafe(`
-            ALTER TABLE tasks.task DROP COLUMN fulltext;
-        `)
-
-        await this.$executeRawUnsafe(`
-            ALTER TABLE tasks.task_project ADD COLUMN fulltext TEXT GENERATED ALWAYS AS ("name" || ' ' || "description") STORED
-        `)
-        await this.$executeRawUnsafe(`
-            ALTER TABLE tasks.task ADD COLUMN fulltext TEXT GENERATED ALWAYS AS ("name" || ' ' || "number"::text || ' ' || "description") STORED
-        `)
-    }
-
     async onModuleInit(): Promise<void> {
         const { logging, maxQueryExecutionTime } = this.config
 
         try {
-            await this.applyTmpMigrations()
-
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-extra-semi
             ;(PrismaService.instance as any).$on('query', (e: any) => {
                 if (logging === 'all_queries') {

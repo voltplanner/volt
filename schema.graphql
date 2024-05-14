@@ -420,7 +420,7 @@ input TaskIntegrationTaskCreateInput {
   estimatedDuration: Float
   assignedToId: String
   parentId: String
-  tagsIds: [String!]
+  tagIds: [String!]
 }
 
 input TaskIntegrationTaskUpdateInput {

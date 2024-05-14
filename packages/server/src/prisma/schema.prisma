@@ -2,7 +2,7 @@ generator client {
     provider        = "prisma-client-js"
     output          = "../../../../node_modules/generatedprisma"
     binaryTargets   = ["native", "linux-musl", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x"]
-    previewFeatures = ["multiSchema", "fullTextSearch"]
+    previewFeatures = ["multiSchema", "fullTextSearch", "views"]
 }
 
 datasource db {
@@ -35,7 +35,7 @@ model AuthRefreshToken {
     isRevoked Boolean  @default(false)
     expiresAt DateTime
     user      AuthUser @relation(fields: [userId], references: [id])
-    userId    String @db.Uuid
+    userId    String   @db.Uuid
 
     @@schema("auth")
 }
@@ -53,9 +53,9 @@ model AuthRole {
 
 model AuthRolePermission {
     role     AuthRole   @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    roleId   String @db.Uuid
+    roleId   String     @db.Uuid
     method   AuthMethod @relation(fields: [methodId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    methodId String @db.Uuid
+    methodId String     @db.Uuid
     allowed  Boolean
     editable Boolean    @default(true)
 
@@ -112,9 +112,8 @@ model Notification {
     sentAt        DateTime?
     error         String?
     Preferences   NotificationPreferences? @relation(fields: [preferencesId], references: [id])
-    preferencesId String? @db.Uuid
+    preferencesId String?                  @db.Uuid
     seen          Boolean
-    
 
     @@schema("notifications")
 }
@@ -148,13 +147,14 @@ model TaskUser {
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamp(6)
 
-    projects        TaskProjectOnUser[]
-    tasksAssignedTo Task[]              @relation("FK__TASK__ASSIGNED_TO")
-    attachments     TaskAttachment[]
-    changes         TaskChange[]
-    comments        TaskComment[]
-    efforts         TaskEffort[]
-    role            TaskUserRole        @relation(fields: [roleId], references: [id], map: "FK__USER__ROLE")
+    projects             TaskProjectOnUser[]
+    tasksAssignedTo      Task[]              @relation("FK__TASK__ASSIGNED_TO")
+    tasksAssignedToViews TaskView[]          @relation("FK__TASK_VIEW__ASSIGNED_TO")
+    attachments          TaskAttachment[]
+    changes              TaskChange[]
+    comments             TaskComment[]
+    efforts              TaskEffort[]
+    role                 TaskUserRole        @relation(fields: [roleId], references: [id], map: "FK__USER__ROLE")
 
     @@map("task_user")
     @@schema("tasks")
@@ -175,7 +175,7 @@ model TaskUserRole {
     projectId String      @map("project_id") @db.Uuid
     project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_USER_ROLE__PROJECT")
 
-    users       TaskUser[]
+    users TaskUser[]
 
     @@unique([code, projectId, isDeleted])
     @@map("task_user_role")
@@ -183,20 +183,21 @@ model TaskUserRole {
 }
 
 model TaskProject {
-    id                   String                @id @default(uuid()) @db.Uuid
-    name                 String                @db.VarChar(512)
-    description          String?
-    deadline             DateTime?             @db.Timestamp(6)
-    budget               Int?                  @db.Integer
-    version              Int                   @db.Integer
-    createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt            DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
-    deletedAt            DateTime?             @map("deleted_at") @db.Timestamp(6)
-    isDeleted            Boolean               @default(false) @map("is_deleted")
-    fulltext String? @db.Text
+    id          String    @id @default(uuid()) @db.Uuid
+    name        String    @db.VarChar(512)
+    description String?
+    deadline    DateTime? @db.Timestamp(6)
+    budget      Int?      @db.Integer
+    version     Int       @db.Integer
+    createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt   DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted   Boolean   @default(false) @map("is_deleted")
+    fulltext    String?   @db.Text
 
     users                TaskProjectOnUser[]
     tasks                Task[]
+    taskViews            TaskView[]
     tasksCustomFields    TaskCustomFieldType[]
     tasksConnectionTypes TaskRelation[]
     tasksStatuses        TaskStatus[]
@@ -228,7 +229,6 @@ model Task {
     estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
     estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
     estimatedDuration  BigInt?   @map("estimated_duration")
-    fulltext String? @db.Text
 
     createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
@@ -262,6 +262,52 @@ model Task {
     @@schema("tasks")
 }
 
+view TaskView {
+    id                 String    @id @default(uuid()) @db.Uuid
+    name               String    @db.VarChar(512)
+    number             Int       @default(autoincrement()) @db.Integer
+    createdById        String    @map("created_by_id") @db.Uuid
+    description        String?
+    version            Int       @db.Integer
+    estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
+    estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
+    estimatedDuration  BigInt?   @map("estimated_duration")
+
+    createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
+    deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
+    isDeleted Boolean   @default(false) @map("is_deleted")
+
+    projectId    String      @map("project_id") @db.Uuid
+    project      TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_VIEW__PROJECT")
+    statusId     String      @map("status_id") @db.Uuid
+    status       TaskStatus  @relation(fields: [statusId], references: [id], map: "FK__TASK_VIEW__STATUS")
+    assignedToId String?     @map("assigned_to_id") @db.Uuid
+    assignedTo   TaskUser?   @relation("FK__TASK_VIEW__ASSIGNED_TO", fields: [assignedToId], references: [id], map: "FK__TASK_VIEW__ASSIGNED_TO")
+    parentId     String?     @map("parent_id") @db.Uuid
+    parent       TaskView?   @relation("FK__TASK_VIEW__PARENT", fields: [parentId], references: [id])
+
+    children TaskView[] @relation("FK__TASK_VIEW__PARENT")
+    connectedForeign TaskOnTaskRelation[] @relation("FK__TASK_VIEW_RELATION__TASK_FOREIGN", map: "FK__TASK_VIEW_RELATION__TASK_FOREIGN")
+    connectedMain    TaskOnTaskRelation[] @relation("FK__TASK_VIEW_RELATION__TASK_MAIN", map: "FK__TASK_VIEW_RELATION__TASK_MAIN")
+
+    lft          Int
+    rgt          Int
+    level        Int
+    changes      TaskChange[]
+    efforts      TaskEffort[]
+    comments     TaskComment[]
+    tags         TaskOnTaskTag[]
+    attachments  TaskAttachment[]
+    customFields TaskCustomField[]
+
+    fulltext String? @db.Text
+    totalEfforts Int? @db.Integer @map("total_efforts")
+
+    @@map("task_view")
+    @@schema("tasks")
+}
+
 model TaskStatus {
     id          String  @id @default(uuid()) @db.Uuid
     code        String  @db.VarChar(36)
@@ -278,7 +324,8 @@ model TaskStatus {
     projectId String      @map("project_id") @db.Uuid
     project   TaskProject @relation(fields: [projectId], references: [id], map: "FK__TASK_STATUS__PROJECT")
 
-    tasks Task[]
+    tasks     Task[]
+    taskViews TaskView[]
 
     @@unique([code, projectId, isDeleted])
     @@unique([position, projectId, isDeleted])
@@ -296,10 +343,11 @@ model TaskEffort {
     deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
     isDeleted Boolean   @default(false) @map("is_deleted")
 
-    taskId String   @map("task_id") @db.Uuid
-    task   Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_EFFORT__TASK")
-    userId String   @map("user_id") @db.Uuid
-    user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_EFFORT__USER")
+    taskId   String   @map("task_id") @db.Uuid
+    task     Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_EFFORT__TASK")
+    taskView TaskView @relation(fields: [taskId], references: [id], map: "FK__TASK_VIEW_EFFORT__TASK")
+    userId   String   @map("user_id") @db.Uuid
+    user     TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_EFFORT__USER")
 
     @@map("task_effort")
     @@schema("tasks")
@@ -334,10 +382,11 @@ model TaskOnTaskTag {
     deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
     isDeleted Boolean   @default(false) @map("is_deleted")
 
-    taskId    String  @map("task_id") @db.Uuid
-    task      Task    @relation(fields: [taskId], references: [id], onDelete: NoAction, map: "FK__TASK_ON_TASK_TAG__TASK")
-    taskTagId String  @map("task_tag_id") @db.Uuid
-    taskTag   TaskTag @relation(fields: [taskTagId], references: [id], onDelete: NoAction, map: "FK__TASK_ON_TASK_TAG__TASK_TAG")
+    taskId    String   @map("task_id") @db.Uuid
+    task      Task     @relation(fields: [taskId], references: [id], onDelete: NoAction, map: "FK__TASK_ON_TASK_TAG__TASK")
+    taskView  TaskView @relation(fields: [taskId], references: [id], onDelete: NoAction, map: "FK__TASK_VIEW_ON_TASK_TAG__TASK")
+    taskTagId String   @map("task_tag_id") @db.Uuid
+    taskTag   TaskTag  @relation(fields: [taskTagId], references: [id], onDelete: NoAction, map: "FK__TASK_ON_TASK_TAG__TASK_TAG")
 
     @@id([taskId, taskTagId], map: "PK__TASK_ON_TASK_TAG")
     @@map("task_on_task_tag")
@@ -356,10 +405,11 @@ model TaskAttachment {
     deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
     isDeleted Boolean   @default(false) @map("is_deleted")
 
-    taskId String   @map("task_id") @db.Uuid
-    task   Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_ATTACHMENT__TASK")
-    userId String   @map("user_id") @db.Uuid
-    user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_ATTACHMENT__USER")
+    taskId   String   @map("task_id") @db.Uuid
+    task     Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_ATTACHMENT__TASK")
+    taskView TaskView @relation(fields: [taskId], references: [id], map: "FK__TASK_VIEW_ATTACHMENT__TASK")
+    userId   String   @map("user_id") @db.Uuid
+    user     TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_ATTACHMENT__USER")
 
     @@map("task_attachment")
     @@schema("tasks")
@@ -374,10 +424,11 @@ model TaskComment {
     deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
     isDeleted Boolean   @default(false) @map("is_deleted")
 
-    taskId String   @map("task_id") @db.Uuid
-    task   Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_COMMENT__TASK")
-    userId String   @map("user_id") @db.Uuid
-    user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_COMMENT__USER")
+    taskId   String   @map("task_id") @db.Uuid
+    task     Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_COMMENT__TASK")
+    taskView TaskView @relation(fields: [taskId], references: [id], map: "FK__TASK_VIEW_COMMENT__TASK")
+    userId   String   @map("user_id") @db.Uuid
+    user     TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_COMMENT__USER")
 
     @@map("task_comment")
     @@schema("tasks")
@@ -394,10 +445,11 @@ model TaskChange {
     deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
     isDeleted Boolean   @default(false) @map("is_deleted")
 
-    taskId String   @map("task_id") @db.Uuid
-    task   Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_CHANGE__TASK")
-    userId String   @map("user_id") @db.Uuid
-    user   TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_CHANGE__USER")
+    taskId   String   @map("task_id") @db.Uuid
+    task     Task     @relation(fields: [taskId], references: [id], map: "FK__TASK_CHANGE__TASK")
+    taskView TaskView @relation(fields: [taskId], references: [id], map: "FK__TASK_VIEW_CHANGE__TASK")
+    userId   String   @map("user_id") @db.Uuid
+    user     TaskUser @relation(fields: [userId], references: [id], map: "FK__TASK_CHANGE__USER")
 
     @@map("task_change")
     @@schema("tasks")
@@ -416,6 +468,9 @@ model TaskOnTaskRelation {
     taskRelation   TaskRelation @relation(fields: [taskRelationId], references: [id], map: "FK__TASK_RELATION__TASK_RELATION_TYPE")
     taskForeign    Task         @relation("FK__TASK_RELATION__TASK_FOREIGN", fields: [taskForeignId], references: [id])
     taskMain       Task         @relation("FK__TASK_RELATION__TASK_MAIN", fields: [taskMainId], references: [id])
+
+    taskForeignView TaskView @relation("FK__TASK_VIEW_RELATION__TASK_FOREIGN", map: "FK__TASK_VIEW_RELATION__TASK_FOREIGN", fields: [taskForeignId], references: [id])
+    taskMainView    TaskView @relation("FK__TASK_VIEW_RELATION__TASK_MAIN", map: "FK__TASK_VIEW_RELATION__TASK_MAIN", fields: [taskMainId], references: [id])
 
     @@id([taskMainId, taskForeignId], map: "PK__TASK_RELATION")
     @@map("task_on_task_relation")
@@ -459,6 +514,7 @@ model TaskCustomField {
     taskCustomFieldType   TaskCustomFieldType @relation(fields: [taskCustomFieldTypeId], references: [id], map: "FK__TASK_CUSTOM_FIELD__TASK_CUSTOM_FIELD_TYPE")
     taskId                String              @map("task_type_id") @db.Uuid
     task                  Task                @relation(fields: [taskId], references: [id], map: "FK__TASK_CUSTOM_FIELD__TASK")
+    taskView              TaskView            @relation(fields: [taskId], references: [id], map: "FK__TASK_VIEW_CUSTOM_FIELD__TASK")
 
     @@map("task_custom_field")
     @@schema("tasks")

@@ -414,7 +414,7 @@ export const taskModelExtentions = {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskWhereInput = {
+            const delegateWhere: Prisma.TaskViewWhereInput = {
                 name: undefined,
                 number: undefined,
                 statusId: undefined,
@@ -427,7 +427,7 @@ export const taskModelExtentions = {
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskViewOrderByWithRelationAndSearchRelevanceInput =
                 { createdAt: 'desc' }
 
             mutateFindManyDelegateWithFilterString(delegateWhere, 'name', dto.filterByName)
@@ -466,11 +466,11 @@ export const taskModelExtentions = {
                 }
             }
 
-            const count = await client.task.count({
+            const count = await client.taskView.count({
                 where: delegateWhere,
             })
 
-            const data = await client.task.findMany({
+            const data = await client.taskView.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 skip,
@@ -493,7 +493,12 @@ export const taskModelExtentions = {
                                 }
                             }
                         }
-                    }
+                    },
+                    efforts: {
+                        select: {
+                            value: true,
+                        },
+                    },
                 },
             })
 
