@@ -302,7 +302,7 @@ view TaskView {
     customFields TaskCustomField[]
 
     fulltext String? @db.Text
-    totalEfforts Int? @db.Integer @map("total_efforts")
+    effortsMs Int? @db.Integer @map("efforts_ms")
 
     @@map("task_view")
     @@schema("tasks")

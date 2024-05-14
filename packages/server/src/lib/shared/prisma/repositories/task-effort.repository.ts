@@ -54,10 +54,10 @@ export const taskEffortModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id, value, description } = dto
+            const { id, value, userId, description } = dto
 
             const { id: updatedId } = await client.taskEffort.update({
-                where: { id },
+                where: { id, userId },
                 data: {
                     value,
                     description,
@@ -86,10 +86,10 @@ export const taskEffortModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id } = dto
+            const { id, userId } = dto
 
             const { id: deletedId } = await client.taskEffort.update({
-                where: { id },
+                where: { id, userId },
                 data: { isDeleted: true },
                 select: { id: true },
             })

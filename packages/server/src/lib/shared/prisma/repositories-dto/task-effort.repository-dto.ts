@@ -11,10 +11,12 @@ export type TaskEffortUpdateRepositoryDto = {
     id: string
     value?: number
     description?: string
+    userId?: string
 }
 
 export type TaskEffortDeleteRepositoryDto = {
     id: string
+    userId?: string
 }
 
 export type TaskEffortFindManyRepositoryDto = {

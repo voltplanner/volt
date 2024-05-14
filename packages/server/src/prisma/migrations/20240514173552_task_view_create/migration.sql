@@ -19,5 +19,5 @@ CREATE OR REPLACE VIEW "tasks"."task_view" AS
     		SELECT sum(e."value")
     		FROM "tasks"."task_effort" e
     		WHERE e."task_id" = t."id" 
-    	) AS "total_efforts"
+    	) AS "efforts_ms"
     FROM "tasks"."task" t;

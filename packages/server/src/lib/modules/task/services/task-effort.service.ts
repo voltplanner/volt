@@ -8,7 +8,7 @@ import {
 } from '../../../shared/prisma'
 
 @Injectable()
-export class TaskEffort {
+export class TaskEffortService {
     constructor(
         @Inject(PrismaService)
         private readonly prisma: PrismaServiceWithExtentionsType,
@@ -33,6 +33,7 @@ export class TaskEffort {
             readonly id: string
             readonly value?: number
             readonly description?: string
+            readonly userId?: string
         },
         prisma?: PrismaTransactionClientType,
     ) {
@@ -49,6 +50,7 @@ export class TaskEffort {
     async delete(
         dto: {
             readonly id: string
+            readonly userId?: string
         },
         prisma?: PrismaTransactionClientType,
     ) {

@@ -3,11 +3,14 @@ import request, { gql } from 'graphql-request'
 import { GetUsersInput } from '../../../../../../../../packages/server/src/lib/modules/auth/interfaces/auth.graphql'
 import { ProjectIntegrationCreateProjectInput } from '../../../project/types-input/project-integration-project-create.input-type'
 import { ProjectIntegrationProjectTasksStatusesInput } from '../../../project/types-input/project-integration-project-tasks-statuses.input-type'
+import { TaskIntegrationTaskInput } from '../../../task/types-input/task-integration-task.input-type'
 import { TaskIntegrationTaskCreateInput } from '../../../task/types-input/task-integration-task-create.input-type'
-import { TaskCommentIntegrationCommentCreateInput } from '../../types-input/task-comment-integration-comment-create.input-type'
-import { TaskCommentIntegrationCommentDeleteInput } from '../../types-input/task-comment-integration-comment-delete.input-type'
-import { TaskCommentIntegrationCommentUpdateInput } from '../../types-input/task-comment-integration-comment-update.input-type'
-import { TaskCommentIntegrationCommentsInput } from '../../types-input/task-comment-integration-comments.input-type'
+import { TaskIntegrationTaskObject } from '../../../task/types-object/task-integration-task.object-type'
+import { TaskEffortIntegrationEffortCreateInput } from '../../types-input/task-effort-integration-effort-create.input-type'
+import { TaskEffortIntegrationEffortDeleteInput } from '../../types-input/task-effort-integration-effort-delete.input-type'
+import { TaskEffortIntegrationEffortUpdateInput } from '../../types-input/task-effort-integration-effort-update.input-type'
+import { TaskEffortIntegrationEffortsInput } from '../../types-input/task-effort-integration-efforts.input-type'
+import { TaskEffortIntegrationEffortsOutput } from '../../types-output/task-effort-integration-efforts.output-type'
 import { setup } from './global-setup'
 
 export class GlobalUtils {
@@ -18,67 +21,68 @@ export class GlobalUtils {
 
     constructor(private readonly _setup: Awaited<ReturnType<typeof setup>>) {}
 
-    async gqlTaskCommentCreate(
-        dto: TaskCommentIntegrationCommentCreateInput,
+    async gqlTaskEffortCreate(
+        dto: TaskEffortIntegrationEffortCreateInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-        mutation taskCommentCreate($taskCommentCreateInput: TaskCommentIntegrationCommentCreateInput!) {
-            taskCommentCreate(input: $taskCommentCreateInput)
+        mutation taskEffortCreate($taskEffortCreateInput: TaskEffortIntegrationEffortCreateInput!) {
+            taskEffortCreate(input: $taskEffortCreateInput)
         }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "taskCommentCreateInput": dto,
+            "taskEffortCreateInput": dto,
         }, {
             Authorization: `Bearer ${accessToken}`
         })
     }
 
-    async gqlTaskCommentUpdate(
-        dto: TaskCommentIntegrationCommentUpdateInput,
+    async gqlTaskEffortUpdate(
+        dto: TaskEffortIntegrationEffortUpdateInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-        mutation taskCommentUpdate($taskCommentUpdateInput: TaskCommentIntegrationCommentUpdateInput!) {
-            taskCommentUpdate(input: $taskCommentUpdateInput)
+        mutation taskEffortUpdate($taskEffortUpdateInput: TaskEffortIntegrationEffortUpdateInput!) {
+            taskEffortUpdate(input: $taskEffortUpdateInput)
         }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "taskCommentUpdateInput": dto,
+            "taskEffortUpdateInput": dto,
         }, {
             Authorization: `Bearer ${accessToken}`
         })
     }
 
-    async gqlTaskCommentDelete(
-        dto: TaskCommentIntegrationCommentDeleteInput,
+    async gqlTaskEffortDelete(
+        dto: TaskEffortIntegrationEffortDeleteInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-        mutation taskCommentDelete($taskCommentDeleteInput: TaskCommentIntegrationCommentDeleteInput!) {
-            taskCommentDelete(input: $taskCommentDeleteInput)
+        mutation taskEffortDelete($taskEffortDeleteInput: TaskEffortIntegrationEffortDeleteInput!) {
+            taskEffortDelete(input: $taskEffortDeleteInput)
         }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "taskCommentDeleteInput": dto,
+            "taskEffortDeleteInput": dto,
         }, {
             Authorization: `Bearer ${accessToken}`
         })
     }
 
-    async gqlTaskComments(
-        dto: TaskCommentIntegrationCommentsInput,
+    async gqlTaskEfforts(
+        dto: TaskEffortIntegrationEffortsInput,
         accessToken: string,
-    ): Promise<Record<string, any>> {
+    ): Promise<{ taskEfforts: TaskEffortIntegrationEffortsOutput }> {
         const doc = gql`
-        query taskComments($taskCommentsInput: TaskCommentIntegrationCommentsInput!) {
-            taskComments(input: $taskCommentsInput) {
+        query taskEfforts($taskEffortsInput: TaskEffortIntegrationEffortsInput!) {
+            taskEfforts(input: $taskEffortsInput) {
               data {
                 id
-                text
+                description
+                value
                 taskId
                 user {
                   id
@@ -100,11 +104,14 @@ export class GlobalUtils {
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "taskCommentsInput": dto,
+            "taskEffortsInput": dto,
         }, {
             Authorization: `Bearer ${accessToken}`
         })
     }
+
+    // -----------------
+
 
     async gqlTaskCreate(dto: TaskIntegrationTaskCreateInput, accessToken: string): Promise<Record<string, any>> {
         const doc = gql`
@@ -119,8 +126,50 @@ export class GlobalUtils {
             Authorization: `Bearer ${accessToken}`
         })
     }
+    
+    async gqlTask(dto: TaskIntegrationTaskInput): Promise<{ task: TaskIntegrationTaskObject }> {
+        const doc = gql`
+        query task($taskInput: TaskIntegrationTaskInput!) {
+            task(input: $taskInput) {
+                id
+                name
+                number
+                description
+                estimatedDateStart
+                estimatedDateEnd
+                estimatedDuration
+                version
+                createdAt
+                effortsMs
+                status {
+                    id
+                    code
+                    name
+                }
+                tags {
+                    id
+                    code
+                    name
+                }
+                createdBy {
+                    id
+                    firstname
+                    lastname
+                }
+                assignedTo {
+                    id
+                    firstname
+                    lastname
+                }
+            }
+        }
+        `
 
-    // Project Integration
+        return await request(this.gqlApiUrl, doc, {
+            "taskInput": dto,
+        })
+    }
+    
     async gqlCreateProject(dto: ProjectIntegrationCreateProjectInput): Promise<Record<string, any>> {
         const doc = gql`
             mutation createProject($input: ProjectIntegrationCreateProjectInput!) {

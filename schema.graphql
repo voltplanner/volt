@@ -202,6 +202,7 @@ type TaskIntegrationTaskObject {
   tags: [TaskIntegrationTaskTagObject!]!
   createdBy: TaskIntegrationUserObject!
   assignedTo: TaskIntegrationUserObject
+  effortsMs: Float!
 }
 
 type TaskIntegrationTasksOutput {
@@ -225,7 +226,7 @@ type TaskCommentIntegrationCommentObject {
   text: String!
   taskId: String!
   user: TaskCommentIntegrationUserObject!
-  isCanEdit: Boolean!
+  isCanUpdate: Boolean!
   isCanDelete: Boolean!
   createdAt: Float!
   updatedAt: Float!
@@ -236,11 +237,35 @@ type TaskCommentIntegrationCommentsOutput {
   meta: PaginatedMetaType!
 }
 
+type TaskEffortIntegrationUserObject {
+  id: String!
+  firstname: String!
+  lastname: String!
+}
+
+type TaskEffortIntegrationEffortObject {
+  id: String!
+  value: Float!
+  description: String!
+  taskId: String!
+  user: TaskEffortIntegrationUserObject!
+  isCanUpdate: Boolean!
+  isCanDelete: Boolean!
+  createdAt: Float!
+  updatedAt: Float!
+}
+
+type TaskEffortIntegrationEffortsOutput {
+  data: [TaskEffortIntegrationEffortObject!]!
+  meta: PaginatedMetaType!
+}
+
 type Query {
   task(input: TaskIntegrationTaskInput!): TaskIntegrationTaskObject!
   tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
   tasksOfCurrentUser(input: TaskIntegrationTasksOfCurrentUserInput): TaskIntegrationTasksOfCurrentUserOutput!
   taskComments(input: TaskCommentIntegrationCommentsInput!): TaskCommentIntegrationCommentsOutput!
+  taskEfforts(input: TaskEffortIntegrationEffortsInput): TaskEffortIntegrationEffortsOutput!
   project(input: ProjectIntegrationProjectInput!): ProjectIntegrationProjectObject!
   projects(input: ProjectIntegrationProjectsInput): ProjectIntegrationProjectsOutput!
   projectsOfCurrentUser: ProjectIntegrationProjectsOfCurrentUserOutput!
@@ -290,6 +315,12 @@ input TaskIntegrationTasksOfCurrentUserInput {
 
 input TaskCommentIntegrationCommentsInput {
   taskId: String!
+  curPage: Float
+  perPage: Float
+}
+
+input TaskEffortIntegrationEffortsInput {
+  taskId: String
   curPage: Float
   perPage: Float
 }
@@ -391,6 +422,9 @@ type Mutation {
   taskCommentCreate(input: TaskCommentIntegrationCommentCreateInput!): String!
   taskCommentUpdate(input: TaskCommentIntegrationCommentUpdateInput!): String!
   taskCommentDelete(input: TaskCommentIntegrationCommentDeleteInput!): String!
+  taskEffortCreate(input: TaskEffortIntegrationEffortCreateInput!): String!
+  taskEffortUpdate(input: TaskEffortIntegrationEffortUpdateInput!): String!
+  taskEffortDelete(input: TaskEffortIntegrationEffortDeleteInput!): String!
   createProject(input: ProjectIntegrationCreateProjectInput!): String!
   updateProject(input: ProjectIntegrationProjectUpdateInput!): String!
   updateRole(input: UpdateRoleInput!): Boolean!
@@ -448,6 +482,22 @@ input TaskCommentIntegrationCommentUpdateInput {
 }
 
 input TaskCommentIntegrationCommentDeleteInput {
+  id: String!
+}
+
+input TaskEffortIntegrationEffortCreateInput {
+  taskId: String!
+  value: Float!
+  description: String!
+}
+
+input TaskEffortIntegrationEffortUpdateInput {
+  id: String!
+  value: Float!
+  description: String!
+}
+
+input TaskEffortIntegrationEffortDeleteInput {
   id: String!
 }
 

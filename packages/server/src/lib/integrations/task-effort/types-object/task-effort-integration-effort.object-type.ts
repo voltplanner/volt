@@ -1,20 +1,23 @@
 import { Field, ObjectType } from '@nestjs/graphql'
 
-import { TaskCommentIntegrationUserObject } from './task-comment-integration-user.object-type'
+import { TaskEffortIntegrationUserObject } from './task-effort-integration-user.object-type'
 
 @ObjectType()
-export class TaskCommentIntegrationCommentObject {
+export class TaskEffortIntegrationEffortObject {
     @Field(() => String)
     readonly id!: string
 
+    @Field(() => Number)
+    readonly value!: number
+
     @Field(() => String)
-    readonly text!: string
+    readonly description!: string
 
     @Field(() => String)
     readonly taskId!: string
 
-    @Field(() => TaskCommentIntegrationUserObject)
-    readonly user!: TaskCommentIntegrationUserObject
+    @Field(() => TaskEffortIntegrationUserObject)
+    readonly user!: TaskEffortIntegrationUserObject
 
     @Field(() => Boolean)
     readonly isCanUpdate!: boolean

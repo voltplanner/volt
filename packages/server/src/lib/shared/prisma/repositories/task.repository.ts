@@ -2,7 +2,7 @@ import { DefaultError } from '../../errors/default.error'
 import { UnexpectedError } from '../../errors/unexpected.error'
 import { TPaginatedMeta } from '../../types/paginated-meta.type'
 import { parseMetaArgs } from '../../utils'
-import { Prisma, Task, TaskStatus, TaskTag } from '..'
+import { Prisma, Task, TaskStatus, TaskTag, TaskView } from '..'
 import { PrismaService } from '../prisma.service'
 import {
     TaskCreateRepositoryDto,
@@ -344,7 +344,7 @@ export const taskModelExtentions = {
     async extGetById(
         dto: TaskGetByIdRepositoryDto,
         prisma?: any,
-    ): Promise<Task & {
+    ): Promise<TaskView & {
         tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
         status: Pick<TaskStatus, 'id' | 'code' | 'name'>
     }> {
@@ -354,7 +354,7 @@ export const taskModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const data = await client.task.findFirstOrThrow({
+            const data = await client.taskView.findFirstOrThrow({
                 where: { id, isDeleted: false },
                 include: {
                     status: {
@@ -399,7 +399,7 @@ export const taskModelExtentions = {
         dto: TaskFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: (Task & {
+        data: (TaskView & {
             status: Pick<TaskStatus, 'id' | 'code' | 'name'>
             tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
         })[]
@@ -533,7 +533,7 @@ export const taskModelExtentions = {
         dto: TaskFindOneRepositoryDto,
         prisma?: any,
     ): Promise<
-        Awaited<ReturnType<typeof PrismaService.instance.task.findFirst>>
+        Awaited<TaskView>
     > {
         try {
             const client: PrismaTransactionClientType =
@@ -541,7 +541,7 @@ export const taskModelExtentions = {
 
             const { id } = dto
 
-            const task = await client.task.findFirst({
+            const task = await client.taskView.findFirst({
                 where: { id },
             })
 
@@ -563,7 +563,7 @@ export const taskModelExtentions = {
         dto: TaskFindSubtasksRepositoryDto,
         prisma?: any,
     ): Promise<
-        Awaited<ReturnType<typeof PrismaService.instance.task.findMany>>
+        Awaited<TaskView[]>
     > {
         try {
             const client: PrismaTransactionClientType =
@@ -571,11 +571,11 @@ export const taskModelExtentions = {
 
             const { parentId } = dto
 
-            const parent = await client.task.findUniqueOrThrow({
+            const parent = await client.taskView.findUniqueOrThrow({
                 where: { id: parentId },
             })
 
-            const data = await client.task.findMany({
+            const data = await client.taskView.findMany({
                 where: {
                     lft: { gt: parent.lft },
                     rgt: { lt: parent.rgt },

@@ -4,43 +4,44 @@ import { CurrentUser } from '@shared/decorators'
 import { CurrentUserPayload } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
-import { TaskCommentService } from '../../modules/task/services/task-comment.service'
+import { TaskEffortService } from '../../modules/task/services/task-effort.service'
 import { ACLGuard } from '../../shared/guards/acl.guard'
 import {
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
 import { getOneByProperty } from '../../shared/utils/find-in-array.util'
-import { TaskCommentIntegrationCommentCreateInput } from './types-input/task-comment-integration-comment-create.input-type'
-import { TaskCommentIntegrationCommentDeleteInput } from './types-input/task-comment-integration-comment-delete.input-type'
-import { TaskCommentIntegrationCommentUpdateInput } from './types-input/task-comment-integration-comment-update.input-type'
-import { TaskCommentIntegrationCommentsInput } from './types-input/task-comment-integration-comments.input-type'
-import { TaskCommentIntegrationCommentObject } from './types-object/task-comment-integration-comment.object-type'
-import { TaskCommentIntegrationCommentsOutput } from './types-output/task-comment-integration-comments.output-type'
+import { TaskEffortIntegrationEffortCreateInput } from './types-input/task-effort-integration-effort-create.input-type'
+import { TaskEffortIntegrationEffortDeleteInput } from './types-input/task-effort-integration-effort-delete.input-type'
+import { TaskEffortIntegrationEffortUpdateInput } from './types-input/task-effort-integration-effort-update.input-type'
+import { TaskEffortIntegrationEffortsInput } from './types-input/task-effort-integration-efforts.input-type'
+import { TaskEffortIntegrationEffortObject } from './types-object/task-effort-integration-effort.object-type'
+import { TaskEffortIntegrationEffortsOutput } from './types-output/task-effort-integration-efforts.output-type'
 
 @Resolver()
-export class TaskCommentIntegrationResolver {
+export class TaskEffortIntegrationResolver {
     constructor(
         private readonly _authUserService: AuthUserService,
-        private readonly _taskCommentService: TaskCommentService,
+        private readonly _taskEffortService: TaskEffortService,
         @Inject(PrismaService)
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentCreate(
+    async taskEffortCreate(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input') input: TaskCommentIntegrationCommentCreateInput,
+        @Args('input') input: TaskEffortIntegrationEffortCreateInput,
     ): Promise<string> {
-        const { taskId, text } = input
+        const { taskId, value, description } = input
 
         return await this._prismaService.$transaction(async (tx) => {
-            return await this._taskCommentService.create(
+            return await this._taskEffortService.create(
                 {
                     taskId,
                     userId,
-                    text,
+                    description,
+                    value,
                 },
                 tx,
             )
@@ -49,18 +50,19 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentUpdate(
+    async taskEffortUpdate(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input') input: TaskCommentIntegrationCommentUpdateInput,
+        @Args('input') input: TaskEffortIntegrationEffortUpdateInput,
     ) {
-        const { id, text } = input
+        const { id, description, value } = input
 
         return await this._prismaService.$transaction(async (tx) => {
-            return await this._taskCommentService.update(
+            return await this._taskEffortService.update(
                 {
                     id,
-                    text,
                     userId,
+                    description,
+                    value,
                 },
                 tx,
             )
@@ -69,14 +71,14 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentDelete(
+    async taskEffortDelete(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input') input: TaskCommentIntegrationCommentDeleteInput,
+        @Args('input') input: TaskEffortIntegrationEffortDeleteInput,
     ) {
         const { id } = input
 
         return await this._prismaService.$transaction(async (tx) => {
-            return await this._taskCommentService.delete(
+            return await this._taskEffortService.delete(
                 {
                     id,
                     userId,
@@ -87,18 +89,18 @@ export class TaskCommentIntegrationResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Query(() => TaskCommentIntegrationCommentsOutput)
-    async taskComments(
+    @Query(() => TaskEffortIntegrationEffortsOutput)
+    async taskEfforts(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input') input: TaskCommentIntegrationCommentsInput,
-    ): Promise<TaskCommentIntegrationCommentsOutput> {
-        const { taskId } = input
+        @Args('input', { nullable: true }) input?: TaskEffortIntegrationEffortsInput | null,
+    ): Promise<TaskEffortIntegrationEffortsOutput> {
+        const { taskId } = input || {}
 
         const curPage = input.curPage ?? 1
         const perPage = input.perPage ?? 10
 
-        const { data, meta } = await this._taskCommentService.findMany({
-            taskId,
+        const { data, meta } = await this._taskEffortService.findMany({
+            filterByTaskId: taskId || undefined,
             curPage: curPage || undefined,
             perPage: perPage || undefined,
         })
@@ -109,25 +111,26 @@ export class TaskCommentIntegrationResolver {
             perPage: data.length,
         })
 
-        const taskComments: TaskCommentIntegrationCommentObject[] = data.map((i) => {
-            const commentOwner = getOneByProperty(users.data, 'id', i.userId)
+        const taskEfforts: TaskEffortIntegrationEffortObject[] = data.map((i) => {
+            const owner = getOneByProperty(users.data, 'id', i.userId)
 
             return {
                 id: i.id,
                 taskId: i.taskId,
-                text: i.text,
+                value: i.value,
+                description: i.description,
                 createdAt: Number(i.createdAt),
                 updatedAt: Number(i.updatedAt),
-                isCanDelete: commentOwner.id === userId,
-                isCanUpdate: commentOwner.id === userId,
+                isCanDelete: owner.id === userId,
+                isCanUpdate: owner.id === userId,
                 user: {
-                    id: commentOwner.id,
-                    lastname: commentOwner.lastname,
-                    firstname: commentOwner.firstname,
+                    id: owner.id,
+                    lastname: owner.lastname,
+                    firstname: owner.firstname,
                 },
             }
         })
 
-        return { meta, data: taskComments }
+        return { meta, data: taskEfforts }
     }
 }

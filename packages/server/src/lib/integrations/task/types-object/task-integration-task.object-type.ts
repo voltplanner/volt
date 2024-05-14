@@ -44,4 +44,7 @@ export class TaskIntegrationTaskObject {
 
     @Field(() => TaskIntegrationUserObject, { nullable: true })
     readonly assignedTo?: TaskIntegrationUserObject | null
+
+    @Field(() => Number)
+    readonly effortsMs: number
 }
