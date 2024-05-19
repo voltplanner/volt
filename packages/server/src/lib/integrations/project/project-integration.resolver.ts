@@ -23,6 +23,7 @@ import { ProjectIntegrationProjectTasksTagsInput } from './types-input/project-i
 import { ProjectIntegrationProjectUpdateInput } from './types-input/project-integration-project-update.input-type'
 import { ProjectIntegrationProjectUsersInput } from './types-input/project-integration-project-users.input-type'
 import { ProjectIntegrationProjectUsersRolesInput } from './types-input/project-integration-project-users-roles.input-type'
+import { ProjectIntegrationProjectsInput } from './types-input/project-integration-projects.input-type'
 import { ProjectIntegrationProjectObject } from './types-object/project-integration-project.object-type'
 import { ProjectIntegrationTasksRelationObject } from './types-object/project-integration-tasks-relation.object-type'
 import { ProjectIntegrationTasksStatusObject } from './types-object/project-integration-tasks-status.object-type'
@@ -105,8 +106,22 @@ export class ProjectIntegrationResolver {
     }
 
     @Query(() => ProjectIntegrationProjectsOutput)
-    async projects(): Promise<ProjectIntegrationProjectsOutput> {
-        const { data, meta } = await this._taskProjectService.findMany()
+    async projects(
+        @Args('input', { nullable: true }) input: ProjectIntegrationProjectsInput,
+    ): Promise<ProjectIntegrationProjectsOutput> {
+        const { filterBy, curPage, perPage } = input || {}
+
+        const { data, meta } = await this._taskProjectService.findMany({
+            curPage: curPage || undefined,
+            perPage: perPage || undefined,
+            filterByName: filterBy?.name || undefined,
+            filterByUserId: filterBy?.userId || undefined,
+            filterByFulltext: filterBy?.fulltext || undefined,
+            filterByCreatedAt: (filterBy?.createdAtFrom || filterBy?.createdAtTo) ? {
+                from: filterBy?.createdAtFrom ? new Date(filterBy.createdAtFrom) : undefined,
+                to: filterBy?.createdAtTo ? new Date(filterBy.createdAtTo) : undefined,
+            } : undefined,
+        })
 
         const projects: ProjectIntegrationProjectObject[] = data.map((i) => ({
             ...i,

@@ -219,7 +219,7 @@ type Query {
   tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
   tasksOfCurrentUser(input: TaskIntegrationTasksOfCurrentUserInput): TaskIntegrationTasksOfCurrentUserOutput!
   project(input: ProjectIntegrationProjectInput!): ProjectIntegrationProjectObject!
-  projects: ProjectIntegrationProjectsOutput!
+  projects(input: ProjectIntegrationProjectsInput): ProjectIntegrationProjectsOutput!
   projectsOfCurrentUser: ProjectIntegrationProjectsOfCurrentUserOutput!
   projectUsers(input: ProjectIntegrationProjectUsersInput!): ProjectIntegrationProjectUsersOutput!
   projectUsersRoles(input: ProjectIntegrationProjectUsersRolesInput!): [ProjectIntegrationUsersRoleObject!]!
@@ -241,6 +241,7 @@ input TaskIntegrationTaskInput {
 
 input TaskIntegrationTasksInput {
   projectId: String
+  fulltext: [String!]
   curPage: Float
   perPage: Float
 }
@@ -253,6 +254,12 @@ input TaskIntegrationTasksOfCurrentUserInput {
 
 input ProjectIntegrationProjectInput {
   id: String!
+}
+
+input ProjectIntegrationProjectsInput {
+  fulltext: [String!]
+  curPage: Float
+  perPage: Float
 }
 
 input ProjectIntegrationProjectUsersInput {

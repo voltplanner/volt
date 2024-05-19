@@ -14,6 +14,7 @@ import {
     TaskProjectUpdateRepositoryDto,
 } from '../repositories-dto/task-project.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
+import { mutateFindManyDelegateWithFilterString } from '../utils/prisma-mutate-find-many-delegate-with-filter-string'
 
 export const taskProjectModelExtentions = {
     async extCreate(
@@ -163,6 +164,7 @@ export const taskProjectModelExtentions = {
 
             const delegateWhere: Prisma.TaskProjectWhereInput = {
                 name: undefined,
+                fulltext: undefined,
                 isDeleted: false,
             }
 
@@ -171,16 +173,43 @@ export const taskProjectModelExtentions = {
                     ? { [dto.orderBy.field]: dto.orderBy.order }
                     : { createdAt: 'desc' }
 
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive',
+            if (dto.filterByFulltext) {
+                if (typeof dto.filterByFulltext === 'string') {
+                    delegateWhere.fulltext = {
+                        contains: dto.filterByFulltext,
+                        mode: 'insensitive',
+                    }
+                } else if (dto.filterByFulltext.length) {
+                    delegateWhere.OR = delegateWhere.OR || []
+
+                    dto.filterByFulltext.forEach((i) => {
+                        delegateWhere.OR.push({
+                            fulltext: {
+                                contains: i,
+                                mode: 'insensitive',
+                            },
+                        })
+                    })
                 }
             }
 
+            mutateFindManyDelegateWithFilterString(delegateWhere, 'name', dto.filterByName)
+
             if (dto.filterByUserId) {
-                delegateWhere.users = {
-                    some: { userId: dto.filterByUserId },
+                if (typeof dto.filterByUserId === 'string') {
+                    delegateWhere.users = {
+                        some: {
+                            userId: dto.filterByUserId,
+                        },
+                    }
+                } else if (dto.filterByUserId.length) {
+                    delegateWhere.users = {
+                        some: {
+                            userId: {
+                                in: dto.filterByUserId,
+                            },
+                        },
+                    }
                 }
             }
 

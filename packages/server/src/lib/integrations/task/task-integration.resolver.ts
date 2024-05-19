@@ -121,20 +121,37 @@ export class TaskIntegrationResolver {
         @Args('input', { nullable: true })
         input?: TaskIntegrationTasksInput | null,
     ): Promise<TaskIntegrationTasksOutput> {
-        const { projectId, curPage, perPage } = input || {}
+        const { filterBy, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.findMany({
-            filterByProjectId: projectId || undefined,
             curPage: curPage || undefined,
             perPage: perPage || undefined,
+            filterByName: filterBy?.name || undefined,
+            filterByTagId: filterBy?.tagId || undefined,
+            filterByNumber: filterBy?.number || undefined,
+            filterByStatusId: filterBy?.statusId || undefined,
+            filterByParentId: filterBy?.parentId || undefined,
+            filterByProjectId: filterBy?.projectId || undefined,
+            filterByCreatedById: filterBy?.createdById || undefined,
+            filterByAssignedToId: filterBy?.assignedToId || undefined,
+            filterByFulltext: filterBy?.fulltext || undefined,
+            filterByCreatedAt: (filterBy?.createdAtFrom || filterBy?.createdAtTo) ? {
+                from: filterBy?.createdAtFrom ? new Date(filterBy.createdAtFrom) : undefined,
+                to: filterBy?.createdAtTo ? new Date(filterBy.createdAtTo) : undefined,
+            } : undefined,
         })
 
         const tasks: TaskIntegrationTaskObject[] = []
 
         for (const task of data) {
-            const userAssigned = await this._authUserService.getUser(
-                task.assignedToId,
-            )
+            let userAssigned: Awaited<ReturnType<AuthUserService['getUser']>> | undefined
+
+            if (task.assignedToId) {
+                userAssigned = await this._authUserService.getUser(
+                    task.assignedToId,
+                )
+            }
+            
             const userCreated = await this._authUserService.getUser(
                 task.createdById,
             )
@@ -146,15 +163,15 @@ export class TaskIntegrationResolver {
                     lastname: userCreated.lastname,
                     firstname: userCreated.firstname,
                 },
-                assignedTo: {
+                assignedTo: userAssigned ? {
                     id: userAssigned.id,
                     lastname: userAssigned.lastname,
                     firstname: userAssigned.firstname,
-                },
+                } : undefined,
                 createdAt: Number(task.createdAt),
-                estimatedDateEnd: Number(task.estimatedDateEnd),
-                estimatedDateStart: Number(task.estimatedDateStart),
-                estimatedDuration: Number(task.estimatedDuration.toString()),
+                estimatedDateEnd: task.estimatedDateEnd ? Number(task.estimatedDateEnd) : undefined,
+                estimatedDateStart: task.estimatedDateStart ? Number(task.estimatedDateStart) : undefined,
+                estimatedDuration: task.estimatedDuration ? Number(task.estimatedDuration.toString()) : undefined,
             })
         }
 

@@ -14,6 +14,9 @@ import {
     TaskUpdateRepositoryDto,
 } from '../repositories-dto/task.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
+import { mutateFindManyDelegateWithFilterNumber } from '../utils/prisma-mutate-find-many-delegate-with-filter-number'
+import { mutateFindManyDelegateWithFilterString } from '../utils/prisma-mutate-find-many-delegate-with-filter-string'
+import { mutateFindManyDelegateWithFilterUuid } from '../utils/prisma-mutate-find-many-delegate-with-filter-uuid'
 
 export const taskModelExtentions = {
     async extCreate(
@@ -401,7 +404,7 @@ export const taskModelExtentions = {
             tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
         })[]
         meta: TPaginatedMeta
-    }> {
+    }> { 
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
@@ -419,43 +422,43 @@ export const taskModelExtentions = {
                 projectId: undefined,
                 createdById: undefined,
                 assignedToId: undefined,
+                fulltext: undefined,
+                tags: undefined,
                 isDeleted: false,
             }
 
             const delegateOrderBy: Prisma.TaskOrderByWithRelationAndSearchRelevanceInput =
                 { createdAt: 'desc' }
 
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive',
+            mutateFindManyDelegateWithFilterString(delegateWhere, 'name', dto.filterByName)
+            mutateFindManyDelegateWithFilterString(delegateWhere, 'fulltext', dto.filterByFulltext)
+
+            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'statusId', dto.filterByStatusId)
+            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'parentId', dto.filterByParentId)
+            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'projectId', dto.filterByProjectId)
+            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'createdById', dto.filterByCreatedById)
+            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'assignedToId', dto.filterByAssignedToId)
+
+            mutateFindManyDelegateWithFilterNumber(delegateWhere, 'number', dto.filterByNumber)
+
+            if (dto.filterByTagId) {
+                if (typeof dto.filterByTagId === 'string') {
+                    delegateWhere.tags = {
+                        some: {
+                            taskTagId: dto.filterByTagId,
+                        },
+                    }
+                } else if (dto.filterByTagId.length) {
+                    delegateWhere.tags = {
+                        some: {
+                            taskTagId: {
+                                in: dto.filterByTagId,
+                            },
+                        },
+                    }
                 }
             }
-
-            if (dto.filterByNumber) {
-                delegateWhere.number = dto.filterByNumber
-            }
-
-            if (dto.filterByStatusId) {
-                delegateWhere.statusId = dto.filterByStatusId
-            }
-
-            if (dto.filterByParentId) {
-                delegateWhere.parentId = dto.filterByParentId
-            }
-
-            if (dto.filterByProjectId) {
-                delegateWhere.projectId = dto.filterByProjectId
-            }
-
-            if (dto.filterByCreatedById) {
-                delegateWhere.createdById = dto.filterByCreatedById
-            }
-
-            if (dto.filterByAssignedToId) {
-                delegateWhere.assignedToId = dto.filterByAssignedToId
-            }
-
+            
             if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
                 delegateWhere.createdAt = {
                     gte: dto.filterByCreatedAt?.from ?? undefined,

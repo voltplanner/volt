@@ -193,6 +193,8 @@ model TaskProject {
     updatedAt            DateTime              @default(now()) @map("updated_at") @db.Timestamp(6)
     deletedAt            DateTime?             @map("deleted_at") @db.Timestamp(6)
     isDeleted            Boolean               @default(false) @map("is_deleted")
+    fulltext String? @db.Text
+
     users                TaskProjectOnUser[]
     tasks                Task[]
     tasksCustomFields    TaskCustomFieldType[]
@@ -226,6 +228,7 @@ model Task {
     estimatedDateStart DateTime? @map("estimated_date_start") @db.Timestamp(6)
     estimatedDateEnd   DateTime? @map("estimated_date_end") @db.Timestamp(6)
     estimatedDuration  BigInt?   @map("estimated_duration")
+    fulltext String? @db.Text
 
     createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
