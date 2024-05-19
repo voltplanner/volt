@@ -58,7 +58,7 @@ async function setupDb() {
         POSTGRES_PORT,
     )}/${POSTGRES_DB}?schema=public`
 
-    await execa(`npx`, ['nx', 'run', 'server:prisma:db:push'], {
+    await execa(`npx`, ['nx', 'run', 'server:prisma:migrate:deploy'], {
         env: { DATABASE_URL: databaseUrl },
     })
     

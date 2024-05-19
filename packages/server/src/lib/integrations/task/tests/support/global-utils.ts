@@ -11,6 +11,7 @@ import { TaskIntegrationTaskUpdateInput } from '../../types-input/task-integrati
 import { TaskIntegrationTasksInput } from '../../types-input/task-integration-tasks.input-type'
 import { TaskIntegrationTasksOfCurrentUserInput } from '../../types-input/task-integration-tasks-of-current-user.input-type'
 import { TaskIntegrationTaskObject } from '../../types-object/task-integration-task.object-type'
+import { TaskIntegrationTasksOutput } from '../../types-output/task-integration-tasks.output-type'
 import { setup } from './global-setup'
 
 export class GlobalUtils {
@@ -92,7 +93,7 @@ export class GlobalUtils {
         })
     }
 
-    async gqlTasks(dto?: TaskIntegrationTasksInput | null): Promise<Record<string, any>> {
+    async gqlTasks(dto?: TaskIntegrationTasksInput | null): Promise<{ tasks: TaskIntegrationTasksOutput }> {
         const doc = gql`
         query tasks($tasksInput: TaskIntegrationTasksInput) {
             tasks(input: $tasksInput) {

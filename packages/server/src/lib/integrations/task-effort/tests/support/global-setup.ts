@@ -19,7 +19,9 @@ import {
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../../../../../../../packages/server/src/lib/shared/prisma'
-import { ProjectIntegrationResolver } from '../../project-integration.resolver'
+import { ProjectIntegrationResolver } from '../../../project/project-integration.resolver'
+import { TaskIntegrationResolver } from '../../../task/task-integration.resolver'
+import { TaskEffortIntegrationResolver } from '../../task-comment-integration.resolver'
 
 dotenv.config()
 
@@ -114,7 +116,11 @@ export async function setup() {
                 eventsProvider: createEventEmitterPublisher(),
             }),
         ],
-        providers: [ProjectIntegrationResolver],
+        providers: [
+            ProjectIntegrationResolver,
+            TaskIntegrationResolver,
+            TaskEffortIntegrationResolver,
+        ],
     }).compile()
 
     const app = moduleFixture.createNestApplication()

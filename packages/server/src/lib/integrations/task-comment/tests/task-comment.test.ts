@@ -169,7 +169,7 @@ describe('Task Comment', () => {
                 expect(typeof i.createdAt).toBe('number')
                 expect(typeof i.updatedAt).toBe('number')
 
-                expect(i.isCanEdit).toBe(true)
+                expect(i.isCanUpdate).toBe(true)
                 expect(i.isCanDelete).toBe(true)
                 expect(i.user.id).toBe(adminUser.id)
                 expect(i.user.lastname).toBe(adminUser.lastname)
