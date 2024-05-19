@@ -2,21 +2,25 @@ import { DefaultError } from '../../errors/default.error'
 import { UnexpectedError } from '../../errors/unexpected.error'
 import { TPaginatedMeta } from '../../types/paginated-meta.type'
 import { parseMetaArgs } from '../../utils'
-import { Prisma, Task, TaskProject, TaskStatus } from '..'
+import { Prisma, Task, TaskStatus, TaskTag, TaskView } from '..'
 import { PrismaService } from '../prisma.service'
 import {
-    TaskCreateRepositoryDto,
-    TaskDeleteRepositoryDto,
+    CreateTaskRepositoryDto,
+    DeleteTaskRepositoryDto,
     TaskFindManyRepositoryDto,
     TaskFindOneRepositoryDto,
     TaskFindSubtasksRepositoryDto,
-    TaskUpdateRepositoryDto,
+    TaskGetByIdRepositoryDto,
+    UpdateTaskRepositoryDto,
 } from '../repositories-dto/task.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
+import { mutateFindManyDelegateWithFilterNumber } from '../utils/prisma-mutate-find-many-delegate-with-filter-number'
+import { mutateFindManyDelegateWithFilterString } from '../utils/prisma-mutate-find-many-delegate-with-filter-string'
+import { mutateFindManyDelegateWithFilterUuid } from '../utils/prisma-mutate-find-many-delegate-with-filter-uuid'
 
 export const taskModelExtentions = {
     async extCreate(
-        dto: TaskCreateRepositoryDto,
+        dto: CreateTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -36,7 +40,7 @@ export const taskModelExtentions = {
 
                 parentId,
                 assignedToId,
-                tagsIds,
+                tagIds,
             } = dto
 
             // Default values, if we have empty DB
@@ -80,11 +84,19 @@ export const taskModelExtentions = {
                 },
             })
 
+            const {
+                _max: { number: maxNumber },
+            } = await client.task.aggregate({
+                _max: { number: true },
+            })
+
             const { id } = await client.task.create({
                 data: {
                     lft: newLft,
                     rgt: newLft + 1,
                     level: newLevel,
+
+                    number: typeof maxNumber === 'number' ? maxNumber + 1 : 1,
 
                     name,
                     description,
@@ -102,9 +114,9 @@ export const taskModelExtentions = {
                 },
             })
 
-            if (tagsIds?.length) {
+            if (tagIds?.length) {
                 await client.taskOnTaskTag.createMany({
-                    data: tagsIds.map((taskTagId) => ({
+                    data: tagIds.map((taskTagId) => ({
                         taskId: id,
                         taskTagId,
                     })),
@@ -127,7 +139,7 @@ export const taskModelExtentions = {
     // Nested Set Notes:
     // Method moves the node and all its children to the new parent if parentId is specified
     async extUpdate(
-        dto: TaskUpdateRepositoryDto,
+        dto: UpdateTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -234,6 +246,8 @@ export const taskModelExtentions = {
                     parentId,
                     statusId,
                     assignedToId,
+
+                    version: { increment: 1 },
                 },
             })
 
@@ -253,7 +267,7 @@ export const taskModelExtentions = {
     // Nested Set Notes:
     // Method deletes node, but retains children. If deleted node had parent, then all closest children of the deleted node will become its children.
     async extDelete(
-        dto: TaskDeleteRepositoryDto,
+        dto: DeleteTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -327,11 +341,75 @@ export const taskModelExtentions = {
         }
     },
 
+    async extGetById(
+        dto: TaskGetByIdRepositoryDto,
+        prisma?: any,
+    ): Promise<
+        TaskView & {
+            tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
+            status: Pick<TaskStatus, 'id' | 'code' | 'name'>
+        }
+    > {
+        const { id } = dto
+
+        try {
+            const client: PrismaTransactionClientType =
+                prisma || PrismaService.instance
+
+            const data = await client.taskView.findFirstOrThrow({
+                where: { id, isDeleted: false },
+                include: {
+                    status: {
+                        select: {
+                            id: true,
+                            code: true,
+                            name: true,
+                        },
+                    },
+                    tags: {
+                        include: {
+                            taskTag: {
+                                select: {
+                                    id: true,
+                                    code: true,
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            })
+
+            return data
+                ? {
+                      ...data,
+                      tags: data.tags.map((i) => ({
+                          id: i.taskTag.id,
+                          code: i.taskTag.code,
+                          name: i.taskTag.name,
+                      })),
+                  }
+                : undefined
+        } catch (e) {
+            if (e instanceof DefaultError) {
+                throw e
+            }
+
+            throw new UnexpectedError({
+                message: e,
+                metadata: dto,
+            })
+        }
+    },
+
     async extFindMany(
         dto: TaskFindManyRepositoryDto = {},
         prisma?: any,
     ): Promise<{
-        data: (Task & { status: Pick<TaskStatus, 'id' | 'code' | 'name'> })[]
+        data: (TaskView & {
+            status: Pick<TaskStatus, 'id' | 'code' | 'name'>
+            tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
+        })[]
         meta: TPaginatedMeta
     }> {
         try {
@@ -343,7 +421,7 @@ export const taskModelExtentions = {
                 perPage: dto.perPage,
             })
 
-            const delegateWhere: Prisma.TaskWhereInput = {
+            const delegateWhere: Prisma.TaskViewWhereInput = {
                 name: undefined,
                 number: undefined,
                 statusId: undefined,
@@ -351,41 +429,73 @@ export const taskModelExtentions = {
                 projectId: undefined,
                 createdById: undefined,
                 assignedToId: undefined,
+                fulltext: undefined,
+                tags: undefined,
                 isDeleted: false,
             }
 
-            const delegateOrderBy: Prisma.TaskOrderByWithRelationAndSearchRelevanceInput =
+            const delegateOrderBy: Prisma.TaskViewOrderByWithRelationAndSearchRelevanceInput =
                 { createdAt: 'desc' }
 
-            if (dto.filterByName) {
-                delegateWhere.name = {
-                    contains: dto.filterByName,
-                    mode: 'insensitive',
+            mutateFindManyDelegateWithFilterString(
+                delegateWhere,
+                'name',
+                dto.filterByName,
+            )
+            mutateFindManyDelegateWithFilterString(
+                delegateWhere,
+                'fulltext',
+                dto.filterByFulltext,
+            )
+
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'statusId',
+                dto.filterByStatusId,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'parentId',
+                dto.filterByParentId,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'projectId',
+                dto.filterByProjectId,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'createdById',
+                dto.filterByCreatedById,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'assignedToId',
+                dto.filterByAssignedToId,
+            )
+
+            mutateFindManyDelegateWithFilterNumber(
+                delegateWhere,
+                'number',
+                dto.filterByNumber,
+            )
+
+            if (dto.filterByTagId) {
+                if (typeof dto.filterByTagId === 'string') {
+                    delegateWhere.tags = {
+                        some: {
+                            taskTagId: dto.filterByTagId,
+                        },
+                    }
+                } else if (dto.filterByTagId.length) {
+                    delegateWhere.tags = {
+                        some: {
+                            taskTagId: {
+                                in: dto.filterByTagId,
+                            },
+                        },
+                    }
                 }
-            }
-
-            if (dto.filterByNumber) {
-                delegateWhere.number = dto.filterByNumber
-            }
-
-            if (dto.filterByStatusId) {
-                delegateWhere.statusId = dto.filterByStatusId
-            }
-
-            if (dto.filterByParentId) {
-                delegateWhere.parentId = dto.filterByParentId
-            }
-
-            if (dto.filterByProjectId) {
-                delegateWhere.projectId = dto.filterByProjectId
-            }
-
-            if (dto.filterByCreatedById) {
-                delegateWhere.createdById = dto.filterByCreatedById
-            }
-
-            if (dto.filterByAssignedToId) {
-                delegateWhere.assignedToId = dto.filterByAssignedToId
             }
 
             if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
@@ -395,11 +505,11 @@ export const taskModelExtentions = {
                 }
             }
 
-            const count = await client.task.count({
+            const count = await client.taskView.count({
                 where: delegateWhere,
             })
 
-            const data = await client.task.findMany({
+            const data = await client.taskView.findMany({
                 where: delegateWhere,
                 orderBy: delegateOrderBy,
                 skip,
@@ -412,11 +522,34 @@ export const taskModelExtentions = {
                             name: true,
                         },
                     },
+                    tags: {
+                        include: {
+                            taskTag: {
+                                select: {
+                                    id: true,
+                                    code: true,
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                    efforts: {
+                        select: {
+                            value: true,
+                        },
+                    },
                 },
             })
 
             return {
-                data,
+                data: data.map((i) => ({
+                    ...i,
+                    tags: i.tags.map((i) => ({
+                        id: i.taskTag.id,
+                        code: i.taskTag.code,
+                        name: i.taskTag.name,
+                    })),
+                })),
                 meta: {
                     curPage,
                     perPage,
@@ -438,16 +571,14 @@ export const taskModelExtentions = {
     async extFindOne(
         dto: TaskFindOneRepositoryDto,
         prisma?: any,
-    ): Promise<
-        Awaited<ReturnType<typeof PrismaService.instance.task.findFirst>>
-    > {
+    ): Promise<Awaited<TaskView>> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
             const { id } = dto
 
-            const task = await client.task.findFirst({
+            const task = await client.taskView.findFirst({
                 where: { id },
             })
 
@@ -468,20 +599,18 @@ export const taskModelExtentions = {
     async extFindSubtasks(
         dto: TaskFindSubtasksRepositoryDto,
         prisma?: any,
-    ): Promise<
-        Awaited<ReturnType<typeof PrismaService.instance.task.findMany>>
-    > {
+    ): Promise<Awaited<TaskView[]>> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
             const { parentId } = dto
 
-            const parent = await client.task.findUniqueOrThrow({
+            const parent = await client.taskView.findUniqueOrThrow({
                 where: { id: parentId },
             })
 
-            const data = await client.task.findMany({
+            const data = await client.taskView.findMany({
                 where: {
                     lft: { gt: parent.lft },
                     rgt: { lt: parent.rgt },
@@ -505,21 +634,21 @@ export const taskModelExtentions = {
     },
 
     async extSetTags(
-        dto: { taskId: string; taskTagIds: string[] },
+        dto: { taskId: string; tagIds: string[] },
         prisma?: any,
     ): Promise<void> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { taskId, taskTagIds } = dto
+            const { taskId, tagIds } = dto
 
             await client.taskOnTaskTag.deleteMany({
                 where: { taskId },
             })
 
             await client.taskOnTaskTag.createMany({
-                data: taskTagIds.map((i) => ({
+                data: tagIds.map((i) => ({
                     taskId,
                     taskTagId: i,
                 })),

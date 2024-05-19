@@ -28,8 +28,8 @@
       }
     },
     "serve": {
-      "dependsOn": ["prisma:db:push"],
       "executor": "@nx/js:node",
+      "dependsOn": ["prisma:migrate:deploy"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "server:build"
@@ -63,12 +63,6 @@
     },
     "prisma:migrate:dev": {
       "executor": "@tinybudgie/schematics:prisma-migrate-dev"
-    },
-    "prisma:db:push": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx prisma db push --schema packages/server/src/prisma/schema.prisma"
-      }
     },
     "prisma:migrate:deploy": {
       "executor": "@tinybudgie/schematics:prisma-migrate-deploy"

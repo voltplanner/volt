@@ -17,16 +17,21 @@ export class TaskUserService {
         dto: {
             readonly userId: string
             readonly roleCode: string
+            readonly projectId: string
         },
         prisma?: PrismaTransactionClientType,
     ): Promise<string> {
-        const { userId, roleCode } = dto
+        const { userId, roleCode, projectId } = dto
 
         const client = prisma || this.prisma
 
-        const role = await client.taskUserRole.extGetOneByCode({
-            code: roleCode,
-        })
+        const role = await client.taskUserRole.extGetOneByCode(
+            {
+                code: roleCode,
+                projectId,
+            },
+            client,
+        )
 
         const id = await client.taskUser.extUpsert(
             {

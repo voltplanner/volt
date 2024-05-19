@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql'
 
 @InputType()
-export class TaskIntegrationTaskCreateInput {
+export class TaskIntegrationCreateTaskInput {
     @Field(() => String)
     readonly projectId!: string
 
@@ -44,5 +44,5 @@ export class TaskIntegrationTaskCreateInput {
     @Field(() => [String], {
         nullable: true,
     })
-    readonly tagsIds?: string[] | null
+    readonly tagIds?: string[] | null
 }

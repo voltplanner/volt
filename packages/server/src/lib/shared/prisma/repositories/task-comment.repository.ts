@@ -5,16 +5,16 @@ import { parseMetaArgs } from '../../utils'
 import { Prisma } from '..'
 import { PrismaService } from '../prisma.service'
 import {
-    TaskCommentCreateRepositoryDto,
-    TaskCommentDeleteRepositoryDto,
+    CreateTaskCommentRepositoryDto,
+    DeleteTaskCommentRepositoryDto,
     TaskCommentFindManyRepositoryDto,
-    TaskCommentUpdateRepositoryDto,
+    UpdateTaskCommentRepositoryDto,
 } from '../repositories-dto/task-comment.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskCommentModelExtentions = {
     async extCreate(
-        dto: TaskCommentCreateRepositoryDto,
+        dto: CreateTaskCommentRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -46,17 +46,17 @@ export const taskCommentModelExtentions = {
     },
 
     async extUpdate(
-        dto: TaskCommentUpdateRepositoryDto,
+        dto: UpdateTaskCommentRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id, text } = dto
+            const { id, userId, text } = dto
 
             const { id: updatedId } = await client.taskComment.update({
-                where: { id },
+                where: { id, userId },
                 data: {
                     text,
                 },
@@ -77,17 +77,17 @@ export const taskCommentModelExtentions = {
     },
 
     async extDelete(
-        dto: TaskCommentDeleteRepositoryDto,
+        dto: DeleteTaskCommentRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id } = dto
+            const { id, userId } = dto
 
             const { id: deletedId } = await client.taskComment.update({
-                where: { id },
+                where: { id, userId },
                 data: { isDeleted: true },
                 select: { id: true },
             })

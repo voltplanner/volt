@@ -36,7 +36,7 @@ export class NotificationsIntegration {
                     email: data.email,
                     userId: data.userId,
                     topic: 'Complete registration in Volt',
-                    message: `${environment.rootUrl}register?code=${data.code}&userId=${data.userId}&email=${data.email}`,
+                    message: `${environment.rootUrl}signup?code=${data.code}&userId=${data.userId}&email=${data.email}`,
                 })
             },
         )

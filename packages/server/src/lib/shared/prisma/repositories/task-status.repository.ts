@@ -159,8 +159,9 @@ export const taskStatusModelExtentions = {
 
             const { id } = await client.taskStatus.upsert({
                 where: {
-                    code_isDeleted: {
+                    code_projectId_isDeleted: {
                         code,
+                        projectId,
                         isDeleted: false,
                     },
                 },

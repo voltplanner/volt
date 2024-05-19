@@ -154,8 +154,9 @@ export const taskRelationModelExtentions = {
 
             const { id } = await client.taskRelation.upsert({
                 where: {
-                    code_isDeleted: {
+                    code_projectId_isDeleted: {
                         code,
+                        projectId,
                         isDeleted: false,
                     },
                 },
