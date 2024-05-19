@@ -5,13 +5,13 @@ import { parseMetaArgs } from '../../utils'
 import { Prisma, Task, TaskStatus, TaskTag, TaskView } from '..'
 import { PrismaService } from '../prisma.service'
 import {
-    TaskCreateRepositoryDto,
-    TaskDeleteRepositoryDto,
+    CreateTaskRepositoryDto,
+    DeleteTaskRepositoryDto,
     TaskFindManyRepositoryDto,
     TaskFindOneRepositoryDto,
     TaskFindSubtasksRepositoryDto,
     TaskGetByIdRepositoryDto,
-    TaskUpdateRepositoryDto,
+    UpdateTaskRepositoryDto,
 } from '../repositories-dto/task.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 import { mutateFindManyDelegateWithFilterNumber } from '../utils/prisma-mutate-find-many-delegate-with-filter-number'
@@ -20,7 +20,7 @@ import { mutateFindManyDelegateWithFilterUuid } from '../utils/prisma-mutate-fin
 
 export const taskModelExtentions = {
     async extCreate(
-        dto: TaskCreateRepositoryDto,
+        dto: CreateTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -139,7 +139,7 @@ export const taskModelExtentions = {
     // Nested Set Notes:
     // Method moves the node and all its children to the new parent if parentId is specified
     async extUpdate(
-        dto: TaskUpdateRepositoryDto,
+        dto: UpdateTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -267,7 +267,7 @@ export const taskModelExtentions = {
     // Nested Set Notes:
     // Method deletes node, but retains children. If deleted node had parent, then all closest children of the deleted node will become its children.
     async extDelete(
-        dto: TaskDeleteRepositoryDto,
+        dto: DeleteTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -344,10 +344,12 @@ export const taskModelExtentions = {
     async extGetById(
         dto: TaskGetByIdRepositoryDto,
         prisma?: any,
-    ): Promise<TaskView & {
-        tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
-        status: Pick<TaskStatus, 'id' | 'code' | 'name'>
-    }> {
+    ): Promise<
+        TaskView & {
+            tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
+            status: Pick<TaskStatus, 'id' | 'code' | 'name'>
+        }
+    > {
         const { id } = dto
 
         try {
@@ -371,18 +373,23 @@ export const taskModelExtentions = {
                                     id: true,
                                     code: true,
                                     name: true,
-                                }
-                            }
-                        }
-                    }
+                                },
+                            },
+                        },
+                    },
                 },
             })
 
-            return data ? { ...data, tags: data.tags.map(i => ({
-                id: i.taskTag.id,
-                code: i.taskTag.code,
-                name: i.taskTag.name,
-            }))} : undefined
+            return data
+                ? {
+                      ...data,
+                      tags: data.tags.map((i) => ({
+                          id: i.taskTag.id,
+                          code: i.taskTag.code,
+                          name: i.taskTag.name,
+                      })),
+                  }
+                : undefined
         } catch (e) {
             if (e instanceof DefaultError) {
                 throw e
@@ -404,7 +411,7 @@ export const taskModelExtentions = {
             tags: Pick<TaskTag, 'id' | 'code' | 'name'>[]
         })[]
         meta: TPaginatedMeta
-    }> { 
+    }> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
@@ -430,16 +437,48 @@ export const taskModelExtentions = {
             const delegateOrderBy: Prisma.TaskViewOrderByWithRelationAndSearchRelevanceInput =
                 { createdAt: 'desc' }
 
-            mutateFindManyDelegateWithFilterString(delegateWhere, 'name', dto.filterByName)
-            mutateFindManyDelegateWithFilterString(delegateWhere, 'fulltext', dto.filterByFulltext)
+            mutateFindManyDelegateWithFilterString(
+                delegateWhere,
+                'name',
+                dto.filterByName,
+            )
+            mutateFindManyDelegateWithFilterString(
+                delegateWhere,
+                'fulltext',
+                dto.filterByFulltext,
+            )
 
-            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'statusId', dto.filterByStatusId)
-            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'parentId', dto.filterByParentId)
-            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'projectId', dto.filterByProjectId)
-            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'createdById', dto.filterByCreatedById)
-            mutateFindManyDelegateWithFilterUuid(delegateWhere, 'assignedToId', dto.filterByAssignedToId)
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'statusId',
+                dto.filterByStatusId,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'parentId',
+                dto.filterByParentId,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'projectId',
+                dto.filterByProjectId,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'createdById',
+                dto.filterByCreatedById,
+            )
+            mutateFindManyDelegateWithFilterUuid(
+                delegateWhere,
+                'assignedToId',
+                dto.filterByAssignedToId,
+            )
 
-            mutateFindManyDelegateWithFilterNumber(delegateWhere, 'number', dto.filterByNumber)
+            mutateFindManyDelegateWithFilterNumber(
+                delegateWhere,
+                'number',
+                dto.filterByNumber,
+            )
 
             if (dto.filterByTagId) {
                 if (typeof dto.filterByTagId === 'string') {
@@ -458,7 +497,7 @@ export const taskModelExtentions = {
                     }
                 }
             }
-            
+
             if (dto.filterByCreatedAt?.from || dto.filterByCreatedAt?.to) {
                 delegateWhere.createdAt = {
                     gte: dto.filterByCreatedAt?.from ?? undefined,
@@ -490,9 +529,9 @@ export const taskModelExtentions = {
                                     id: true,
                                     code: true,
                                     name: true,
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     efforts: {
                         select: {
@@ -503,13 +542,13 @@ export const taskModelExtentions = {
             })
 
             return {
-                data: data.map(i => ({
+                data: data.map((i) => ({
                     ...i,
-                    tags: i.tags.map(i => ({
+                    tags: i.tags.map((i) => ({
                         id: i.taskTag.id,
                         code: i.taskTag.code,
                         name: i.taskTag.name,
-                    }))
+                    })),
                 })),
                 meta: {
                     curPage,
@@ -532,9 +571,7 @@ export const taskModelExtentions = {
     async extFindOne(
         dto: TaskFindOneRepositoryDto,
         prisma?: any,
-    ): Promise<
-        Awaited<TaskView>
-    > {
+    ): Promise<Awaited<TaskView>> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
@@ -562,9 +599,7 @@ export const taskModelExtentions = {
     async extFindSubtasks(
         dto: TaskFindSubtasksRepositoryDto,
         prisma?: any,
-    ): Promise<
-        Awaited<TaskView[]>
-    > {
+    ): Promise<Awaited<TaskView[]>> {
         try {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance

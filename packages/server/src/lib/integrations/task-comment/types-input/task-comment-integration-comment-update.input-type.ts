@@ -4,7 +4,7 @@ import { Field, InputType } from '@nestjs/graphql'
 export class TaskCommentIntegrationCommentUpdateInput {
     @Field(() => String)
     readonly id: string
-    
+
     @Field(() => String)
     readonly text: string
 }

@@ -55,17 +55,20 @@ export class TaskCommentService {
         return await client.taskComment.extDelete(dto, client)
     }
 
-    async findMany(dto?: {
-        taskId: string
+    async findMany(
+        dto?: {
+            taskId: string
 
-        curPage?: number
-        perPage?: number
+            curPage?: number
+            perPage?: number
 
-        orderBy?: {
-            field: 'createdAt'
-            order: OrderEnum
-        }
-    }, prisma?: PrismaTransactionClientType,) {
+            orderBy?: {
+                field: 'createdAt'
+                order: OrderEnum
+            }
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const { taskId, ...other } = dto
 
         const client = prisma || this.prisma

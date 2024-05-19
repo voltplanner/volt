@@ -10,12 +10,11 @@ export const Modal = ({
     isOpen: boolean
     onClose: () => void
 }) => {
-
     const handleOverlayClick = (e: { target: any; currentTarget: any }) => {
-      if (e.target === e.currentTarget) {
-        onClose();
-      }
-    };
+        if (e.target === e.currentTarget) {
+            onClose()
+        }
+    }
     if (!isOpen) {
         return null
     }

@@ -1,20 +1,20 @@
 import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 
-export type TaskEffortCreateRepositoryDto = {
+export type CreateTaskEffortRepositoryDto = {
     value: number
     description: string
     taskId: string
     userId: string
 }
 
-export type TaskEffortUpdateRepositoryDto = {
+export type UpdateTaskEffortRepositoryDto = {
     id: string
     value?: number
     description?: string
     userId?: string
 }
 
-export type TaskEffortDeleteRepositoryDto = {
+export type DeleteTaskEffortRepositoryDto = {
     id: string
     userId?: string
 }

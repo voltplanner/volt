@@ -9,6 +9,16 @@ type CursorBasedMetaType {
   take: Float!
 }
 
+type ProjectIntegrationProjectObject {
+  id: String!
+  name: String!
+  description: String
+  deadline: Float
+  budget: Float
+  version: Float!
+  createdAt: Float!
+}
+
 type ProjectIntegrationTasksRelationObject {
   id: String!
   code: String!
@@ -54,16 +64,6 @@ type ProjectIntegrationProjectUsersOutput {
   meta: PaginatedMetaType!
 }
 
-type ProjectIntegrationProjectObject {
-  id: String!
-  name: String!
-  description: String
-  deadline: Float
-  budget: Float
-  version: Float!
-  createdAt: Float!
-}
-
 type ProjectIntegrationProjectsOutput {
   data: [ProjectIntegrationProjectObject!]!
   meta: PaginatedMetaType!
@@ -72,6 +72,18 @@ type ProjectIntegrationProjectsOutput {
 type ProjectIntegrationProjectsOfCurrentUserOutput {
   data: [ProjectIntegrationProjectObject!]!
   meta: PaginatedMetaType!
+}
+
+type TaskIntegrationTaskStatusObject {
+  id: String!
+  code: String!
+  name: String!
+}
+
+type TaskIntegrationTaskTagObject {
+  id: String!
+  code: String!
+  name: String!
 }
 
 type TaskIntegrationUserObject {
@@ -90,9 +102,11 @@ type TaskIntegrationTaskObject {
   estimatedDuration: Float
   version: Float!
   createdAt: Float!
-  status: String!
+  status: TaskIntegrationTaskStatusObject!
+  tags: [TaskIntegrationTaskTagObject!]!
   createdBy: TaskIntegrationUserObject!
   assignedTo: TaskIntegrationUserObject
+  effortsMs: Float!
 }
 
 type TaskIntegrationTasksOutput {
@@ -100,8 +114,53 @@ type TaskIntegrationTasksOutput {
   meta: PaginatedMetaType!
 }
 
-type TaskIntegrationTasksOfCurrentUserOutput {
+type TaskIntegrationMyTasksOutput {
   data: [TaskIntegrationTaskObject!]!
+  meta: PaginatedMetaType!
+}
+
+type TaskCommentIntegrationUserObject {
+  id: String!
+  firstname: String!
+  lastname: String!
+}
+
+type TaskCommentIntegrationCommentObject {
+  id: String!
+  text: String!
+  taskId: String!
+  user: TaskCommentIntegrationUserObject!
+  isCanUpdate: Boolean!
+  isCanDelete: Boolean!
+  createdAt: Float!
+  updatedAt: Float!
+}
+
+type TaskCommentIntegrationCommentsOutput {
+  data: [TaskCommentIntegrationCommentObject!]!
+  meta: PaginatedMetaType!
+}
+
+type TaskEffortIntegrationUserObject {
+  id: String!
+  firstname: String!
+  lastname: String!
+}
+
+type TaskEffortIntegrationEffortObject {
+  id: String!
+  value: Float!
+  description: String!
+  taskId: String!
+  user: TaskEffortIntegrationUserObject!
+  isCanUpdate: Boolean!
+  isCanDelete: Boolean!
+  createdAt: Float!
+  updatedAt: Float!
+}
+
+type TaskEffortIntegrationEffortsOutput {
+  data: [TaskEffortIntegrationEffortObject!]!
   meta: PaginatedMetaType!
 }
 
@@ -206,8 +265,13 @@ type Query {
   getMyNotifications(
     input: GetNotificationsInput!
   ): [GetNotificationsResponse!]!
-  projects: ProjectIntegrationProjectsOutput!
-  myProjects: ProjectIntegrationProjectsOfCurrentUserOutput!
+  project(
+    input: ProjectIntegrationProjectInput!
+  ): ProjectIntegrationProjectObject!
+  projects(
+    input: ProjectIntegrationProjectsInput
+  ): ProjectIntegrationProjectsOutput!
+  projectsOfCurrentUser: ProjectIntegrationProjectsOfCurrentUserOutput!
   projectUsers(
     input: ProjectIntegrationProjectUsersInput!
   ): ProjectIntegrationProjectUsersOutput!
@@ -223,11 +287,16 @@ type Query {
   projectTasksRelations(
     input: ProjectIntegrationProjectTasksRelationsInput!
   ): [ProjectIntegrationTasksRelationObject!]!
+  task(input: TaskIntegrationTaskInput!): TaskIntegrationTaskObject!
   tasks(input: TaskIntegrationTasksInput): TaskIntegrationTasksOutput!
-  myTasks(
-    input: TaskIntegrationTasksOfCurrentUserInput
-  ): TaskIntegrationTasksOfCurrentUserOutput!
+  myTasks(input: TaskIntegrationMyTasksInput): TaskIntegrationMyTasksOutput!
   getFile(input: GetFileInput!): String!
+  taskComments(
+    input: TaskCommentIntegrationCommentsInput!
+  ): TaskCommentIntegrationCommentsOutput!
+  taskEfforts(
+    input: TaskEffortIntegrationEffortsInput
+  ): TaskEffortIntegrationEffortsOutput!
 }
 
 input GetUsersInput {
@@ -277,6 +346,24 @@ input GetNotificationsInput {
   seen: Boolean
 }
 
+input ProjectIntegrationProjectInput {
+  id: String!
+}
+
+input ProjectIntegrationProjectsInput {
+  curPage: Float
+  perPage: Float
+  filterBy: ProjectIntegrationProjectsFilterByInput
+}
+
+input ProjectIntegrationProjectsFilterByInput {
+  name: [String!]
+  userId: [String!]
+  fulltext: [String!]
+  createdAtFrom: Float
+  createdAtTo: Float
+}
+
 input ProjectIntegrationProjectUsersInput {
   projectId: String!
   filterByName: String
@@ -299,18 +386,50 @@ input ProjectIntegrationProjectTasksRelationsInput {
   projectId: String!
 }
 
+input TaskIntegrationTaskInput {
+  id: String!
+}
+
 input TaskIntegrationTasksInput {
   curPage: Float
   perPage: Float
+  filterBy: TaskIntegrationTasksFilterByInput
 }
 
-input TaskIntegrationTasksOfCurrentUserInput {
+input TaskIntegrationTasksFilterByInput {
+  name: [String!]
+  number: [Float!]
+  statusId: [String!]
+  parentId: [String!]
+  projectId: [String!]
+  createdById: [String!]
+  assignedToId: [String!]
+  fulltext: [String!]
+  tagId: [String!]
+  createdAtFrom: Float
+  createdAtTo: Float
+}
+
+input TaskIntegrationMyTasksInput {
+  projectId: String
   curPage: Float
   perPage: Float
 }
 
 input GetFileInput {
   id: String!
+}
+
+input TaskCommentIntegrationCommentsInput {
+  taskId: String!
+  curPage: Float
+  perPage: Float
+}
+
+input TaskEffortIntegrationEffortsInput {
+  taskId: String
+  curPage: Float
+  perPage: Float
 }
 
 type Mutation {
@@ -332,9 +451,15 @@ type Mutation {
   markAllAsSeen(input: MarkAllAsSeenInput!): Boolean!
   createProject(input: ProjectIntegrationCreateProjectInput!): String!
   updateProject(input: ProjectIntegrationProjectUpdateInput!): String!
-  taskCreate(input: TaskIntegrationTaskCreateInput!): String!
-  taskUpdate(input: TaskIntegrationTaskUpdateInput!): String!
+  createTask(input: TaskIntegrationCreateTaskInput!): String!
+  updateTask(input: TaskIntegrationUpdateTaskInput!): String!
   uploadFile(input: UploadFileInput!): String!
+  createTaskComment(input: TaskCommentIntegrationCommentCreateInput!): String!
+  updateTaskComment(input: TaskCommentIntegrationCommentUpdateInput!): String!
+  deleteTaskComment(input: TaskCommentIntegrationCommentDeleteInput!): String!
+  createTaskEffort(input: TaskEffortIntegrationEffortCreateInput!): String!
+  updateTaskEffort(input: TaskEffortIntegrationEffortUpdateInput!): String!
+  deleteTaskEffort(input: TaskEffortIntegrationEffortDeleteInput!): String!
 }
 
 input UpdateRoleInput {
@@ -425,13 +550,13 @@ input ProjectIntegrationCreateProjectInput {
   """
   Budget of the project in hours
   """
-  budget: Float!
+  budget: Float
 
   """
   Deadline of the project in timestampMs
   """
-  deadline: Float!
-  description: String!
+  deadline: Float
+  description: String
   members: [ProjectIntegrationCreateProjectMemberInput!]
 }
 
@@ -449,7 +574,7 @@ input ProjectIntegrationProjectUpdateInput {
   deadline: Float
 }
 
-input TaskIntegrationTaskCreateInput {
+input TaskIntegrationCreateTaskInput {
   projectId: String!
   name: String!
   statusId: String!
@@ -459,10 +584,10 @@ input TaskIntegrationTaskCreateInput {
   estimatedDuration: Float
   assignedToId: String
   parentId: String
-  tagsIds: [String!]
+  tagIds: [String!]
 }
 
-input TaskIntegrationTaskUpdateInput {
+input TaskIntegrationUpdateTaskInput {
   id: String!
   version: Float!
   name: String
@@ -473,7 +598,7 @@ input TaskIntegrationTaskUpdateInput {
   parentId: String
   statusId: String
   assignedToId: String
-  taskTagIds: [String!]
+  tagIds: [String!]
 }
 
 input UploadFileInput {
@@ -484,6 +609,36 @@ input UploadFileInput {
 The `Upload` scalar type represents a file upload.
 """
 scalar Upload
+
+input TaskCommentIntegrationCommentCreateInput {
+  taskId: String!
+  text: String!
+}
+
+input TaskCommentIntegrationCommentUpdateInput {
+  id: String!
+  text: String!
+}
+
+input TaskCommentIntegrationCommentDeleteInput {
+  id: String!
+}
+
+input TaskEffortIntegrationEffortCreateInput {
+  taskId: String!
+  value: Float!
+  description: String!
+}
+
+input TaskEffortIntegrationEffortUpdateInput {
+  id: String!
+  value: Float!
+  description: String!
+}
+
+input TaskEffortIntegrationEffortDeleteInput {
+  id: String!
+}
 
 type Subscription {
   onNewNotification: OnNewNotification!

@@ -29,7 +29,7 @@ export class TaskEffortIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskEffortCreate(
+    async createTaskEffort(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskEffortIntegrationEffortCreateInput,
     ): Promise<string> {
@@ -50,7 +50,7 @@ export class TaskEffortIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskEffortUpdate(
+    async updateTaskEffort(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskEffortIntegrationEffortUpdateInput,
     ) {
@@ -71,7 +71,7 @@ export class TaskEffortIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskEffortDelete(
+    async deleteTaskEffort(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskEffortIntegrationEffortDeleteInput,
     ) {
@@ -92,7 +92,8 @@ export class TaskEffortIntegrationResolver {
     @Query(() => TaskEffortIntegrationEffortsOutput)
     async taskEfforts(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input', { nullable: true }) input?: TaskEffortIntegrationEffortsInput | null,
+        @Args('input', { nullable: true })
+        input?: TaskEffortIntegrationEffortsInput | null,
     ): Promise<TaskEffortIntegrationEffortsOutput> {
         const { taskId } = input || {}
 
@@ -106,30 +107,32 @@ export class TaskEffortIntegrationResolver {
         })
 
         const users = await this._authUserService.getUsers({
-            filter: { ids: data.map(i => i.userId) },
+            filter: { ids: data.map((i) => i.userId) },
             curPage: 1,
             perPage: data.length,
         })
 
-        const taskEfforts: TaskEffortIntegrationEffortObject[] = data.map((i) => {
-            const owner = getOneByProperty(users.data, 'id', i.userId)
+        const taskEfforts: TaskEffortIntegrationEffortObject[] = data.map(
+            (i) => {
+                const owner = getOneByProperty(users.data, 'id', i.userId)
 
-            return {
-                id: i.id,
-                taskId: i.taskId,
-                value: i.value,
-                description: i.description,
-                createdAt: Number(i.createdAt),
-                updatedAt: Number(i.updatedAt),
-                isCanDelete: owner.id === userId,
-                isCanUpdate: owner.id === userId,
-                user: {
-                    id: owner.id,
-                    lastname: owner.lastname,
-                    firstname: owner.firstname,
-                },
-            }
-        })
+                return {
+                    id: i.id,
+                    taskId: i.taskId,
+                    value: i.value,
+                    description: i.description,
+                    createdAt: Number(i.createdAt),
+                    updatedAt: Number(i.updatedAt),
+                    isCanDelete: owner.id === userId,
+                    isCanUpdate: owner.id === userId,
+                    user: {
+                        id: owner.id,
+                        lastname: owner.lastname,
+                        firstname: owner.firstname,
+                    },
+                }
+            },
+        )
 
         return { meta, data: taskEfforts }
     }

@@ -107,7 +107,8 @@ export class ProjectIntegrationResolver {
 
     @Query(() => ProjectIntegrationProjectsOutput)
     async projects(
-        @Args('input', { nullable: true }) input: ProjectIntegrationProjectsInput,
+        @Args('input', { nullable: true })
+        input: ProjectIntegrationProjectsInput,
     ): Promise<ProjectIntegrationProjectsOutput> {
         const { filterBy, curPage, perPage } = input || {}
 
@@ -117,10 +118,17 @@ export class ProjectIntegrationResolver {
             filterByName: filterBy?.name || undefined,
             filterByUserId: filterBy?.userId || undefined,
             filterByFulltext: filterBy?.fulltext || undefined,
-            filterByCreatedAt: (filterBy?.createdAtFrom || filterBy?.createdAtTo) ? {
-                from: filterBy?.createdAtFrom ? new Date(filterBy.createdAtFrom) : undefined,
-                to: filterBy?.createdAtTo ? new Date(filterBy.createdAtTo) : undefined,
-            } : undefined,
+            filterByCreatedAt:
+                filterBy?.createdAtFrom || filterBy?.createdAtTo
+                    ? {
+                          from: filterBy?.createdAtFrom
+                              ? new Date(filterBy.createdAtFrom)
+                              : undefined,
+                          to: filterBy?.createdAtTo
+                              ? new Date(filterBy.createdAtTo)
+                              : undefined,
+                      }
+                    : undefined,
         })
 
         const projects: ProjectIntegrationProjectObject[] = data.map((i) => ({

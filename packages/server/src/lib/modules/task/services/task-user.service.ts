@@ -25,10 +25,13 @@ export class TaskUserService {
 
         const client = prisma || this.prisma
 
-        const role = await client.taskUserRole.extGetOneByCode({
-            code: roleCode,
-            projectId,
-        }, client)
+        const role = await client.taskUserRole.extGetOneByCode(
+            {
+                code: roleCode,
+                projectId,
+            },
+            client,
+        )
 
         const id = await client.taskUser.extUpsert(
             {

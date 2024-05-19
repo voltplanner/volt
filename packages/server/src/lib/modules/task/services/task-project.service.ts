@@ -76,35 +76,44 @@ export class TaskProjectService {
         } catch (e) {
             const conflictingProps = await this._findConflictingProps(dto)
 
-            throw new TaskProjectUpdateConflictError({ id: dto.id, conflictingProps })
+            throw new TaskProjectUpdateConflictError({
+                id: dto.id,
+                conflictingProps,
+            })
         }
     }
 
-    async getById(dto?: {
-        id: string
-    }, prisma?: PrismaTransactionClientType) {
+    async getById(
+        dto?: {
+            id: string
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const client = prisma || this.prisma
 
         return await client.taskProject.extGetById(dto, client)
     }
 
-    async findMany(dto?: {
-        curPage?: number
-        perPage?: number
+    async findMany(
+        dto?: {
+            curPage?: number
+            perPage?: number
 
-        filterByName?: string | string[]
-        filterByUserId?: string | string[]
-        filterByFulltext?: string | string[]
-        filterByCreatedAt?: {
-            from?: Date
-            to?: Date
-        }
+            filterByName?: string | string[]
+            filterByUserId?: string | string[]
+            filterByFulltext?: string | string[]
+            filterByCreatedAt?: {
+                from?: Date
+                to?: Date
+            }
 
-        orderBy?: {
-            field: 'name' | 'status' | 'createdAt'
-            order: OrderEnum
-        }
-    }, prisma?: PrismaTransactionClientType) {
+            orderBy?: {
+                field: 'name' | 'status' | 'createdAt'
+                order: OrderEnum
+            }
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const client = prisma || this.prisma
 
         return await client.taskProject.extFindMany(dto, client)
@@ -370,13 +379,15 @@ export class TaskProjectService {
         }
     }
 
-    private async _findConflictingProps(dto: {
-        readonly id: string
-        readonly name?: string
-        readonly budget?: number | null
-        readonly deadline?: number | null
-        readonly description?: string | null
-    }, prisma?: PrismaTransactionClientType,
+    private async _findConflictingProps(
+        dto: {
+            readonly id: string
+            readonly name?: string
+            readonly budget?: number | null
+            readonly deadline?: number | null
+            readonly description?: string | null
+        },
+        prisma?: PrismaTransactionClientType,
     ): Promise<{
         name?: { old?: string; new: string }
         description?: { old?: string; new: string | null }
@@ -398,19 +409,34 @@ export class TaskProjectService {
         } = {}
 
         if (dto.name !== undefined && project.name !== dto.name) {
-            conflictingProps.name = { old: project.name ?? undefined, new: dto.name }
+            conflictingProps.name = {
+                old: project.name ?? undefined,
+                new: dto.name,
+            }
         }
 
-        if (dto.description !== undefined && project.description !== dto.description) {
-            conflictingProps.description = { old: project.description ?? undefined, new: dto.description }
+        if (
+            dto.description !== undefined &&
+            project.description !== dto.description
+        ) {
+            conflictingProps.description = {
+                old: project.description ?? undefined,
+                new: dto.description,
+            }
         }
 
         if (dto.deadline !== undefined && +project.deadline !== dto.deadline) {
-            conflictingProps.deadline = { old: +project.deadline ?? undefined, new: dto.deadline }
+            conflictingProps.deadline = {
+                old: +project.deadline ?? undefined,
+                new: dto.deadline,
+            }
         }
 
         if (dto.budget !== undefined && project.budget !== dto.budget) {
-            conflictingProps.budget = { old: project.budget ?? undefined, new: dto.budget }
+            conflictingProps.budget = {
+                old: project.budget ?? undefined,
+                new: dto.budget,
+            }
         }
 
         return conflictingProps

@@ -1,4 +1,3 @@
-
 import { ProjectIntegrationCreateProjectInput } from '../types-input/project-integration-project-create.input-type'
 import { setup as setupTest } from './support/global-setup'
 import { teardown } from './support/global-teardown'
@@ -24,7 +23,7 @@ describe('Project', () => {
             await setup.prisma.taskOnTaskTag.deleteMany()
             await setup.prisma.taskProjectOnUser.deleteMany()
             await setup.prisma.taskOnTaskRelation.deleteMany()
-    
+
             await setup.prisma.taskUser.deleteMany()
             await setup.prisma.taskUserRole.deleteMany()
             await setup.prisma.taskTag.deleteMany()
@@ -35,8 +34,8 @@ describe('Project', () => {
 
         it('Must create project', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
@@ -48,14 +47,16 @@ describe('Project', () => {
             const { adminUser } = await utils.gqlGetAdminUser()
 
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
+                members: [
+                    {
+                        userId: adminUser.id,
+                        roleCode: 'MANAGER',
+                    },
+                ],
             })
 
             expect(typeof createProject).toBe('string')
@@ -65,17 +66,21 @@ describe('Project', () => {
             const { adminUser } = await utils.gqlGetAdminUser()
 
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
-                members: [{
-                    userId: adminUser.id,
-                    roleCode: 'MANAGER',
-                }],
+                members: [
+                    {
+                        userId: adminUser.id,
+                        roleCode: 'MANAGER',
+                    },
+                ],
             })
 
-            const { projectUsers } = await utils.gqlProjectUsers({ projectId: createProject })
+            const { projectUsers } = await utils.gqlProjectUsers({
+                projectId: createProject,
+            })
 
             expect(projectUsers instanceof Object).toBeTruthy()
 
@@ -96,8 +101,8 @@ describe('Project', () => {
 
         it('Must return project', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
@@ -105,7 +110,7 @@ describe('Project', () => {
             const { project } = await utils.gqlProject({ id: createProject })
 
             expect(project instanceof Object).toBeTruthy()
-            
+
             expect(typeof project.id).toBe('string')
             expect(typeof project.createdAt).toBe('number')
 
@@ -118,12 +123,12 @@ describe('Project', () => {
 
         it('Must return project user roles', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
-        
+
             const { projectUsersRoles } = await utils.gqlProjectUsersRoles({
                 projectId: createProject,
             })
@@ -140,12 +145,12 @@ describe('Project', () => {
 
         it('Must return project tasks tags', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
-        
+
             const { projectTasksTags } = await utils.gqlProjectTasksTags({
                 projectId: createProject,
             })
@@ -162,15 +167,16 @@ describe('Project', () => {
 
         it('Must return project tasks statuses', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
-        
-            const { projectTasksStatuses } = await utils.gqlProjectTasksStatuses({
-                projectId: createProject,
-            })
+
+            const { projectTasksStatuses } =
+                await utils.gqlProjectTasksStatuses({
+                    projectId: createProject,
+                })
 
             expect(projectTasksStatuses instanceof Array).toBeTruthy()
 
@@ -185,15 +191,16 @@ describe('Project', () => {
 
         it('Must return project tasks relations', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
-        
-            const { projectTasksRelations } = await utils.gqlProjectTasksRelations({
-                projectId: createProject,
-            })
+
+            const { projectTasksRelations } =
+                await utils.gqlProjectTasksRelations({
+                    projectId: createProject,
+                })
 
             expect(projectTasksRelations instanceof Array).toBeTruthy()
 
@@ -208,8 +215,8 @@ describe('Project', () => {
 
         it('Must update project', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1714332185805,
                 budget: 100,
             })
@@ -221,8 +228,8 @@ describe('Project', () => {
             const { updateProject } = await utils.gqlUpdateProject({
                 id: project.id,
                 version: project.version,
-                name: "Test Name 2",
-                description: "Test Description 2",
+                name: 'Test Name 2',
+                description: 'Test Description 2',
                 deadline: 1,
                 budget: 1,
             })
@@ -243,7 +250,6 @@ describe('Project', () => {
             expect(projectUpdated.deadline).toBe(1)
             expect(projectUpdated.budget).toBe(1)
             expect(projectUpdated.version).toBe(1)
-
         })
     })
 
@@ -252,12 +258,12 @@ describe('Project', () => {
         let projectPayload_2: ProjectIntegrationCreateProjectInput = {} as any
         let projectPayload_3: ProjectIntegrationCreateProjectInput = {} as any
         let adminUserId = ''
-        
+
         afterAll(async () => {
             await setup.prisma.taskOnTaskTag.deleteMany()
             await setup.prisma.taskProjectOnUser.deleteMany()
             await setup.prisma.taskOnTaskRelation.deleteMany()
-    
+
             await setup.prisma.taskUser.deleteMany()
             await setup.prisma.taskUserRole.deleteMany()
             await setup.prisma.taskTag.deleteMany()
@@ -271,7 +277,8 @@ describe('Project', () => {
 
             projectPayload_1 = {
                 name: 'Lorem ipsum pariatur velit',
-                description: 'ipsum dolor sit amet, consectetur adipiscing elit',
+                description:
+                    'ipsum dolor sit amet, consectetur adipiscing elit',
                 deadline: 1,
                 budget: 1,
             }
@@ -308,7 +315,8 @@ describe('Project', () => {
 
         it('Must return projects of current user', async () => {
             const accessToken = await utils.adminGetAccessToken()
-            const { projectsOfCurrentUser } = await utils.gqlProjectsOfCurrentUser(accessToken)
+            const { projectsOfCurrentUser } =
+                await utils.gqlProjectsOfCurrentUser(accessToken)
 
             expect(projectsOfCurrentUser instanceof Object).toBeTruthy()
             expect(projectsOfCurrentUser.data instanceof Array).toBeTruthy()
@@ -316,50 +324,94 @@ describe('Project', () => {
 
             expect(typeof projectsOfCurrentUser.data[0].id).toBe('string')
             expect(typeof projectsOfCurrentUser.data[0].name).toBe('string')
-            expect(typeof projectsOfCurrentUser.data[0].description).toBe('string')
+            expect(typeof projectsOfCurrentUser.data[0].description).toBe(
+                'string',
+            )
             expect(typeof projectsOfCurrentUser.data[0].deadline).toBe('number')
             expect(typeof projectsOfCurrentUser.data[0].budget).toBe('number')
             expect(typeof projectsOfCurrentUser.data[0].version).toBe('number')
-            expect(typeof projectsOfCurrentUser.data[0].createdAt).toBe('number')
+            expect(typeof projectsOfCurrentUser.data[0].createdAt).toBe(
+                'number',
+            )
 
             expect(projectsOfCurrentUser.meta instanceof Object).toBeTruthy()
             expect(typeof projectsOfCurrentUser.meta.curPage).toBe('number')
             expect(typeof projectsOfCurrentUser.meta.perPage).toBe('number')
             expect(typeof projectsOfCurrentUser.meta.total).toBe('number')
-
         })
 
         it('Must return filtered projects by name', async () => {
-            const { projects } = await utils.gqlProjects({ filterBy: { name: ['Lorem'] } })
+            const { projects } = await utils.gqlProjects({
+                filterBy: { name: ['Lorem'] },
+            })
 
-            expect(projects?.data?.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects?.data?.map((i) => i.name)).toEqual([
+                projectPayload_2.name,
+                projectPayload_1.name,
+            ])
         })
 
         it('Must return filtered projects by user', async () => {
-            const { projects } = await utils.gqlProjects({ filterBy: { userId: [adminUserId] } })
+            const { projects } = await utils.gqlProjects({
+                filterBy: { userId: [adminUserId] },
+            })
 
-            expect(projects?.data?.map(i => i.name)).toEqual([projectPayload_3.name, projectPayload_2.name])
+            expect(projects?.data?.map((i) => i.name)).toEqual([
+                projectPayload_3.name,
+                projectPayload_2.name,
+            ])
         })
 
         it('Must return filtered projects by full text', async () => {
-            const { projects: projects_1_by_name } = await utils.gqlProjects({ filterBy: { fulltext: ['lorem iPsum'] } })
-            const { projects: projects_1_by_description } = await utils.gqlProjects({ filterBy: { fulltext: ['ConsectEtur'] } })
-            const { projects: projects_by_name } = await utils.gqlProjects({ filterBy: { fulltext: ['loRem'] } })
-            const { projects: projects_by_description } = await utils.gqlProjects({ filterBy: { fulltext: ['doLor'] } })
-            const { projects: projects_by_different } = await utils.gqlProjects({ filterBy: { fulltext: ['veLit'] } })
-            const { projects: projects_by_name_combined } = await utils.gqlProjects({ filterBy: { fulltext: ['pariaTUr', 'temPora'] } })
-            const { projects: projects_by_descriptions_combined } = await utils.gqlProjects({ filterBy: { fulltext: ['consectetur', 'natus'] } })
+            const { projects: projects_1_by_name } = await utils.gqlProjects({
+                filterBy: { fulltext: ['lorem iPsum'] },
+            })
+            const { projects: projects_1_by_description } =
+                await utils.gqlProjects({
+                    filterBy: { fulltext: ['ConsectEtur'] },
+                })
+            const { projects: projects_by_name } = await utils.gqlProjects({
+                filterBy: { fulltext: ['loRem'] },
+            })
+            const { projects: projects_by_description } =
+                await utils.gqlProjects({ filterBy: { fulltext: ['doLor'] } })
+            const { projects: projects_by_different } = await utils.gqlProjects(
+                { filterBy: { fulltext: ['veLit'] } },
+            )
+            const { projects: projects_by_name_combined } =
+                await utils.gqlProjects({
+                    filterBy: { fulltext: ['pariaTUr', 'temPora'] },
+                })
+            const { projects: projects_by_descriptions_combined } =
+                await utils.gqlProjects({
+                    filterBy: { fulltext: ['consectetur', 'natus'] },
+                })
 
-            expect(projects_1_by_name.data.map(i => i.name)).toEqual([projectPayload_1.name])
-            expect(projects_1_by_description.data.map(i => i.name)).toEqual([projectPayload_1.name])
-            expect(projects_by_name.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_description.data.map(i => i.name))
-                .toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_different.data.map(i => i.name)).toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_name_combined.data.map(i => i.name))
-                .toEqual([projectPayload_2.name, projectPayload_1.name])
-            expect(projects_by_descriptions_combined.data.map(i => i.name))
-                .toEqual([projectPayload_2.name, projectPayload_1.name])
+            expect(projects_1_by_name.data.map((i) => i.name)).toEqual([
+                projectPayload_1.name,
+            ])
+            expect(projects_1_by_description.data.map((i) => i.name)).toEqual([
+                projectPayload_1.name,
+            ])
+            expect(projects_by_name.data.map((i) => i.name)).toEqual([
+                projectPayload_2.name,
+                projectPayload_1.name,
+            ])
+            expect(projects_by_description.data.map((i) => i.name)).toEqual([
+                projectPayload_2.name,
+                projectPayload_1.name,
+            ])
+            expect(projects_by_different.data.map((i) => i.name)).toEqual([
+                projectPayload_2.name,
+                projectPayload_1.name,
+            ])
+            expect(projects_by_name_combined.data.map((i) => i.name)).toEqual([
+                projectPayload_2.name,
+                projectPayload_1.name,
+            ])
+            expect(
+                projects_by_descriptions_combined.data.map((i) => i.name),
+            ).toEqual([projectPayload_2.name, projectPayload_1.name])
         })
     })
 
@@ -368,7 +420,7 @@ describe('Project', () => {
             await setup.prisma.taskOnTaskTag.deleteMany()
             await setup.prisma.taskProjectOnUser.deleteMany()
             await setup.prisma.taskOnTaskRelation.deleteMany()
-    
+
             await setup.prisma.taskUser.deleteMany()
             await setup.prisma.taskUserRole.deleteMany()
             await setup.prisma.taskTag.deleteMany()
@@ -379,8 +431,8 @@ describe('Project', () => {
 
         it('Must not update project', async () => {
             const { createProject } = await utils.gqlCreateProject({
-                name: "Test Name 1",
-                description: "Test Description 1",
+                name: 'Test Name 1',
+                description: 'Test Description 1',
                 deadline: 1,
                 budget: 1,
             })
@@ -393,10 +445,10 @@ describe('Project', () => {
             await utils.gqlUpdateProject({
                 id: project.id,
                 version: project.version,
-                name: "Test Name 2",
+                name: 'Test Name 2',
                 budget: 2,
                 deadline: 2,
-                description: "Test Description 2",
+                description: 'Test Description 2',
             })
 
             let error: any
@@ -406,10 +458,10 @@ describe('Project', () => {
                 await utils.gqlUpdateProject({
                     id: project.id,
                     version: project.version,
-                    name: "Test Name 3",
+                    name: 'Test Name 3',
                     budget: 3,
                     deadline: 3,
-                    description: "Test Description 3",
+                    description: 'Test Description 3',
                 })
             } catch (e) {
                 error = e

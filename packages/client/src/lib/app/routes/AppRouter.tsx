@@ -47,7 +47,7 @@ const AppRouter = () => {
         const expirationTime = Number(localStorage.getItem('expiresAt'))
         const currentTimeInSeconds = Math.floor(Date.now() / 1000)
         const token = localStorage.getItem('accessToken')
-        if(token && location.pathname === '/register'){
+        if (token && location.pathname === '/register') {
             navigate('/')
         }
         if (!token) {

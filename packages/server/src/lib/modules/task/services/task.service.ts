@@ -6,7 +6,7 @@ import {
     PrismaServiceWithExtentionsType,
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
-import { TaskUpdateConflictError } from '../errors/task-update-conflict.error'
+import { UpdateTaskConflictError } from '../errors/task-update-conflict.error'
 
 @Injectable()
 export class TaskService {
@@ -93,41 +93,47 @@ export class TaskService {
         } catch (e) {
             const conflictingProps = await this._findConflictingProps(dto)
 
-            throw new TaskUpdateConflictError({ id: dto.id, conflictingProps })
+            throw new UpdateTaskConflictError({ id: dto.id, conflictingProps })
         }
     }
 
-    async findMany(dto?: {
-        curPage?: number
-        perPage?: number
+    async findMany(
+        dto?: {
+            curPage?: number
+            perPage?: number
 
-        filterByName?: string | string[]
-        filterByTagId?: string | string[]
-        filterByNumber?: number | number[]
-        filterByStatusId?: string | string[]
-        filterByParentId?: string | string[]
-        filterByFulltext?: string | string[]
-        filterByProjectId?: string | string[]
-        filterByCreatedById?: string | string[]
-        filterByAssignedToId?: string | string[]
-        filterByCreatedAt?: {
-            from?: Date
-            to?: Date
-        }
+            filterByName?: string | string[]
+            filterByTagId?: string | string[]
+            filterByNumber?: number | number[]
+            filterByStatusId?: string | string[]
+            filterByParentId?: string | string[]
+            filterByFulltext?: string | string[]
+            filterByProjectId?: string | string[]
+            filterByCreatedById?: string | string[]
+            filterByAssignedToId?: string | string[]
+            filterByCreatedAt?: {
+                from?: Date
+                to?: Date
+            }
 
-        orderBy?: {
-            field: 'name' | 'status' | 'createdAt'
-            order: OrderEnum
-        }
-    }, prisma?: PrismaTransactionClientType) {
+            orderBy?: {
+                field: 'name' | 'status' | 'createdAt'
+                order: OrderEnum
+            }
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const client = prisma || this.prisma
 
         return await client.task.extFindMany(dto, client)
     }
 
-    async getById(dto: {
-        id: string
-    }, prisma?: PrismaTransactionClientType) {
+    async getById(
+        dto: {
+            id: string
+        },
+        prisma?: PrismaTransactionClientType,
+    ) {
         const client = prisma || this.prisma
 
         return await client.task.extGetById(dto, client)
@@ -155,20 +161,22 @@ export class TaskService {
         return id
     }
 
-    private async _findConflictingProps(dto: {
-        readonly id: string
-        readonly name?: string
-        readonly description?: string | null
-        readonly estimatedDateEnd?: number | null
-        readonly estimatedDateStart?: number | null
-        readonly estimatedDuration?: number | null
+    private async _findConflictingProps(
+        dto: {
+            readonly id: string
+            readonly name?: string
+            readonly description?: string | null
+            readonly estimatedDateEnd?: number | null
+            readonly estimatedDateStart?: number | null
+            readonly estimatedDuration?: number | null
 
-        readonly statusId?: string
-        
-        readonly assignedToId?: string | null
+            readonly statusId?: string
 
-        readonly tagIds?: string[]
-    }, prisma?: PrismaTransactionClientType,
+            readonly assignedToId?: string | null
+
+            readonly tagIds?: string[]
+        },
+        prisma?: PrismaTransactionClientType,
     ): Promise<{
         name?: { old?: string; new: string | null }
         description?: { old?: string; new: string | null }
@@ -177,10 +185,7 @@ export class TaskService {
     }> {
         const client = prisma || this.prisma
 
-        const task = await client.task.extGetById(
-            { id: dto.id },
-            client,
-        )
+        const task = await client.task.extGetById({ id: dto.id }, client)
 
         const conflictingProps: {
             name?: { old?: string; new: string }
@@ -195,41 +200,74 @@ export class TaskService {
 
         if (dto.tagIds !== undefined) {
             const newTaskTags = [...dto.tagIds].sort().join()
-            const oldTaskTags = [...task.tags.map(i => i.id)].sort().join()
+            const oldTaskTags = [...task.tags.map((i) => i.id)].sort().join()
 
             if (newTaskTags !== oldTaskTags) {
-                conflictingProps.tagIds = { old: task.tags.map(i => i.id) ?? undefined, new: dto.tagIds }
+                conflictingProps.tagIds = {
+                    old: task.tags.map((i) => i.id) ?? undefined,
+                    new: dto.tagIds,
+                }
             }
         }
 
         if (dto.name !== undefined && task.name !== dto.name) {
-            conflictingProps.name = { old: task.name ?? undefined, new: dto.name }
+            conflictingProps.name = {
+                old: task.name ?? undefined,
+                new: dto.name,
+            }
         }
 
         if (dto.statusId !== undefined && task.statusId !== dto.statusId) {
-            conflictingProps.statusId = { old: task.statusId ?? undefined, new: dto.statusId }
+            conflictingProps.statusId = {
+                old: task.statusId ?? undefined,
+                new: dto.statusId,
+            }
         }
 
-        if (dto.description !== undefined && task.description !== dto.description) {
-            conflictingProps.description = { old: task.description ?? undefined, new: dto.description }
+        if (
+            dto.description !== undefined &&
+            task.description !== dto.description
+        ) {
+            conflictingProps.description = {
+                old: task.description ?? undefined,
+                new: dto.description,
+            }
         }
 
-        if (dto.estimatedDateEnd !== undefined && +task.estimatedDateEnd !== dto.estimatedDateEnd) {
-            conflictingProps.estimatedDateEnd = { old: +task.estimatedDateEnd ?? undefined, new: dto.estimatedDateEnd }
+        if (
+            dto.estimatedDateEnd !== undefined &&
+            +task.estimatedDateEnd !== dto.estimatedDateEnd
+        ) {
+            conflictingProps.estimatedDateEnd = {
+                old: +task.estimatedDateEnd ?? undefined,
+                new: dto.estimatedDateEnd,
+            }
         }
 
-        if (dto.estimatedDateStart !== undefined && +task.estimatedDateStart !== dto.estimatedDateStart) {
+        if (
+            dto.estimatedDateStart !== undefined &&
+            +task.estimatedDateStart !== dto.estimatedDateStart
+        ) {
             conflictingProps.estimatedDateStart = {
                 old: +task.estimatedDateStart ?? undefined,
                 new: dto.estimatedDateStart,
             }
         }
 
-        if (dto.assignedToId !== undefined && task.assignedToId !== dto.assignedToId) {
-            conflictingProps.assignedToId = { old: task.assignedToId ?? undefined, new: dto.assignedToId }
+        if (
+            dto.assignedToId !== undefined &&
+            task.assignedToId !== dto.assignedToId
+        ) {
+            conflictingProps.assignedToId = {
+                old: task.assignedToId ?? undefined,
+                new: dto.assignedToId,
+            }
         }
 
-        if (dto.estimatedDuration !== undefined && +task.estimatedDuration.toString() !== dto.estimatedDuration) {
+        if (
+            dto.estimatedDuration !== undefined &&
+            +task.estimatedDuration.toString() !== dto.estimatedDuration
+        ) {
             conflictingProps.estimatedDuration = {
                 old: +task.estimatedDuration.toString() ?? undefined,
                 new: dto.estimatedDuration,

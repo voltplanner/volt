@@ -60,7 +60,7 @@ async function setupDb() {
     await execa(`npx`, ['nx', 'run', 'server:prisma:migrate:deploy'], {
         env: { DATABASE_URL: databaseUrl },
     })
-    
+
     return { containerDb, databaseUrl }
 }
 
@@ -87,14 +87,23 @@ export async function setup() {
                     'graphql-ws': true,
                 },
                 autoSchemaFile: true,
-                formatError: (formattedError: GraphQLFormattedError, error: any) => {
-                    if (error?.originalError?.code && formattedError?.extensions) {
+                formatError: (
+                    formattedError: GraphQLFormattedError,
+                    error: any,
+                ) => {
+                    if (
+                        error?.originalError?.code &&
+                        formattedError?.extensions
+                    ) {
                         formattedError.extensions.stacktrace = undefined
-                        formattedError.extensions.metadata = error.originalError.metadata
-                        formattedError.extensions.code = error.originalError.code
-                        formattedError.extensions.name = error.originalError.name
+                        formattedError.extensions.metadata =
+                            error.originalError.metadata
+                        formattedError.extensions.code =
+                            error.originalError.code
+                        formattedError.extensions.name =
+                            error.originalError.name
                     }
-    
+
                     return formattedError
                 },
             }),
@@ -115,10 +124,7 @@ export async function setup() {
                 eventsProvider: createEventEmitterPublisher(),
             }),
         ],
-        providers: [
-            ProjectIntegrationResolver,
-            TaskIntegrationResolver,
-        ],
+        providers: [ProjectIntegrationResolver, TaskIntegrationResolver],
     }).compile()
 
     const app = moduleFixture.createNestApplication()

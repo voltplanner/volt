@@ -193,7 +193,11 @@ export const taskProjectModelExtentions = {
                 }
             }
 
-            mutateFindManyDelegateWithFilterString(delegateWhere, 'name', dto.filterByName)
+            mutateFindManyDelegateWithFilterString(
+                delegateWhere,
+                'name',
+                dto.filterByName,
+            )
 
             if (dto.filterByUserId) {
                 if (typeof dto.filterByUserId === 'string') {

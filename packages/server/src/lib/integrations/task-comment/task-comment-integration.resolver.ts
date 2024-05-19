@@ -29,7 +29,7 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentCreate(
+    async createTaskComment(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskCommentIntegrationCommentCreateInput,
     ): Promise<string> {
@@ -49,7 +49,7 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentUpdate(
+    async updateTaskComment(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskCommentIntegrationCommentUpdateInput,
     ) {
@@ -69,7 +69,7 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentDelete(
+    async deleteTaskComment(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskCommentIntegrationCommentDeleteInput,
     ) {
@@ -104,29 +104,35 @@ export class TaskCommentIntegrationResolver {
         })
 
         const users = await this._authUserService.getUsers({
-            filter: { ids: data.map(i => i.userId) },
+            filter: { ids: data.map((i) => i.userId) },
             curPage: 1,
             perPage: data.length,
         })
 
-        const taskComments: TaskCommentIntegrationCommentObject[] = data.map((i) => {
-            const commentOwner = getOneByProperty(users.data, 'id', i.userId)
+        const taskComments: TaskCommentIntegrationCommentObject[] = data.map(
+            (i) => {
+                const commentOwner = getOneByProperty(
+                    users.data,
+                    'id',
+                    i.userId,
+                )
 
-            return {
-                id: i.id,
-                taskId: i.taskId,
-                text: i.text,
-                createdAt: Number(i.createdAt),
-                updatedAt: Number(i.updatedAt),
-                isCanDelete: commentOwner.id === userId,
-                isCanUpdate: commentOwner.id === userId,
-                user: {
-                    id: commentOwner.id,
-                    lastname: commentOwner.lastname,
-                    firstname: commentOwner.firstname,
-                },
-            }
-        })
+                return {
+                    id: i.id,
+                    taskId: i.taskId,
+                    text: i.text,
+                    createdAt: Number(i.createdAt),
+                    updatedAt: Number(i.updatedAt),
+                    isCanDelete: commentOwner.id === userId,
+                    isCanUpdate: commentOwner.id === userId,
+                    user: {
+                        id: commentOwner.id,
+                        lastname: commentOwner.lastname,
+                        firstname: commentOwner.firstname,
+                    },
+                }
+            },
+        )
 
         return { meta, data: taskComments }
     }

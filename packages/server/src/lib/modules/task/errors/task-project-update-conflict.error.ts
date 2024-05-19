@@ -5,7 +5,7 @@ export class TaskProjectUpdateConflictError extends DefaultError {
     name = 'TASK_PROJECT_UPDATE_CONFLICT_ERROR'
 
     constructor(dto: {
-        id: string;
+        id: string
         conflictingProps: Record<string, { old?: unknown; new: unknown | null }>
     }) {
         super({

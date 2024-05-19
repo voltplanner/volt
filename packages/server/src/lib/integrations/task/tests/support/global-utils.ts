@@ -6,10 +6,10 @@ import { ProjectIntegrationProjectTasksRelationsInput } from '../../../project/t
 import { ProjectIntegrationProjectTasksStatusesInput } from '../../../project/types-input/project-integration-project-tasks-statuses.input-type'
 import { ProjectIntegrationProjectTasksTagsInput } from '../../../project/types-input/project-integration-project-tasks-tags.input-type'
 import { TaskIntegrationTaskInput } from '../../types-input/task-integration-task.input-type'
-import { TaskIntegrationTaskCreateInput } from '../../types-input/task-integration-task-create.input-type'
-import { TaskIntegrationTaskUpdateInput } from '../../types-input/task-integration-task-update.input-type'
+import { TaskIntegrationCreateTaskInput } from '../../types-input/task-integration-task-create.input-type'
+import { TaskIntegrationUpdateTaskInput } from '../../types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from '../../types-input/task-integration-tasks.input-type'
-import { TaskIntegrationTasksOfCurrentUserInput } from '../../types-input/task-integration-tasks-of-current-user.input-type'
+import { TaskIntegrationMyTasksInput } from '../../types-input/task-integration-tasks-of-current-user.input-type'
 import { TaskIntegrationTaskObject } from '../../types-object/task-integration-task.object-type'
 import { TaskIntegrationTasksOutput } from '../../types-output/task-integration-tasks.output-type'
 import { setup } from './global-setup'
@@ -22,184 +22,216 @@ export class GlobalUtils {
 
     constructor(private readonly _setup: Awaited<ReturnType<typeof setup>>) {}
 
-
-    async gqlTaskCreate(dto: TaskIntegrationTaskCreateInput, accessToken: string): Promise<Record<string, any>> {
-        const doc = gql`
-        mutation taskCreate($taskCreateInput: TaskIntegrationTaskCreateInput!) {
-            taskCreate(input: $taskCreateInput)
-        }
-        `
-
-        return await request(this.gqlApiUrl, doc, {
-            "taskCreateInput": dto,
-        }, {
-            Authorization: `Bearer ${accessToken}`
-        })
-    }
-
-    async gqlTaskUpdate(dto: TaskIntegrationTaskUpdateInput, accessToken: string): Promise<{ taskUpdate: string }> {
-        const doc = gql`
-        mutation taskUpdate($taskUpdateInput: TaskIntegrationTaskUpdateInput!) {
-            taskUpdate(input: $taskUpdateInput)
-        }
-        `
-
-        return await request(this.gqlApiUrl, doc, {
-            "taskUpdateInput": dto,
-        }, {
-            Authorization: `Bearer ${accessToken}`
-        })
-    }
-
-    async gqlTask(dto: TaskIntegrationTaskInput): Promise<{ task: TaskIntegrationTaskObject }> {
-        const doc = gql`
-        query task($taskInput: TaskIntegrationTaskInput!) {
-            task(input: $taskInput) {
-                id
-                name
-                number
-                description
-                estimatedDateStart
-                estimatedDateEnd
-                estimatedDuration
-                version
-                createdAt
-                status {
-                    id
-                    code
-                    name
-                }
-                tags {
-                    id
-                    code
-                    name
-                }
-                createdBy {
-                    id
-                    firstname
-                    lastname
-                }
-                assignedTo {
-                    id
-                    firstname
-                    lastname
-                }
-            }
-        }
-        `
-
-        return await request(this.gqlApiUrl, doc, {
-            "taskInput": dto,
-        })
-    }
-
-    async gqlTasks(dto?: TaskIntegrationTasksInput | null): Promise<{ tasks: TaskIntegrationTasksOutput }> {
-        const doc = gql`
-        query tasks($tasksInput: TaskIntegrationTasksInput) {
-            tasks(input: $tasksInput) {
-              data {
-                id
-                name
-                number
-                description
-                estimatedDateStart
-                estimatedDateEnd
-                estimatedDuration
-                version
-                createdAt
-                status {
-                  id
-                  code
-                  name
-                }
-                tags {
-                  id
-                  code
-                  name
-                }
-                createdBy {
-                  id
-                  firstname
-                  lastname
-                }
-                assignedTo {
-                  id
-                  firstname
-                  lastname
-                }
-              }
-              meta {
-                curPage
-                perPage
-                total
-              }
-            }
-        }
-        `
-
-        return await request(this.gqlApiUrl, doc, {
-            "tasksInput": dto,
-        })
-    }
-
-    async gqlTasksOfCurrentUser(
-        dto: TaskIntegrationTasksOfCurrentUserInput | undefined | null,
-        accessToken: string
+    async gqlCreateTask(
+        dto: TaskIntegrationCreateTaskInput,
+        accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-        query tasksOfCurrentUser($tasksOfCurrentUserInput: TaskIntegrationTasksOfCurrentUserInput) {
-            tasksOfCurrentUser(input: $tasksOfCurrentUserInput) {
-              data {
-                id
-                name
-                number
-                description
-                estimatedDateStart
-                estimatedDateEnd
-                estimatedDuration
-                version
-                createdAt
-                status {
-                  id
-                  code
-                  name
-                }
-                tags {
-                  id
-                  code
-                  name
-                }
-                createdBy {
-                  id
-                  firstname
-                  lastname
-                }
-                assignedTo {
-                  id
-                  firstname
-                  lastname
-                }
-              }
-              meta {
-                curPage
-                perPage
-                total
-              }
+            mutation createTask(
+                $createTaskInput: TaskIntegrationCreateTaskInput!
+            ) {
+                createTask(input: $createTaskInput)
             }
-        }
+        `
+
+        return await request(
+            this.gqlApiUrl,
+            doc,
+            {
+                createTaskInput: dto,
+            },
+            {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        )
+    }
+
+    async gqlUpdateTask(
+        dto: TaskIntegrationUpdateTaskInput,
+        accessToken: string,
+    ): Promise<{ updateTask: string }> {
+        const doc = gql`
+            mutation updateTask(
+                $updateTaskInput: TaskIntegrationUpdateTaskInput!
+            ) {
+                updateTask(input: $updateTaskInput)
+            }
+        `
+
+        return await request(
+            this.gqlApiUrl,
+            doc,
+            {
+                updateTaskInput: dto,
+            },
+            {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        )
+    }
+
+    async gqlTask(
+        dto: TaskIntegrationTaskInput,
+    ): Promise<{ task: TaskIntegrationTaskObject }> {
+        const doc = gql`
+            query task($taskInput: TaskIntegrationTaskInput!) {
+                task(input: $taskInput) {
+                    id
+                    name
+                    number
+                    description
+                    estimatedDateStart
+                    estimatedDateEnd
+                    estimatedDuration
+                    version
+                    createdAt
+                    status {
+                        id
+                        code
+                        name
+                    }
+                    tags {
+                        id
+                        code
+                        name
+                    }
+                    createdBy {
+                        id
+                        firstname
+                        lastname
+                    }
+                    assignedTo {
+                        id
+                        firstname
+                        lastname
+                    }
+                }
+            }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "tasksOfCurrentUserInput": dto,
-        }, {
-            Authorization: `Bearer ${accessToken}`
+            taskInput: dto,
         })
+    }
+
+    async gqlTasks(
+        dto?: TaskIntegrationTasksInput | null,
+    ): Promise<{ tasks: TaskIntegrationTasksOutput }> {
+        const doc = gql`
+            query tasks($tasksInput: TaskIntegrationTasksInput) {
+                tasks(input: $tasksInput) {
+                    data {
+                        id
+                        name
+                        number
+                        description
+                        estimatedDateStart
+                        estimatedDateEnd
+                        estimatedDuration
+                        version
+                        createdAt
+                        status {
+                            id
+                            code
+                            name
+                        }
+                        tags {
+                            id
+                            code
+                            name
+                        }
+                        createdBy {
+                            id
+                            firstname
+                            lastname
+                        }
+                        assignedTo {
+                            id
+                            firstname
+                            lastname
+                        }
+                    }
+                    meta {
+                        curPage
+                        perPage
+                        total
+                    }
+                }
+            }
+        `
+
+        return await request(this.gqlApiUrl, doc, {
+            tasksInput: dto,
+        })
+    }
+
+    async gqlMyTasks(
+        dto: TaskIntegrationMyTasksInput | undefined | null,
+        accessToken: string,
+    ): Promise<Record<string, any>> {
+        const doc = gql`
+            query myTasks($myTasksInput: TaskIntegrationMyTasksInput) {
+                myTasks(input: $myTasksInput) {
+                    data {
+                        id
+                        name
+                        number
+                        description
+                        estimatedDateStart
+                        estimatedDateEnd
+                        estimatedDuration
+                        version
+                        createdAt
+                        status {
+                            id
+                            code
+                            name
+                        }
+                        tags {
+                            id
+                            code
+                            name
+                        }
+                        createdBy {
+                            id
+                            firstname
+                            lastname
+                        }
+                        assignedTo {
+                            id
+                            firstname
+                            lastname
+                        }
+                    }
+                    meta {
+                        curPage
+                        perPage
+                        total
+                    }
+                }
+            }
+        `
+
+        return await request(
+            this.gqlApiUrl,
+            doc,
+            {
+                myTasksInput: dto,
+            },
+            {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        )
     }
 
     // Project Integration
-    async gqlCreateProject(dto: ProjectIntegrationCreateProjectInput): Promise<Record<string, any>> {
+    async gqlCreateProject(
+        dto: ProjectIntegrationCreateProjectInput,
+    ): Promise<Record<string, any>> {
         const doc = gql`
-            mutation createProject($input: ProjectIntegrationCreateProjectInput!) {
+            mutation createProject(
+                $input: ProjectIntegrationCreateProjectInput!
+            ) {
                 createProject(input: $input)
             }
         `
@@ -207,63 +239,78 @@ export class GlobalUtils {
         return await request(this.gqlApiUrl, doc, { input: dto })
     }
 
-    async gqlProjectTasksTags(dto: ProjectIntegrationProjectTasksTagsInput): Promise<Record<string, any>> {
+    async gqlProjectTasksTags(
+        dto: ProjectIntegrationProjectTasksTagsInput,
+    ): Promise<Record<string, any>> {
         const doc = gql`
-        query projectTasksTags($projectTasksTagsInput: ProjectIntegrationProjectTasksTagsInput!) {
-            projectTasksTags(input: $projectTasksTagsInput) {
-                id
-                code
-                name
-                position
-                description
+            query projectTasksTags(
+                $projectTasksTagsInput: ProjectIntegrationProjectTasksTagsInput!
+            ) {
+                projectTasksTags(input: $projectTasksTagsInput) {
+                    id
+                    code
+                    name
+                    position
+                    description
+                }
             }
-        }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "projectTasksTagsInput": dto,
+            projectTasksTagsInput: dto,
         })
     }
 
-    async gqlProjectTasksStatuses(dto: ProjectIntegrationProjectTasksStatusesInput): Promise<Record<string, any>> {
+    async gqlProjectTasksStatuses(
+        dto: ProjectIntegrationProjectTasksStatusesInput,
+    ): Promise<Record<string, any>> {
         const doc = gql`
-        query projectTasksStatuses($projectTasksStatusesInput: ProjectIntegrationProjectTasksStatusesInput!) {
-            projectTasksStatuses(input: $projectTasksStatusesInput) {
-                id
-                code
-                name
-                position
-                isDefault
-                description
+            query projectTasksStatuses(
+                $projectTasksStatusesInput: ProjectIntegrationProjectTasksStatusesInput!
+            ) {
+                projectTasksStatuses(input: $projectTasksStatusesInput) {
+                    id
+                    code
+                    name
+                    position
+                    isDefault
+                    description
+                }
             }
-        }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "projectTasksStatusesInput": dto,
+            projectTasksStatusesInput: dto,
         })
     }
 
-    async gqlProjectTasksRelations(dto: ProjectIntegrationProjectTasksRelationsInput): Promise<Record<string, any>> {
+    async gqlProjectTasksRelations(
+        dto: ProjectIntegrationProjectTasksRelationsInput,
+    ): Promise<Record<string, any>> {
         const doc = gql`
-        query projectTasksRelations($projectTasksRelationsInput: ProjectIntegrationProjectTasksRelationsInput!) {
-            projectTasksRelations(input: $projectTasksRelationsInput) {
-                id
-                code
-                nameMain
-                nameForeign
-                position
-                description
+            query projectTasksRelations(
+                $projectTasksRelationsInput: ProjectIntegrationProjectTasksRelationsInput!
+            ) {
+                projectTasksRelations(input: $projectTasksRelationsInput) {
+                    id
+                    code
+                    nameMain
+                    nameForeign
+                    position
+                    description
+                }
             }
-        }
         `
 
         return await request(this.gqlApiUrl, doc, {
-            "projectTasksRelationsInput": dto,
+            projectTasksRelationsInput: dto,
         })
     }
 
-    async gqlGetUsers(dto: GetUsersInput, accessToken: string): Promise<Record<string, any>> {
+    async gqlGetUsers(
+        dto: GetUsersInput,
+        accessToken: string,
+    ): Promise<Record<string, any>> {
         const doc = gql`
             query getUsers($input: GetUsersInput!) {
                 getUsers(input: $input) {
@@ -285,16 +332,27 @@ export class GlobalUtils {
             }
         `
 
-        return await request(this.gqlApiUrl, doc, { input: dto }, {
-            Authorization: `Bearer ${accessToken}`
-        })
+        return await request(
+            this.gqlApiUrl,
+            doc,
+            { input: dto },
+            {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        )
     }
-    
-    async gqlGetAdminUser(): Promise<{ adminUser: Record<string, any>, adminAccessToken: string }> {
-        const { getUsers } = await this.gqlGetUsers({
-            filter: { email: process.env.ADMIN_EMAIL },
-        }, await this.adminGetAccessToken())
-        
+
+    async gqlGetAdminUser(): Promise<{
+        adminUser: Record<string, any>
+        adminAccessToken: string
+    }> {
+        const { getUsers } = await this.gqlGetUsers(
+            {
+                filter: { email: process.env.ADMIN_EMAIL },
+            },
+            await this.adminGetAccessToken(),
+        )
+
         if (!getUsers.data[0]) {
             throw new Error(`Admin user not found`)
         }
@@ -306,7 +364,7 @@ export class GlobalUtils {
     }
 
     async adminGetAccessToken(): Promise<string> {
-        if ((this._adminAccessTokenExpiresAt - 30 * 1000) > Number(new Date())) {
+        if (this._adminAccessTokenExpiresAt - 30 * 1000 > Number(new Date())) {
             return this._adminAccessToken
         }
 
@@ -323,10 +381,10 @@ export class GlobalUtils {
 
         const result: any = await request(this.gqlApiUrl, doc, {
             input: {
-              email: process.env.ADMIN_EMAIL,
-              password: process.env.ADMIN_PASSWORD,
+                email: process.env.ADMIN_EMAIL,
+                password: process.env.ADMIN_PASSWORD,
             },
-          })
+        })
 
         this._adminAccessToken = result.signIn.accessToken
         this._adminAccessTokenExpiresAt = result.signIn.expiresAt
