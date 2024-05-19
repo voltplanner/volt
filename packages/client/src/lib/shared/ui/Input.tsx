@@ -3,7 +3,6 @@ import {
     FieldValues,
     RegisterOptions,
     UseFormRegister,
-    UseFormReturn,
 } from 'react-hook-form'
 import styled from 'styled-components'
 
@@ -103,7 +102,7 @@ export const Input = memo((props: InputProps) => {
         type = 'text',
         autofocus,
         readonly,
-        variant,
+        variant = 'primary',
         register,
         validationSchema,
         label,
