@@ -14,6 +14,7 @@ interface SessionStore {
     getLocalSession: () => void
     login: (data: AuthorizationResponse) => void
     logout: () => void
+    checkAuth: () => boolean
 }
 export const useSessionStore = create<SessionStore>()(
     devtools((set, get) => ({
@@ -62,5 +63,8 @@ export const useSessionStore = create<SessionStore>()(
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('userId')
         },
+        checkAuth: () => {
+            return get().session.userId !== ''
+        }
     })),
 )

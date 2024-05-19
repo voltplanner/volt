@@ -14,10 +14,13 @@ interface MainLayoutProps {
     content: ReactElement
     sidebar?: ReactElement
     toolbar?: ReactElement
+    isAuth: boolean
 }
 export const Layout = (props: MainLayoutProps) => {
-    const { content, toolbar, header, sidebar } = props
-
+    const { content, toolbar, header, sidebar, isAuth } = props
+    if (!isAuth) {
+        return content
+    }
     return (
         <LayoutStyled>
             <HeaderStyled>{header}</HeaderStyled>
