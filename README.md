@@ -32,3 +32,5 @@ Volt is [BUSL 1.1](./LICENSE.md)
 
 Test only file
 npx nx run server:test --test-file task.test.ts
+npx nx run server:test --test-file task-comment.test.ts
+npx nx run server:test --test-file project.test.ts

@@ -13,7 +13,7 @@ export type TaskCreateRepositoryDto = {
 
     parentId?: string
     assignedToId?: string
-    tagsIds?: string[]
+    tagIds?: string[]
 }
 
 export type TaskUpdateRepositoryDto = {

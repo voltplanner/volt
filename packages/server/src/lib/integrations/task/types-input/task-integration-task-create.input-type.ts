@@ -44,5 +44,5 @@ export class TaskIntegrationTaskCreateInput {
     @Field(() => [String], {
         nullable: true,
     })
-    readonly tagsIds?: string[] | null
+    readonly tagIds?: string[] | null
 }

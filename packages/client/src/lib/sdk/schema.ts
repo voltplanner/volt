@@ -262,8 +262,8 @@ export interface Mutation {
     markAllAsSeen: Scalars['Boolean']
     createProject: Scalars['String']
     updateProject: Scalars['String']
-    createTask: Scalars['String']
-    updateTask: Scalars['String']
+    taskCreate: Scalars['String']
+    taskUpdate: Scalars['String']
     uploadFile: Scalars['String']
     __typename: 'Mutation'
 }
@@ -649,8 +649,8 @@ export interface MutationGenqlSelection {
     markAllAsSeen?: { __args: { input: MarkAllAsSeenInput } }
     createProject?: { __args: { input: ProjectIntegrationCreateProjectInput } }
     updateProject?: { __args: { input: ProjectIntegrationProjectUpdateInput } }
-    createTask?: { __args: { input: TaskIntegrationTaskCreateInput } }
-    updateTask?: { __args: { input: TaskIntegrationTaskUpdateInput } }
+    taskCreate?: { __args: { input: TaskIntegrationTaskCreateInput } }
+    taskUpdate?: { __args: { input: TaskIntegrationTaskUpdateInput } }
     uploadFile?: { __args: { input: UploadFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number

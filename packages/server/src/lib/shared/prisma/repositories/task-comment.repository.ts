@@ -53,10 +53,10 @@ export const taskCommentModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id, text } = dto
+            const { id, userId, text } = dto
 
             const { id: updatedId } = await client.taskComment.update({
-                where: { id },
+                where: { id, userId },
                 data: {
                     text,
                 },
@@ -84,10 +84,10 @@ export const taskCommentModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id } = dto
+            const { id, userId } = dto
 
             const { id: deletedId } = await client.taskComment.update({
-                where: { id },
+                where: { id, userId },
                 data: { isDeleted: true },
                 select: { id: true },
             })

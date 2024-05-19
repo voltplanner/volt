@@ -9,6 +9,7 @@ import {
 } from './configs/task-module.config'
 import { TaskService } from './services/task.service'
 import { TaskBootstrap } from './services/task-bootstrap.service'
+import { TaskCommentService } from './services/task-comment.service'
 import { TaskProjectService } from './services/task-project.service'
 import { TaskUserService } from './services/task-user.service'
 
@@ -29,6 +30,7 @@ export class TaskModule extends TaskConfigurableModuleClass {
             TaskProjectService,
             TaskUserService,
             TaskService,
+            TaskCommentService,
             TaskBootstrap,
         ]
 

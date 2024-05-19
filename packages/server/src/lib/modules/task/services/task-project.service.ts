@@ -82,8 +82,10 @@ export class TaskProjectService {
 
     async getById(dto?: {
         id: string
-    }) {
-        return await this.prisma.taskProject.extGetById(dto)
+    }, prisma?: PrismaTransactionClientType) {
+        const client = prisma || this.prisma
+
+        return await client.taskProject.extGetById(dto, client)
     }
 
     async findMany(dto?: {
@@ -102,8 +104,10 @@ export class TaskProjectService {
             field: 'name' | 'status' | 'createdAt'
             order: OrderEnum
         }
-    }) {
-        return await this.prisma.taskProject.extFindMany(dto)
+    }, prisma?: PrismaTransactionClientType) {
+        const client = prisma || this.prisma
+
+        return await client.taskProject.extFindMany(dto, client)
     }
 
     async addUsers(
@@ -235,9 +239,10 @@ export class TaskProjectService {
         dto: {
             projectId: string
         },
-        client?: PrismaTransactionClientType,
+        prisma?: PrismaTransactionClientType,
     ) {
         const { projectId } = dto
+        const client = prisma || this.prisma
 
         for (const item of this.config.tags) {
             await this.upsertTasksTags({ ...item, projectId }, client)
@@ -294,9 +299,10 @@ export class TaskProjectService {
         dto: {
             projectId: string
         },
-        client?: PrismaTransactionClientType,
+        prisma?: PrismaTransactionClientType,
     ) {
         const { projectId } = dto
+        const client = prisma || this.prisma
 
         for (const item of this.config.relations) {
             await this.upsertTasksRelations({ ...item, projectId }, client)
@@ -346,9 +352,10 @@ export class TaskProjectService {
         dto: {
             projectId: string
         },
-        client?: PrismaTransactionClientType,
+        prisma?: PrismaTransactionClientType,
     ): Promise<void> {
         const { projectId } = dto
+        const client = prisma || this.prisma
 
         for (const role of this.config.roles) {
             await this.upsertUsersRoles(
