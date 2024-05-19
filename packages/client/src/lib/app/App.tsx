@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 export function App() {
     const { checkAuth, getLocalSession } = useSessionStore()
     useEffect(() => {
+        getLocalSession()
         const intervalId = setInterval(() => {
             getLocalSession()
         }, 3000)
