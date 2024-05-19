@@ -17,12 +17,14 @@ export enum AppRoutes {
     ROLE_DETAILS = 'role_details',
     ABOUT = 'about',
     SETTINGS = 'settings',
-    AUTH = 'auth',
+    SIGNUP = 'signup',
+    SIGNIN = 'signin',
     NOT_FOUND = 'not_found',
 }
 
 export const RoutePath: Record<AppRoutes, string> = {
-    [AppRoutes.AUTH]: '/register',
+    [AppRoutes.SIGNUP]: '/signup',
+    [AppRoutes.SIGNIN]: '/signin',
     [AppRoutes.MAIN]: '/',
     [AppRoutes.ROLES]: '/roles',
     [AppRoutes.USERS]: '/users',
@@ -66,8 +68,12 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
         path: RoutePath.not_found,
         element: <NotFoundPage />,
     },
-    [AppRoutes.AUTH]: {
-        path: RoutePath.auth,
+    [AppRoutes.SIGNUP]: {
+        path: RoutePath.signup,
+        element: <AuthPage />,
+    },
+    [AppRoutes.SIGNIN]: {
+        path: RoutePath.signin,
         element: <AuthPage />,
     },
 }

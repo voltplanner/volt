@@ -175,7 +175,7 @@ export const TasksOverview = () => {
     return (
         <Table
             height="450px"
-            styles={{ width: 1353 }}
+            styles={{ width: '100%' }}
             columns={columns}
             data={data}
         />
