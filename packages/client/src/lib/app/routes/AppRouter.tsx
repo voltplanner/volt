@@ -5,7 +5,6 @@ import {
     Routes,
     useNavigate,
     useLocation,
-    Navigate,
 } from 'react-router-dom'
 import { routeConfig } from 'shared'
 import styled from 'styled-components'
@@ -30,7 +29,7 @@ const AppRouter = () => {
             console.error('Error refreshing token:', error)
             setIsAuth(false)
             logout()
-            navigate('/register')
+            navigate('/signin')
         }
     }
 
@@ -47,13 +46,13 @@ const AppRouter = () => {
         const expirationTime = Number(localStorage.getItem('expiresAt'))
         const currentTimeInSeconds = Math.floor(Date.now() / 1000)
         const token = localStorage.getItem('accessToken')
-        if(token && location.pathname === '/register'){
+        if(token && (location.pathname === '/signin' || location.pathname === '/signup')){
             navigate('/')
         }
         if (!token) {
             setIsAuth(false)
-            if (location.pathname !== '/register') {
-                navigate('/register')
+            if (location.pathname !== '/signin' && location.pathname !== '/signup') {
+                navigate('/signin')
             }
         } else if (expirationTime <= currentTimeInSeconds) {
             handleRefresh()
