@@ -1,21 +1,23 @@
-import { Inject } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
 import { CurrentUserPayload } from '@shared/interfaces'
 
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskService } from '../../modules/task/services/task.service'
+import { ACLGuard } from '../../shared/guards/acl.guard'
 import {
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
-import { TaskIntegrationTaskCreateInput } from './types-input/task-integration-task-create.input-type'
-import { TaskIntegrationTaskUpdateInput } from './types-input/task-integration-task-update.input-type'
+import { TaskIntegrationTaskInput } from './types-input/task-integration-task.input-type'
+import { TaskIntegrationCreateTaskInput } from './types-input/task-integration-task-create.input-type'
+import { TaskIntegrationUpdateTaskInput } from './types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from './types-input/task-integration-tasks.input-type'
-import { TaskIntegrationTasksOfCurrentUserInput } from './types-input/task-integration-tasks-of-current-user.input-type'
+import { TaskIntegrationMyTasksInput } from './types-input/task-integration-tasks-of-current-user.input-type'
 import { TaskIntegrationTaskObject } from './types-object/task-integration-task.object-type'
 import { TaskIntegrationTasksOutput } from './types-output/task-integration-tasks.output-type'
-import { TaskIntegrationTasksOfCurrentUserOutput } from './types-output/task-integration-tasks-of-current-user.output-type'
+import { TaskIntegrationMyTasksOutput } from './types-output/task-integration-tasks-of-current-user.output-type'
 
 @Resolver()
 export class TaskIntegrationResolver {
@@ -26,10 +28,11 @@ export class TaskIntegrationResolver {
         private readonly _prismaService: PrismaServiceWithExtentionsType,
     ) {}
 
+    @UseGuards(ACLGuard)
     @Mutation(() => String)
     async createTask(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input') input: TaskIntegrationTaskCreateInput,
+        @Args('input') input: TaskIntegrationCreateTaskInput,
     ): Promise<string> {
         const {
             projectId,
@@ -38,7 +41,7 @@ export class TaskIntegrationResolver {
             statusId,
             assignedToId,
             estimatedDuration,
-            tagsIds,
+            tagIds,
             parentId,
         } = input
 
@@ -67,7 +70,7 @@ export class TaskIntegrationResolver {
                     estimatedDateStart,
                     estimatedDuration,
                     parentId,
-                    tagsIds,
+                    tagIds,
                 },
                 tx,
             )
@@ -77,8 +80,49 @@ export class TaskIntegrationResolver {
     }
 
     @Mutation(() => String)
-    async updateTask(@Args('input') input: TaskIntegrationTaskUpdateInput) {
+    async updateTask(@Args('input') input: TaskIntegrationUpdateTaskInput) {
         return await this._taskService.update(input)
+    }
+
+    @Query(() => TaskIntegrationTaskObject)
+    async task(
+        @Args('input') input: TaskIntegrationTaskInput,
+    ): Promise<TaskIntegrationTaskObject> {
+        const task = await this._taskService.getById(input)
+
+        const userAssigned = task.assignedToId
+            ? await this._authUserService.getUser(task.assignedToId)
+            : undefined
+        const userCreated = await this._authUserService.getUser(
+            task.createdById,
+        )
+
+        return {
+            ...task,
+            createdBy: {
+                id: userCreated.id,
+                lastname: userCreated.lastname,
+                firstname: userCreated.firstname,
+            },
+            assignedTo: userAssigned
+                ? {
+                      id: userAssigned.id,
+                      lastname: userAssigned.lastname,
+                      firstname: userAssigned.firstname,
+                  }
+                : undefined,
+            createdAt: Number(task.createdAt),
+            effortsMs: task.effortsMs || 0,
+            estimatedDateEnd: task.estimatedDateEnd
+                ? Number(task.estimatedDateEnd)
+                : undefined,
+            estimatedDateStart: task.estimatedDateStart
+                ? Number(task.estimatedDateStart)
+                : undefined,
+            estimatedDuration: task.estimatedDuration
+                ? Number(task.estimatedDuration.toString())
+                : undefined,
+        }
     }
 
     @Query(() => TaskIntegrationTasksOutput)
@@ -86,58 +130,95 @@ export class TaskIntegrationResolver {
         @Args('input', { nullable: true })
         input?: TaskIntegrationTasksInput | null,
     ): Promise<TaskIntegrationTasksOutput> {
-        const { curPage, perPage } = input || {}
+        const { filterBy, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.findMany({
-            curPage,
-            perPage,
+            curPage: curPage || undefined,
+            perPage: perPage || undefined,
+            filterByName: filterBy?.name || undefined,
+            filterByTagId: filterBy?.tagId || undefined,
+            filterByNumber: filterBy?.number || undefined,
+            filterByStatusId: filterBy?.statusId || undefined,
+            filterByParentId: filterBy?.parentId || undefined,
+            filterByProjectId: filterBy?.projectId || undefined,
+            filterByCreatedById: filterBy?.createdById || undefined,
+            filterByAssignedToId: filterBy?.assignedToId || undefined,
+            filterByFulltext: filterBy?.fulltext || undefined,
+            filterByCreatedAt:
+                filterBy?.createdAtFrom || filterBy?.createdAtTo
+                    ? {
+                          from: filterBy?.createdAtFrom
+                              ? new Date(filterBy.createdAtFrom)
+                              : undefined,
+                          to: filterBy?.createdAtTo
+                              ? new Date(filterBy.createdAtTo)
+                              : undefined,
+                      }
+                    : undefined,
         })
 
         const tasks: TaskIntegrationTaskObject[] = []
 
         for (const task of data) {
-            const userAssigned = await this._authUserService.getUser(
-                task.assignedToId,
-            )
+            let userAssigned:
+                | Awaited<ReturnType<AuthUserService['getUser']>>
+                | undefined
+
+            if (task.assignedToId) {
+                userAssigned = await this._authUserService.getUser(
+                    task.assignedToId,
+                )
+            }
+
             const userCreated = await this._authUserService.getUser(
                 task.createdById,
             )
 
             tasks.push({
                 ...task,
-                status: task.status.name,
                 createdBy: {
                     id: userCreated.id,
                     lastname: userCreated.lastname,
                     firstname: userCreated.firstname,
                 },
-                assignedTo: {
-                    id: userAssigned.id,
-                    lastname: userAssigned.lastname,
-                    firstname: userAssigned.firstname,
-                },
+                assignedTo: userAssigned
+                    ? {
+                          id: userAssigned.id,
+                          lastname: userAssigned.lastname,
+                          firstname: userAssigned.firstname,
+                      }
+                    : undefined,
                 createdAt: Number(task.createdAt),
-                estimatedDateEnd: Number(task.estimatedDateEnd),
-                estimatedDateStart: Number(task.estimatedDateStart),
-                estimatedDuration: Number(task.estimatedDuration.toString()),
+                effortsMs: task.effortsMs || 0,
+                estimatedDateEnd: task.estimatedDateEnd
+                    ? Number(task.estimatedDateEnd)
+                    : undefined,
+                estimatedDateStart: task.estimatedDateStart
+                    ? Number(task.estimatedDateStart)
+                    : undefined,
+                estimatedDuration: task.estimatedDuration
+                    ? Number(task.estimatedDuration.toString())
+                    : undefined,
             })
         }
 
         return { meta, data: tasks }
     }
 
-    @Query(() => TaskIntegrationTasksOfCurrentUserOutput)
+    @UseGuards(ACLGuard)
+    @Query(() => TaskIntegrationMyTasksOutput)
     async myTasks(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input', { nullable: true })
-        input?: TaskIntegrationTasksOfCurrentUserInput | null,
-    ): Promise<TaskIntegrationTasksOfCurrentUserOutput> {
-        const { curPage, perPage } = input || {}
+        input?: TaskIntegrationMyTasksInput | null,
+    ): Promise<TaskIntegrationMyTasksOutput> {
+        const { projectId, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.findMany({
             filterByAssignedToId: userId,
-            curPage,
-            perPage,
+            filterByProjectId: projectId || undefined,
+            curPage: curPage || undefined,
+            perPage: perPage || undefined,
         })
 
         const tasks: TaskIntegrationTaskObject[] = []
@@ -152,7 +233,6 @@ export class TaskIntegrationResolver {
 
             tasks.push({
                 ...task,
-                status: task.status.name,
                 createdBy: {
                     id: userCreated.id,
                     lastname: userCreated.lastname,
@@ -164,6 +244,7 @@ export class TaskIntegrationResolver {
                     firstname: userAssigned.firstname,
                 },
                 createdAt: Number(task.createdAt),
+                effortsMs: task.effortsMs || 0,
                 estimatedDateEnd: Number(task.estimatedDateEnd),
                 estimatedDateStart: Number(task.estimatedDateStart),
                 estimatedDuration: Number(task.estimatedDuration.toString()),

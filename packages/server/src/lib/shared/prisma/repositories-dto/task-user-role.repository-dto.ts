@@ -22,5 +22,6 @@ export type TaskUserRoleFindManyRepositoryDto = {
 }
 
 export type TaskUserRoleGetOneByCodeRepositoryDto = {
+    projectId: string
     code: string
 }

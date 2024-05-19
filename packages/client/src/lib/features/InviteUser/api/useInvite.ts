@@ -1,5 +1,9 @@
 import { useMutation } from '@apollo/client'
-import { CreateUserInput, generateMutationOp, generateQueryOp } from '../../../sdk'
+import {
+    CreateUserInput,
+    generateMutationOp,
+    generateQueryOp,
+} from '../../../sdk'
 import gql from 'graphql-tag'
 
 export const useInvite = (payload: CreateUserInput) => {
@@ -7,7 +11,7 @@ export const useInvite = (payload: CreateUserInput) => {
         createUser: {
             __args: {
                 input: {
-                    ...payload
+                    ...payload,
                 },
             },
             id: true,
@@ -17,7 +21,7 @@ export const useInvite = (payload: CreateUserInput) => {
             status: true,
             createdAt: true,
             deletedAt: true,
-        }
+        },
     })
 
     const [createUser, { data, loading, error }] = useMutation(gql(query), {

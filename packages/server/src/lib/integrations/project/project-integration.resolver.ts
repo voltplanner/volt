@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common'
+import { Inject, UseGuards } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '@shared/decorators'
 import { CurrentUserPayload, OrderEnum } from '@shared/interfaces'
@@ -6,11 +6,13 @@ import { CurrentUserPayload, OrderEnum } from '@shared/interfaces'
 import { AuthUserService } from '../../modules/auth/services/auth-user.service'
 import { TaskProjectService } from '../../modules/task/services/task-project.service'
 import { TaskUserService } from '../../modules/task/services/task-user.service'
+import { ACLGuard } from '../../shared/guards/acl.guard'
 import {
     AuthUserStatusEnum,
     PrismaService,
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
+import { ProjectIntegrationProjectInput } from './types-input/project-integration-project.input-type'
 import {
     ProjectIntegrationCreateProjectInput,
     ProjectIntegrationCreateProjectMemberInput,
@@ -21,6 +23,7 @@ import { ProjectIntegrationProjectTasksTagsInput } from './types-input/project-i
 import { ProjectIntegrationProjectUpdateInput } from './types-input/project-integration-project-update.input-type'
 import { ProjectIntegrationProjectUsersInput } from './types-input/project-integration-project-users.input-type'
 import { ProjectIntegrationProjectUsersRolesInput } from './types-input/project-integration-project-users-roles.input-type'
+import { ProjectIntegrationProjectsInput } from './types-input/project-integration-projects.input-type'
 import { ProjectIntegrationProjectObject } from './types-object/project-integration-project.object-type'
 import { ProjectIntegrationTasksRelationObject } from './types-object/project-integration-tasks-relation.object-type'
 import { ProjectIntegrationTasksStatusObject } from './types-object/project-integration-tasks-status.object-type'
@@ -51,15 +54,6 @@ export class ProjectIntegrationResolver {
         const userIds: string[] = []
 
         return await this._prismaService.$transaction(async (client) => {
-            for (const member of members) {
-                const userId = await this._taskUserService.upsert(
-                    member,
-                    client,
-                )
-
-                userIds.push(userId)
-            }
-
             const projectId = await this._taskProjectService.create(
                 {
                     name,
@@ -69,6 +63,15 @@ export class ProjectIntegrationResolver {
                 },
                 client,
             )
+
+            for (const member of members) {
+                const userId = await this._taskUserService.upsert(
+                    { ...member, projectId },
+                    client,
+                )
+
+                userIds.push(userId)
+            }
 
             await this._taskProjectService.addUsers(
                 {
@@ -89,9 +92,44 @@ export class ProjectIntegrationResolver {
         return await this._taskProjectService.update(input)
     }
 
+    @Query(() => ProjectIntegrationProjectObject)
+    async project(
+        @Args('input') input: ProjectIntegrationProjectInput,
+    ): Promise<ProjectIntegrationProjectObject> {
+        const project = await this._taskProjectService.getById(input)
+
+        return {
+            ...project,
+            deadline: Number(project.deadline),
+            createdAt: Number(project.createdAt),
+        }
+    }
+
     @Query(() => ProjectIntegrationProjectsOutput)
-    async projects(): Promise<ProjectIntegrationProjectsOutput> {
-        const { data, meta } = await this._taskProjectService.findMany()
+    async projects(
+        @Args('input', { nullable: true })
+        input: ProjectIntegrationProjectsInput,
+    ): Promise<ProjectIntegrationProjectsOutput> {
+        const { filterBy, curPage, perPage } = input || {}
+
+        const { data, meta } = await this._taskProjectService.findMany({
+            curPage: curPage || undefined,
+            perPage: perPage || undefined,
+            filterByName: filterBy?.name || undefined,
+            filterByUserId: filterBy?.userId || undefined,
+            filterByFulltext: filterBy?.fulltext || undefined,
+            filterByCreatedAt:
+                filterBy?.createdAtFrom || filterBy?.createdAtTo
+                    ? {
+                          from: filterBy?.createdAtFrom
+                              ? new Date(filterBy.createdAtFrom)
+                              : undefined,
+                          to: filterBy?.createdAtTo
+                              ? new Date(filterBy.createdAtTo)
+                              : undefined,
+                      }
+                    : undefined,
+        })
 
         const projects: ProjectIntegrationProjectObject[] = data.map((i) => ({
             ...i,
@@ -102,8 +140,9 @@ export class ProjectIntegrationResolver {
         return { meta, data: projects }
     }
 
+    @UseGuards(ACLGuard)
     @Query(() => ProjectIntegrationProjectsOfCurrentUserOutput)
-    async myProjects(
+    async projectsOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
     ): Promise<ProjectIntegrationProjectsOfCurrentUserOutput> {
         const { data, meta } = await this._taskProjectService.findMany({

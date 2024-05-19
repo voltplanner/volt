@@ -10,7 +10,11 @@ export const InviteUser = () => {
     return (
         <>
             <Button onClick={onClickModal}>+ Invite user</Button>
-            <Modal children={<InviteModal onClose={onClickModal}/>} onClose={() => setIsOpen(false)} isOpen={isOpen} />
+            <Modal
+                children={<InviteModal onClose={onClickModal} />}
+                onClose={() => setIsOpen(false)}
+                isOpen={isOpen}
+            />
         </>
     )
 }

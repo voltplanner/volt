@@ -24,8 +24,9 @@ export type TaskProjectFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 
-    filterByName?: string
-    filterByUserId?: string
+    filterByName?: string | string[]
+    filterByUserId?: string | string[]
+    filterByFulltext?: string | string[]
     filterByCreatedAt?: {
         from?: Date
         to?: Date
@@ -35,6 +36,10 @@ export type TaskProjectFindManyRepositoryDto = {
         field: 'name' | 'status' | 'createdAt'
         order: OrderEnum
     }
+}
+
+export type TaskProjectGetByIdRepositoryDto = {
+    id: string
 }
 
 export type TaskProjectConnectUsersRepositoryDto = {

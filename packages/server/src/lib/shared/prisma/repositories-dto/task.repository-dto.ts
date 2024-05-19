@@ -1,6 +1,6 @@
 import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 
-export type TaskCreateRepositoryDto = {
+export type CreateTaskRepositoryDto = {
     name: string
     description?: string
     estimatedDateEnd?: Date
@@ -13,10 +13,10 @@ export type TaskCreateRepositoryDto = {
 
     parentId?: string
     assignedToId?: string
-    tagsIds?: string[]
+    tagIds?: string[]
 }
 
-export type TaskUpdateRepositoryDto = {
+export type UpdateTaskRepositoryDto = {
     id: string
     version: number
 
@@ -31,7 +31,7 @@ export type TaskUpdateRepositoryDto = {
     assignedToId?: string
 }
 
-export type TaskDeleteRepositoryDto = {
+export type DeleteTaskRepositoryDto = {
     id: string
 }
 
@@ -39,13 +39,15 @@ export type TaskFindManyRepositoryDto = {
     curPage?: number
     perPage?: number
 
-    filterByName?: string
-    filterByNumber?: number
-    filterByStatusId?: string
-    filterByParentId?: string
-    filterByProjectId?: string
-    filterByCreatedById?: string
-    filterByAssignedToId?: string
+    filterByName?: string | string[]
+    filterByTagId?: string | string[]
+    filterByNumber?: number | number[]
+    filterByStatusId?: string | string[]
+    filterByParentId?: string | string[]
+    filterByFulltext?: string | string[]
+    filterByProjectId?: string | string[]
+    filterByCreatedById?: string | string[]
+    filterByAssignedToId?: string | string[]
     filterByCreatedAt?: {
         from?: Date
         to?: Date
@@ -55,6 +57,10 @@ export type TaskFindManyRepositoryDto = {
         field: 'name' | 'status' | 'createdAt'
         order: OrderEnum
     }
+}
+
+export type TaskGetByIdRepositoryDto = {
+    id: string
 }
 
 export type TaskFindOneRepositoryDto = {
