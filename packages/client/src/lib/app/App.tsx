@@ -11,7 +11,7 @@ export function App() {
         const intervalId = setInterval(() => {
             getLocalSession()
         }, 3000)
-        return () => clearInterval(intervalId) 
+        return () => clearInterval(intervalId)
     }, [])
     return (
         <WrapperStyled>

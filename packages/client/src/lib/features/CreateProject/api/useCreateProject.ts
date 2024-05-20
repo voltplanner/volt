@@ -1,8 +1,13 @@
 import { useMutation } from '@apollo/client'
-import { ProjectIntegrationCreateProjectInput, generateMutationOp } from '../../../sdk'
+import {
+    ProjectIntegrationCreateProjectInput,
+    generateMutationOp,
+} from '../../../sdk'
 import gql from 'graphql-tag'
 
-export const useCreateProject = (payload: ProjectIntegrationCreateProjectInput) => {
+export const useCreateProject = (
+    payload: ProjectIntegrationCreateProjectInput,
+) => {
     const { query, variables } = generateMutationOp({
         createProject: {
             __args: {
@@ -13,12 +18,9 @@ export const useCreateProject = (payload: ProjectIntegrationCreateProjectInput) 
         },
     })
 
-    const [createProject, { data, loading, error }] = useMutation(
-        gql(query),
-        {
-            variables,
-        },
-    )
+    const [createProject, { data, loading, error }] = useMutation(gql(query), {
+        variables,
+    })
 
     return {
         createProject,

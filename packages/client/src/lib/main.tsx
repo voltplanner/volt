@@ -8,6 +8,7 @@ import { ApolloProvider } from '@apollo/client'
 import App from './app/App'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+console.log('hello bob')
 root.render(
     <StrictMode>
         <BrowserRouter>
