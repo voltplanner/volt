@@ -65,6 +65,6 @@ export const useSessionStore = create<SessionStore>()(
         },
         checkAuth: () => {
             return get().session.userId !== ''
-        }
+        },
     })),
 )

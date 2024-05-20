@@ -1,45 +1,45 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const LayoutStyled = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  background-color: purple;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: purple;
 `
 export const ContentWrapper = styled.div`
-display: flex;
-flex-direction: row;
-width: 100%;
-height: 100%;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
 `
 export const SidebarStyled = styled.div`
-display: flex;
-width: 250px;
-height: 100%;
-  background-color: blue;
+    display: flex;
+    width: 250px;
+    height: 100%;
+    background-color: blue;
 `
 export const ContentStyled = styled.div`
-display: flex;
-width: 100%;
-height: 100%;
-  background-color: green;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: green;
 `
 export const RightbarStyled = styled.div`
-display: flex;
-width: 50px;
-height: 50px;
-  background-color: yellow;
+    display: flex;
+    width: 50px;
+    height: 50px;
+    background-color: yellow;
 `
 export const ToolbarStyled = styled.div`
-display: flex;
-width: 100%;
-height: fit-content;
-  background-color: darkorchid;
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    background-color: darkorchid;
 `
 export const HeaderStyled = styled.div`
-display: flex;
-width: 100%;
-height: fit-content;
-background-color: tomato;
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    background-color: tomato;
 `

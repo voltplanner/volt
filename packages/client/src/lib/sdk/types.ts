@@ -1,5 +1,5 @@
 export default {
-    scalars: [1, 3, 6, 19, 23, 24, 28, 35, 71],
+    scalars: [1, 3, 5, 6, 10, 11, 15, 37, 71],
     types: {
         PaginatedMetaType: {
             curPage: [1],
@@ -14,6 +14,86 @@ export default {
             __typename: [3],
         },
         String: {},
+        MethodsType: {
+            id: [5],
+            name: [3],
+            group: [3],
+            editable: [6],
+            description: [3],
+            allowed: [6],
+            __typename: [3],
+        },
+        ID: {},
+        Boolean: {},
+        RoleType: {
+            id: [5],
+            name: [3],
+            editable: [6],
+            superuser: [6],
+            methods: [4],
+            __typename: [3],
+        },
+        PaginatedRoles: {
+            data: [7],
+            meta: [0],
+            __typename: [3],
+        },
+        UserType: {
+            id: [5],
+            firstname: [3],
+            lastname: [3],
+            email: [3],
+            status: [10],
+            createdAt: [11],
+            deletedAt: [11],
+            __typename: [3],
+        },
+        AuthUserStatusEnum: {},
+        DateTime: {},
+        PaginatedUsers: {
+            data: [9],
+            meta: [0],
+            __typename: [3],
+        },
+        AuthorizationResponse: {
+            refreshToken: [3],
+            accessToken: [3],
+            userId: [5],
+            expiresAt: [1],
+            __typename: [3],
+        },
+        GetNotificationData: {
+            id: [3],
+            topic: [3],
+            message: [3],
+            link: [3],
+            type: [15],
+            sent: [6],
+            sentAt: [11],
+            seen: [6],
+            __typename: [3],
+        },
+        NotificationTypeEnum: {},
+        GetNotificationsResponse: {
+            data: [14],
+            meta: [2],
+            __typename: [3],
+        },
+        GetNotificationPreferences: {
+            emailEnabled: [6],
+            email: [3],
+            webEnabled: [6],
+            telegramEnabled: [6],
+            telegramAccount: [1],
+            __typename: [3],
+        },
+        OnNewNotification: {
+            userId: [3],
+            topic: [3],
+            message: [3],
+            link: [3],
+            __typename: [3],
+        },
         ProjectIntegrationTasksRelationObject: {
             id: [3],
             code: [3],
@@ -32,7 +112,6 @@ export default {
             description: [3],
             __typename: [3],
         },
-        Boolean: {},
         ProjectIntegrationTasksTagObject: {
             id: [3],
             code: [3],
@@ -56,7 +135,7 @@ export default {
             __typename: [3],
         },
         ProjectIntegrationProjectUsersOutput: {
-            data: [9],
+            data: [23],
             meta: [0],
             __typename: [3],
         },
@@ -71,12 +150,12 @@ export default {
             __typename: [3],
         },
         ProjectIntegrationProjectsOutput: {
-            data: [11],
+            data: [25],
             meta: [0],
             __typename: [3],
         },
         ProjectIntegrationProjectsOfCurrentUserOutput: {
-            data: [11],
+            data: [25],
             meta: [0],
             __typename: [3],
         },
@@ -97,171 +176,92 @@ export default {
             version: [1],
             createdAt: [1],
             status: [3],
-            createdBy: [14],
-            assignedTo: [14],
+            createdBy: [28],
+            assignedTo: [28],
             __typename: [3],
         },
         TaskIntegrationTasksOutput: {
-            data: [15],
+            data: [29],
             meta: [0],
             __typename: [3],
         },
         TaskIntegrationTasksOfCurrentUserOutput: {
-            data: [15],
+            data: [29],
             meta: [0],
-            __typename: [3],
-        },
-        MethodsType: {
-            id: [19],
-            name: [3],
-            group: [3],
-            editable: [6],
-            description: [3],
-            allowed: [6],
-            __typename: [3],
-        },
-        ID: {},
-        RoleType: {
-            id: [19],
-            name: [3],
-            editable: [6],
-            superuser: [6],
-            methods: [18],
-            __typename: [3],
-        },
-        PaginatedRoles: {
-            data: [20],
-            meta: [0],
-            __typename: [3],
-        },
-        UserType: {
-            id: [19],
-            firstname: [3],
-            lastname: [3],
-            email: [3],
-            status: [23],
-            createdAt: [24],
-            deletedAt: [24],
-            __typename: [3],
-        },
-        AuthUserStatusEnum: {},
-        DateTime: {},
-        PaginatedUsers: {
-            data: [22],
-            meta: [0],
-            __typename: [3],
-        },
-        AuthorizationResponse: {
-            refreshToken: [3],
-            accessToken: [3],
-            userId: [19],
-            expiresAt: [1],
-            __typename: [3],
-        },
-        GetNotificationData: {
-            id: [3],
-            topic: [3],
-            message: [3],
-            link: [3],
-            type: [28],
-            sent: [6],
-            sentAt: [24],
-            seen: [6],
-            __typename: [3],
-        },
-        NotificationTypeEnum: {},
-        GetNotificationsResponse: {
-            data: [27],
-            meta: [2],
-            __typename: [3],
-        },
-        GetNotificationPreferences: {
-            emailEnabled: [6],
-            email: [3],
-            webEnabled: [6],
-            telegramEnabled: [6],
-            telegramAccount: [1],
-            __typename: [3],
-        },
-        OnNewNotification: {
-            userId: [3],
-            topic: [3],
-            message: [3],
-            link: [3],
             __typename: [3],
         },
         Query: {
-            getUsers: [
-                25,
+            tasks: [
+                30,
                 {
-                    input: [33, 'GetUsersInput!'],
+                    input: [33],
                 },
             ],
-            getRoles: [
-                21,
+            myTasks: [
+                31,
                 {
-                    input: [37, 'GetRolesInput!'],
+                    input: [34],
                 },
             ],
-            getMyRole: [20],
-            getUser: [
-                22,
-                {
-                    input: [39, 'GetUserInput!'],
-                },
-            ],
-            getMyNotificationPreferences: [30],
-            getMyNotifications: [
-                29,
-                {
-                    input: [40, 'GetNotificationsInput!'],
-                },
-            ],
-            projects: [12],
-            myProjects: [13],
+            projects: [26],
+            myProjects: [27],
             projectUsers: [
-                10,
+                24,
                 {
-                    input: [41, 'ProjectIntegrationProjectUsersInput!'],
+                    input: [35, 'ProjectIntegrationProjectUsersInput!'],
                 },
             ],
             projectUsersRoles: [
-                8,
+                22,
                 {
-                    input: [42, 'ProjectIntegrationProjectUsersRolesInput!'],
+                    input: [38, 'ProjectIntegrationProjectUsersRolesInput!'],
                 },
             ],
             projectTasksTags: [
-                7,
+                21,
                 {
-                    input: [43, 'ProjectIntegrationProjectTasksTagsInput!'],
+                    input: [39, 'ProjectIntegrationProjectTasksTagsInput!'],
                 },
             ],
             projectTasksStatuses: [
-                5,
+                20,
                 {
-                    input: [44, 'ProjectIntegrationProjectTasksStatusesInput!'],
+                    input: [40, 'ProjectIntegrationProjectTasksStatusesInput!'],
                 },
             ],
             projectTasksRelations: [
-                4,
+                19,
                 {
                     input: [
-                        45,
+                        41,
                         'ProjectIntegrationProjectTasksRelationsInput!',
                     ],
                 },
             ],
-            tasks: [
-                16,
+            getUsers: [
+                12,
                 {
-                    input: [46],
+                    input: [42, 'GetUsersInput!'],
                 },
             ],
-            myTasks: [
-                17,
+            getRoles: [
+                8,
                 {
-                    input: [47],
+                    input: [44, 'GetRolesInput!'],
+                },
+            ],
+            getMyRole: [7],
+            getUser: [
+                9,
+                {
+                    input: [46, 'GetUserInput!'],
+                },
+            ],
+            getMyNotificationPreferences: [17],
+            getMyNotifications: [
+                16,
+                {
+                    input: [47, 'GetNotificationsInput!'],
                 },
             ],
             getFile: [
@@ -272,55 +272,28 @@ export default {
             ],
             __typename: [3],
         },
-        GetUsersInput: {
+        TaskIntegrationTasksInput: {
             curPage: [1],
             perPage: [1],
-            orderBy: [34],
-            filter: [36],
             __typename: [3],
         },
-        OrderByInput: {
-            field: [3],
-            order: [35],
-            __typename: [3],
-        },
-        OrderEnum: {},
-        GetUsersFilterInput: {
-            email: [3],
-            firstname: [3],
-            lastname: [3],
-            role: [3],
-            status: [23],
-            __typename: [3],
-        },
-        GetRolesInput: {
+        TaskIntegrationTasksOfCurrentUserInput: {
             curPage: [1],
             perPage: [1],
-            filter: [38],
-            __typename: [3],
-        },
-        GetRolesFilterInput: {
-            name: [3],
-            __typename: [3],
-        },
-        GetUserInput: {
-            userId: [19],
-            __typename: [3],
-        },
-        GetNotificationsInput: {
-            userId: [3],
-            cursor: [3],
-            take: [1],
-            type: [28],
-            seen: [6],
             __typename: [3],
         },
         ProjectIntegrationProjectUsersInput: {
             projectId: [3],
             filterByName: [3],
-            orderBy: [34],
+            orderBy: [36],
             __typename: [3],
         },
+        OrderByInput: {
+            field: [3],
+            order: [37],
+            __typename: [3],
+        },
+        OrderEnum: {},
         ProjectIntegrationProjectUsersRolesInput: {
             projectId: [3],
             __typename: [3],
@@ -337,14 +310,41 @@ export default {
             projectId: [3],
             __typename: [3],
         },
-        TaskIntegrationTasksInput: {
+        GetUsersInput: {
             curPage: [1],
             perPage: [1],
+            orderBy: [36],
+            filter: [43],
             __typename: [3],
         },
-        TaskIntegrationTasksOfCurrentUserInput: {
+        GetUsersFilterInput: {
+            email: [3],
+            firstname: [3],
+            lastname: [3],
+            role: [3],
+            status: [10],
+            __typename: [3],
+        },
+        GetRolesInput: {
             curPage: [1],
             perPage: [1],
+            filter: [45],
+            __typename: [3],
+        },
+        GetRolesFilterInput: {
+            name: [3],
+            __typename: [3],
+        },
+        GetUserInput: {
+            userId: [5],
+            __typename: [3],
+        },
+        GetNotificationsInput: {
+            userId: [3],
+            cursor: [3],
+            take: [1],
+            type: [15],
+            seen: [6],
             __typename: [3],
         },
         GetFileInput: {
@@ -352,112 +352,112 @@ export default {
             __typename: [3],
         },
         Mutation: {
-            updateRole: [
-                6,
-                {
-                    input: [50, 'UpdateRoleInput!'],
-                },
-            ],
-            changeUserRole: [
-                6,
-                {
-                    input: [51, 'ChangeUserRoleInput!'],
-                },
-            ],
-            createRole: [
-                6,
-                {
-                    input: [52, 'CreateRoleInput!'],
-                },
-            ],
-            deleteRole: [
-                6,
-                {
-                    input: [53, 'DeleteRoleInput!'],
-                },
-            ],
-            changePermissions: [
-                6,
-                {
-                    input: [54, 'ChangePermissionsInput!'],
-                },
-            ],
-            updateUser: [
-                6,
-                {
-                    input: [56, 'UpdateUserInput!'],
-                },
-            ],
-            signIn: [
-                26,
-                {
-                    input: [57, 'SignInInput!'],
-                },
-            ],
-            refreshToken: [
-                26,
-                {
-                    input: [58, 'RefreshTokenInput!'],
-                },
-            ],
-            createUser: [
-                22,
-                {
-                    input: [59, 'CreateUserInput!'],
-                },
-            ],
-            deleteUser: [
-                6,
-                {
-                    input: [60, 'DeleteUserInput!'],
-                },
-            ],
-            completeSignIn: [
-                26,
-                {
-                    input: [61, 'CompleteSignInInput!'],
-                },
-            ],
-            changeMyNotificationPreferences: [
-                6,
-                {
-                    input: [62, 'ChangeMyNotificationPreferences!'],
-                },
-            ],
-            markAsSeen: [
-                6,
-                {
-                    input: [63, 'MarkAsSeenInput!'],
-                },
-            ],
-            markAllAsSeen: [
-                6,
-                {
-                    input: [64, 'MarkAllAsSeenInput!'],
-                },
-            ],
-            createProject: [
-                3,
-                {
-                    input: [65, 'ProjectIntegrationCreateProjectInput!'],
-                },
-            ],
-            updateProject: [
-                3,
-                {
-                    input: [67, 'ProjectIntegrationProjectUpdateInput!'],
-                },
-            ],
             createTask: [
                 3,
                 {
-                    input: [68, 'TaskIntegrationTaskCreateInput!'],
+                    input: [50, 'TaskIntegrationTaskCreateInput!'],
                 },
             ],
             updateTask: [
                 3,
                 {
-                    input: [69, 'TaskIntegrationTaskUpdateInput!'],
+                    input: [51, 'TaskIntegrationTaskUpdateInput!'],
+                },
+            ],
+            createProject: [
+                3,
+                {
+                    input: [52, 'ProjectIntegrationCreateProjectInput!'],
+                },
+            ],
+            updateProject: [
+                3,
+                {
+                    input: [54, 'ProjectIntegrationProjectUpdateInput!'],
+                },
+            ],
+            updateRole: [
+                6,
+                {
+                    input: [55, 'UpdateRoleInput!'],
+                },
+            ],
+            changeUserRole: [
+                6,
+                {
+                    input: [56, 'ChangeUserRoleInput!'],
+                },
+            ],
+            createRole: [
+                6,
+                {
+                    input: [57, 'CreateRoleInput!'],
+                },
+            ],
+            deleteRole: [
+                6,
+                {
+                    input: [58, 'DeleteRoleInput!'],
+                },
+            ],
+            changePermissions: [
+                6,
+                {
+                    input: [59, 'ChangePermissionsInput!'],
+                },
+            ],
+            updateUser: [
+                6,
+                {
+                    input: [61, 'UpdateUserInput!'],
+                },
+            ],
+            signIn: [
+                13,
+                {
+                    input: [62, 'SignInInput!'],
+                },
+            ],
+            refreshToken: [
+                13,
+                {
+                    input: [63, 'RefreshTokenInput!'],
+                },
+            ],
+            createUser: [
+                9,
+                {
+                    input: [64, 'CreateUserInput!'],
+                },
+            ],
+            deleteUser: [
+                6,
+                {
+                    input: [65, 'DeleteUserInput!'],
+                },
+            ],
+            completeSignIn: [
+                13,
+                {
+                    input: [66, 'CompleteSignInInput!'],
+                },
+            ],
+            changeMyNotificationPreferences: [
+                6,
+                {
+                    input: [67, 'ChangeMyNotificationPreferences!'],
+                },
+            ],
+            markAsSeen: [
+                6,
+                {
+                    input: [68, 'MarkAsSeenInput!'],
+                },
+            ],
+            markAllAsSeen: [
+                6,
+                {
+                    input: [69, 'MarkAllAsSeenInput!'],
                 },
             ],
             uploadFile: [
@@ -466,110 +466,6 @@ export default {
                     input: [70, 'UploadFileInput!'],
                 },
             ],
-            __typename: [3],
-        },
-        UpdateRoleInput: {
-            roleId: [19],
-            name: [3],
-            superuser: [6],
-            editable: [6],
-            __typename: [3],
-        },
-        ChangeUserRoleInput: {
-            userId: [19],
-            roleName: [3],
-            __typename: [3],
-        },
-        CreateRoleInput: {
-            name: [3],
-            __typename: [3],
-        },
-        DeleteRoleInput: {
-            roleId: [19],
-            __typename: [3],
-        },
-        ChangePermissionsInput: {
-            roleId: [19],
-            permissions: [55],
-            __typename: [3],
-        },
-        PermissionInput: {
-            methodId: [19],
-            allow: [6],
-            __typename: [3],
-        },
-        UpdateUserInput: {
-            userId: [19],
-            email: [3],
-            firstname: [3],
-            lastname: [3],
-            password: [3],
-            role: [3],
-            status: [23],
-            __typename: [3],
-        },
-        SignInInput: {
-            email: [3],
-            password: [3],
-            __typename: [3],
-        },
-        RefreshTokenInput: {
-            refreshToken: [3],
-            __typename: [3],
-        },
-        CreateUserInput: {
-            email: [3],
-            firstname: [3],
-            lastname: [3],
-            roleName: [3],
-            __typename: [3],
-        },
-        DeleteUserInput: {
-            userId: [19],
-            __typename: [3],
-        },
-        CompleteSignInInput: {
-            userId: [19],
-            code: [3],
-            password: [3],
-            __typename: [3],
-        },
-        ChangeMyNotificationPreferences: {
-            emailEnabled: [6],
-            email: [3],
-            webEnabled: [6],
-            telegramEnabled: [6],
-            telegramAccount: [1],
-            __typename: [3],
-        },
-        MarkAsSeenInput: {
-            notificationId: [3],
-            __typename: [3],
-        },
-        MarkAllAsSeenInput: {
-            type: [28],
-            __typename: [3],
-        },
-        ProjectIntegrationCreateProjectInput: {
-            name: [3],
-            budget: [1],
-            deadline: [1],
-            description: [3],
-            members: [66],
-            __typename: [3],
-        },
-        ProjectIntegrationCreateProjectMemberInput: {
-            userId: [3],
-            roleCode: [3],
-            __typename: [3],
-        },
-        ProjectIntegrationProjectUpdateInput: {
-            id: [3],
-            version: [1],
-            name: [3],
-            description: [3],
-            budget: [1],
-            deadline: [1],
             __typename: [3],
         },
         TaskIntegrationTaskCreateInput: {
@@ -599,13 +495,117 @@ export default {
             taskTagIds: [3],
             __typename: [3],
         },
+        ProjectIntegrationCreateProjectInput: {
+            name: [3],
+            budget: [1],
+            deadline: [1],
+            description: [3],
+            members: [53],
+            __typename: [3],
+        },
+        ProjectIntegrationCreateProjectMemberInput: {
+            userId: [3],
+            roleCode: [3],
+            __typename: [3],
+        },
+        ProjectIntegrationProjectUpdateInput: {
+            id: [3],
+            version: [1],
+            name: [3],
+            description: [3],
+            budget: [1],
+            deadline: [1],
+            __typename: [3],
+        },
+        UpdateRoleInput: {
+            roleId: [5],
+            name: [3],
+            superuser: [6],
+            editable: [6],
+            __typename: [3],
+        },
+        ChangeUserRoleInput: {
+            userId: [5],
+            roleName: [3],
+            __typename: [3],
+        },
+        CreateRoleInput: {
+            name: [3],
+            __typename: [3],
+        },
+        DeleteRoleInput: {
+            roleId: [5],
+            __typename: [3],
+        },
+        ChangePermissionsInput: {
+            roleId: [5],
+            permissions: [60],
+            __typename: [3],
+        },
+        PermissionInput: {
+            methodId: [5],
+            allow: [6],
+            __typename: [3],
+        },
+        UpdateUserInput: {
+            userId: [5],
+            email: [3],
+            firstname: [3],
+            lastname: [3],
+            password: [3],
+            role: [3],
+            status: [10],
+            __typename: [3],
+        },
+        SignInInput: {
+            email: [3],
+            password: [3],
+            __typename: [3],
+        },
+        RefreshTokenInput: {
+            refreshToken: [3],
+            __typename: [3],
+        },
+        CreateUserInput: {
+            email: [3],
+            firstname: [3],
+            lastname: [3],
+            roleName: [3],
+            __typename: [3],
+        },
+        DeleteUserInput: {
+            userId: [5],
+            __typename: [3],
+        },
+        CompleteSignInInput: {
+            userId: [5],
+            code: [3],
+            password: [3],
+            __typename: [3],
+        },
+        ChangeMyNotificationPreferences: {
+            emailEnabled: [6],
+            email: [3],
+            webEnabled: [6],
+            telegramEnabled: [6],
+            telegramAccount: [1],
+            __typename: [3],
+        },
+        MarkAsSeenInput: {
+            notificationId: [3],
+            __typename: [3],
+        },
+        MarkAllAsSeenInput: {
+            type: [15],
+            __typename: [3],
+        },
         UploadFileInput: {
             file: [71],
             __typename: [3],
         },
         Upload: {},
         Subscription: {
-            onNewNotification: [31],
+            onNewNotification: [18],
             __typename: [3],
         },
     },
