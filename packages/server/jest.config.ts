@@ -10,8 +10,7 @@ export default {
         ],
     },
     transformIgnorePatterns: [
-        '.*volt/node_modules/packages/server/(?!(@apollo)|(execa)|(human-signals)|(graphql-request)/.*)',
-        '.*volt/node_modules/(?!(@apollo)/.*)',
+        '.*volt/node_modules/(?!(@apollo)|(execa)|(human-signals)/.*)',
     ],
     moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/packages/server',

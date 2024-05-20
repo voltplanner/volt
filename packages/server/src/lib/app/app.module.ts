@@ -17,7 +17,7 @@ import { NotificationsIntegration } from '../integrations/notifications.integrat
 import { ProjectIntegrationResolver } from '../integrations/project/project-integration.resolver'
 import { TaskIntegrationResolver } from '../integrations/task/task-integration.resolver'
 import { TaskCommentIntegrationResolver } from '../integrations/task-comment/task-comment-integration.resolver'
-import { TaskEffortIntegrationResolver } from '../integrations/task-effort/task-effort-integration.resolver'
+import { TaskEffortIntegrationResolver } from '../integrations/task-effort/task-comment-integration.resolver'
 import { AuthModule } from '../modules/auth/auth.module'
 import { AUTH_LISTENER } from '../modules/auth/configs/auth-events.config'
 import { FilesModule } from '../modules/files/files.module'

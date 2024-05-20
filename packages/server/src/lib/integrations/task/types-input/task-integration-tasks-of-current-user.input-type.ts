@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql'
 
 @InputType()
-export class TaskIntegrationMyTasksInput {
+export class TaskIntegrationTasksOfCurrentUserInput {
     @Field(() => String, { nullable: true })
     projectId?: string | null
 

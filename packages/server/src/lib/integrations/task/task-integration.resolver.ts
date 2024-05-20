@@ -11,13 +11,13 @@ import {
     PrismaServiceWithExtentionsType,
 } from '../../shared/prisma'
 import { TaskIntegrationTaskInput } from './types-input/task-integration-task.input-type'
-import { TaskIntegrationCreateTaskInput } from './types-input/task-integration-task-create.input-type'
-import { TaskIntegrationUpdateTaskInput } from './types-input/task-integration-task-update.input-type'
+import { TaskIntegrationTaskCreateInput } from './types-input/task-integration-task-create.input-type'
+import { TaskIntegrationTaskUpdateInput } from './types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from './types-input/task-integration-tasks.input-type'
-import { TaskIntegrationMyTasksInput } from './types-input/task-integration-tasks-of-current-user.input-type'
+import { TaskIntegrationTasksOfCurrentUserInput } from './types-input/task-integration-tasks-of-current-user.input-type'
 import { TaskIntegrationTaskObject } from './types-object/task-integration-task.object-type'
 import { TaskIntegrationTasksOutput } from './types-output/task-integration-tasks.output-type'
-import { TaskIntegrationMyTasksOutput } from './types-output/task-integration-tasks-of-current-user.output-type'
+import { TaskIntegrationTasksOfCurrentUserOutput } from './types-output/task-integration-tasks-of-current-user.output-type'
 
 @Resolver()
 export class TaskIntegrationResolver {
@@ -30,9 +30,9 @@ export class TaskIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async createTask(
+    async taskCreate(
         @CurrentUser() { userId }: CurrentUserPayload,
-        @Args('input') input: TaskIntegrationCreateTaskInput,
+        @Args('input') input: TaskIntegrationTaskCreateInput,
     ): Promise<string> {
         const {
             projectId,
@@ -80,7 +80,7 @@ export class TaskIntegrationResolver {
     }
 
     @Mutation(() => String)
-    async updateTask(@Args('input') input: TaskIntegrationUpdateTaskInput) {
+    async taskUpdate(@Args('input') input: TaskIntegrationTaskUpdateInput) {
         return await this._taskService.update(input)
     }
 
@@ -206,12 +206,12 @@ export class TaskIntegrationResolver {
     }
 
     @UseGuards(ACLGuard)
-    @Query(() => TaskIntegrationMyTasksOutput)
-    async myTasks(
+    @Query(() => TaskIntegrationTasksOfCurrentUserOutput)
+    async tasksOfCurrentUser(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input', { nullable: true })
-        input?: TaskIntegrationMyTasksInput | null,
-    ): Promise<TaskIntegrationMyTasksOutput> {
+        input?: TaskIntegrationTasksOfCurrentUserInput | null,
+    ): Promise<TaskIntegrationTasksOfCurrentUserOutput> {
         const { projectId, curPage, perPage } = input || {}
 
         const { data, meta } = await this._taskService.findMany({

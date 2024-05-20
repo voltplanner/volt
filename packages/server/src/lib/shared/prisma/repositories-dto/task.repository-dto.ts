@@ -1,6 +1,6 @@
 import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 
-export type CreateTaskRepositoryDto = {
+export type TaskCreateRepositoryDto = {
     name: string
     description?: string
     estimatedDateEnd?: Date
@@ -16,7 +16,7 @@ export type CreateTaskRepositoryDto = {
     tagIds?: string[]
 }
 
-export type UpdateTaskRepositoryDto = {
+export type TaskUpdateRepositoryDto = {
     id: string
     version: number
 
@@ -31,7 +31,7 @@ export type UpdateTaskRepositoryDto = {
     assignedToId?: string
 }
 
-export type DeleteTaskRepositoryDto = {
+export type TaskDeleteRepositoryDto = {
     id: string
 }
 

@@ -144,61 +144,10 @@ export interface TaskIntegrationTasksOutput {
     __typename: 'TaskIntegrationTasksOutput'
 }
 
-export interface TaskIntegrationMyTasksOutput {
+export interface TaskIntegrationTasksOfCurrentUserOutput {
     data: TaskIntegrationTaskObject[]
     meta: PaginatedMetaType
-    __typename: 'TaskIntegrationMyTasksOutput'
-}
-
-export interface TaskCommentIntegrationUserObject {
-    id: Scalars['String']
-    firstname: Scalars['String']
-    lastname: Scalars['String']
-    __typename: 'TaskCommentIntegrationUserObject'
-}
-
-export interface TaskCommentIntegrationCommentObject {
-    id: Scalars['String']
-    text: Scalars['String']
-    taskId: Scalars['String']
-    user: TaskCommentIntegrationUserObject
-    isCanUpdate: Scalars['Boolean']
-    isCanDelete: Scalars['Boolean']
-    createdAt: Scalars['Float']
-    updatedAt: Scalars['Float']
-    __typename: 'TaskCommentIntegrationCommentObject'
-}
-
-export interface TaskCommentIntegrationCommentsOutput {
-    data: TaskCommentIntegrationCommentObject[]
-    meta: PaginatedMetaType
-    __typename: 'TaskCommentIntegrationCommentsOutput'
-}
-
-export interface TaskEffortIntegrationUserObject {
-    id: Scalars['String']
-    firstname: Scalars['String']
-    lastname: Scalars['String']
-    __typename: 'TaskEffortIntegrationUserObject'
-}
-
-export interface TaskEffortIntegrationEffortObject {
-    id: Scalars['String']
-    value: Scalars['Float']
-    description: Scalars['String']
-    taskId: Scalars['String']
-    user: TaskEffortIntegrationUserObject
-    isCanUpdate: Scalars['Boolean']
-    isCanDelete: Scalars['Boolean']
-    createdAt: Scalars['Float']
-    updatedAt: Scalars['Float']
-    __typename: 'TaskEffortIntegrationEffortObject'
-}
-
-export interface TaskEffortIntegrationEffortsOutput {
-    data: TaskEffortIntegrationEffortObject[]
-    meta: PaginatedMetaType
-    __typename: 'TaskEffortIntegrationEffortsOutput'
+    __typename: 'TaskIntegrationTasksOfCurrentUserOutput'
 }
 
 export interface MethodsType {
@@ -307,10 +256,8 @@ export interface Query {
     projectTasksRelations: ProjectIntegrationTasksRelationObject[]
     task: TaskIntegrationTaskObject
     tasks: TaskIntegrationTasksOutput
-    myTasks: TaskIntegrationMyTasksOutput
+    tasksOfCurrentUser: TaskIntegrationTasksOfCurrentUserOutput
     getFile: Scalars['String']
-    taskComments: TaskCommentIntegrationCommentsOutput
-    taskEfforts: TaskEffortIntegrationEffortsOutput
     __typename: 'Query'
 }
 
@@ -333,15 +280,9 @@ export interface Mutation {
     markAllAsSeen: Scalars['Boolean']
     createProject: Scalars['String']
     updateProject: Scalars['String']
-    createTask: Scalars['String']
-    updateTask: Scalars['String']
+    taskCreate: Scalars['String']
+    taskUpdate: Scalars['String']
     uploadFile: Scalars['String']
-    createTaskComment: Scalars['String']
-    updateTaskComment: Scalars['String']
-    deleteTaskComment: Scalars['String']
-    createTaskEffort: Scalars['String']
-    updateTaskEffort: Scalars['String']
-    deleteTaskEffort: Scalars['String']
     __typename: 'Mutation'
 }
 
@@ -498,65 +439,8 @@ export interface TaskIntegrationTasksOutputGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface TaskIntegrationMyTasksOutputGenqlSelection {
+export interface TaskIntegrationTasksOfCurrentUserOutputGenqlSelection {
     data?: TaskIntegrationTaskObjectGenqlSelection
-    meta?: PaginatedMetaTypeGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TaskCommentIntegrationUserObjectGenqlSelection {
-    id?: boolean | number
-    firstname?: boolean | number
-    lastname?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TaskCommentIntegrationCommentObjectGenqlSelection {
-    id?: boolean | number
-    text?: boolean | number
-    taskId?: boolean | number
-    user?: TaskCommentIntegrationUserObjectGenqlSelection
-    isCanUpdate?: boolean | number
-    isCanDelete?: boolean | number
-    createdAt?: boolean | number
-    updatedAt?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TaskCommentIntegrationCommentsOutputGenqlSelection {
-    data?: TaskCommentIntegrationCommentObjectGenqlSelection
-    meta?: PaginatedMetaTypeGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TaskEffortIntegrationUserObjectGenqlSelection {
-    id?: boolean | number
-    firstname?: boolean | number
-    lastname?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TaskEffortIntegrationEffortObjectGenqlSelection {
-    id?: boolean | number
-    value?: boolean | number
-    description?: boolean | number
-    taskId?: boolean | number
-    user?: TaskEffortIntegrationUserObjectGenqlSelection
-    isCanUpdate?: boolean | number
-    isCanDelete?: boolean | number
-    createdAt?: boolean | number
-    updatedAt?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface TaskEffortIntegrationEffortsOutputGenqlSelection {
-    data?: TaskEffortIntegrationEffortObjectGenqlSelection
     meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
@@ -698,16 +582,10 @@ export interface QueryGenqlSelection {
     tasks?: TaskIntegrationTasksOutputGenqlSelection & {
         __args?: { input?: TaskIntegrationTasksInput | null }
     }
-    myTasks?: TaskIntegrationMyTasksOutputGenqlSelection & {
-        __args?: { input?: TaskIntegrationMyTasksInput | null }
+    tasksOfCurrentUser?: TaskIntegrationTasksOfCurrentUserOutputGenqlSelection & {
+        __args?: { input?: TaskIntegrationTasksOfCurrentUserInput | null }
     }
     getFile?: { __args: { input: GetFileInput } }
-    taskComments?: TaskCommentIntegrationCommentsOutputGenqlSelection & {
-        __args: { input: TaskCommentIntegrationCommentsInput }
-    }
-    taskEfforts?: TaskEffortIntegrationEffortsOutputGenqlSelection & {
-        __args?: { input?: TaskEffortIntegrationEffortsInput | null }
-    }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -818,7 +696,7 @@ export interface TaskIntegrationTasksFilterByInput {
     createdAtTo?: Scalars['Float'] | null
 }
 
-export interface TaskIntegrationMyTasksInput {
+export interface TaskIntegrationTasksOfCurrentUserInput {
     projectId?: Scalars['String'] | null
     curPage?: Scalars['Float'] | null
     perPage?: Scalars['Float'] | null
@@ -826,18 +704,6 @@ export interface TaskIntegrationMyTasksInput {
 
 export interface GetFileInput {
     id: Scalars['String']
-}
-
-export interface TaskCommentIntegrationCommentsInput {
-    taskId: Scalars['String']
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
-}
-
-export interface TaskEffortIntegrationEffortsInput {
-    taskId?: Scalars['String'] | null
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
 }
 
 export interface MutationGenqlSelection {
@@ -865,27 +731,9 @@ export interface MutationGenqlSelection {
     markAllAsSeen?: { __args: { input: MarkAllAsSeenInput } }
     createProject?: { __args: { input: ProjectIntegrationCreateProjectInput } }
     updateProject?: { __args: { input: ProjectIntegrationProjectUpdateInput } }
-    createTask?: { __args: { input: TaskIntegrationCreateTaskInput } }
-    updateTask?: { __args: { input: TaskIntegrationUpdateTaskInput } }
+    taskCreate?: { __args: { input: TaskIntegrationTaskCreateInput } }
+    taskUpdate?: { __args: { input: TaskIntegrationTaskUpdateInput } }
     uploadFile?: { __args: { input: UploadFileInput } }
-    createTaskComment?: {
-        __args: { input: TaskCommentIntegrationCommentCreateInput }
-    }
-    updateTaskComment?: {
-        __args: { input: TaskCommentIntegrationCommentUpdateInput }
-    }
-    deleteTaskComment?: {
-        __args: { input: TaskCommentIntegrationCommentDeleteInput }
-    }
-    createTaskEffort?: {
-        __args: { input: TaskEffortIntegrationEffortCreateInput }
-    }
-    updateTaskEffort?: {
-        __args: { input: TaskEffortIntegrationEffortUpdateInput }
-    }
-    deleteTaskEffort?: {
-        __args: { input: TaskEffortIntegrationEffortDeleteInput }
-    }
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -975,10 +823,10 @@ export interface MarkAllAsSeenInput {
 export interface ProjectIntegrationCreateProjectInput {
     name: Scalars['String']
     /** Budget of the project in hours */
-    budget?: Scalars['Float'] | null
+    budget: Scalars['Float']
     /** Deadline of the project in timestampMs */
-    deadline?: Scalars['Float'] | null
-    description?: Scalars['String'] | null
+    deadline: Scalars['Float']
+    description: Scalars['String']
     members?: ProjectIntegrationCreateProjectMemberInput[] | null
 }
 
@@ -996,7 +844,7 @@ export interface ProjectIntegrationProjectUpdateInput {
     deadline?: Scalars['Float'] | null
 }
 
-export interface TaskIntegrationCreateTaskInput {
+export interface TaskIntegrationTaskCreateInput {
     projectId: Scalars['String']
     name: Scalars['String']
     statusId: Scalars['String']
@@ -1009,7 +857,7 @@ export interface TaskIntegrationCreateTaskInput {
     tagIds?: Scalars['String'][] | null
 }
 
-export interface TaskIntegrationUpdateTaskInput {
+export interface TaskIntegrationTaskUpdateInput {
     id: Scalars['String']
     version: Scalars['Float']
     name?: Scalars['String'] | null
@@ -1025,36 +873,6 @@ export interface TaskIntegrationUpdateTaskInput {
 
 export interface UploadFileInput {
     file: Scalars['Upload']
-}
-
-export interface TaskCommentIntegrationCommentCreateInput {
-    taskId: Scalars['String']
-    text: Scalars['String']
-}
-
-export interface TaskCommentIntegrationCommentUpdateInput {
-    id: Scalars['String']
-    text: Scalars['String']
-}
-
-export interface TaskCommentIntegrationCommentDeleteInput {
-    id: Scalars['String']
-}
-
-export interface TaskEffortIntegrationEffortCreateInput {
-    taskId: Scalars['String']
-    value: Scalars['Float']
-    description: Scalars['String']
-}
-
-export interface TaskEffortIntegrationEffortUpdateInput {
-    id: Scalars['String']
-    value: Scalars['Float']
-    description: Scalars['String']
-}
-
-export interface TaskEffortIntegrationEffortDeleteInput {
-    id: Scalars['String']
 }
 
 export interface SubscriptionGenqlSelection {
@@ -1281,105 +1099,17 @@ export const isTaskIntegrationTasksOutput = (
     return TaskIntegrationTasksOutput_possibleTypes.includes(obj.__typename)
 }
 
-const TaskIntegrationMyTasksOutput_possibleTypes: string[] = [
-    'TaskIntegrationMyTasksOutput',
+const TaskIntegrationTasksOfCurrentUserOutput_possibleTypes: string[] = [
+    'TaskIntegrationTasksOfCurrentUserOutput',
 ]
-export const isTaskIntegrationMyTasksOutput = (
+export const isTaskIntegrationTasksOfCurrentUserOutput = (
     obj?: { __typename?: any } | null,
-): obj is TaskIntegrationMyTasksOutput => {
+): obj is TaskIntegrationTasksOfCurrentUserOutput => {
     if (!obj?.__typename)
         throw new Error(
-            '__typename is missing in "isTaskIntegrationMyTasksOutput"',
+            '__typename is missing in "isTaskIntegrationTasksOfCurrentUserOutput"',
         )
-    return TaskIntegrationMyTasksOutput_possibleTypes.includes(obj.__typename)
-}
-
-const TaskCommentIntegrationUserObject_possibleTypes: string[] = [
-    'TaskCommentIntegrationUserObject',
-]
-export const isTaskCommentIntegrationUserObject = (
-    obj?: { __typename?: any } | null,
-): obj is TaskCommentIntegrationUserObject => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isTaskCommentIntegrationUserObject"',
-        )
-    return TaskCommentIntegrationUserObject_possibleTypes.includes(
-        obj.__typename,
-    )
-}
-
-const TaskCommentIntegrationCommentObject_possibleTypes: string[] = [
-    'TaskCommentIntegrationCommentObject',
-]
-export const isTaskCommentIntegrationCommentObject = (
-    obj?: { __typename?: any } | null,
-): obj is TaskCommentIntegrationCommentObject => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isTaskCommentIntegrationCommentObject"',
-        )
-    return TaskCommentIntegrationCommentObject_possibleTypes.includes(
-        obj.__typename,
-    )
-}
-
-const TaskCommentIntegrationCommentsOutput_possibleTypes: string[] = [
-    'TaskCommentIntegrationCommentsOutput',
-]
-export const isTaskCommentIntegrationCommentsOutput = (
-    obj?: { __typename?: any } | null,
-): obj is TaskCommentIntegrationCommentsOutput => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isTaskCommentIntegrationCommentsOutput"',
-        )
-    return TaskCommentIntegrationCommentsOutput_possibleTypes.includes(
-        obj.__typename,
-    )
-}
-
-const TaskEffortIntegrationUserObject_possibleTypes: string[] = [
-    'TaskEffortIntegrationUserObject',
-]
-export const isTaskEffortIntegrationUserObject = (
-    obj?: { __typename?: any } | null,
-): obj is TaskEffortIntegrationUserObject => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isTaskEffortIntegrationUserObject"',
-        )
-    return TaskEffortIntegrationUserObject_possibleTypes.includes(
-        obj.__typename,
-    )
-}
-
-const TaskEffortIntegrationEffortObject_possibleTypes: string[] = [
-    'TaskEffortIntegrationEffortObject',
-]
-export const isTaskEffortIntegrationEffortObject = (
-    obj?: { __typename?: any } | null,
-): obj is TaskEffortIntegrationEffortObject => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isTaskEffortIntegrationEffortObject"',
-        )
-    return TaskEffortIntegrationEffortObject_possibleTypes.includes(
-        obj.__typename,
-    )
-}
-
-const TaskEffortIntegrationEffortsOutput_possibleTypes: string[] = [
-    'TaskEffortIntegrationEffortsOutput',
-]
-export const isTaskEffortIntegrationEffortsOutput = (
-    obj?: { __typename?: any } | null,
-): obj is TaskEffortIntegrationEffortsOutput => {
-    if (!obj?.__typename)
-        throw new Error(
-            '__typename is missing in "isTaskEffortIntegrationEffortsOutput"',
-        )
-    return TaskEffortIntegrationEffortsOutput_possibleTypes.includes(
+    return TaskIntegrationTasksOfCurrentUserOutput_possibleTypes.includes(
         obj.__typename,
     )
 }

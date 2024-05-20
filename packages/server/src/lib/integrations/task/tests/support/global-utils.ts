@@ -6,10 +6,10 @@ import { ProjectIntegrationProjectTasksRelationsInput } from '../../../project/t
 import { ProjectIntegrationProjectTasksStatusesInput } from '../../../project/types-input/project-integration-project-tasks-statuses.input-type'
 import { ProjectIntegrationProjectTasksTagsInput } from '../../../project/types-input/project-integration-project-tasks-tags.input-type'
 import { TaskIntegrationTaskInput } from '../../types-input/task-integration-task.input-type'
-import { TaskIntegrationCreateTaskInput } from '../../types-input/task-integration-task-create.input-type'
-import { TaskIntegrationUpdateTaskInput } from '../../types-input/task-integration-task-update.input-type'
+import { TaskIntegrationTaskCreateInput } from '../../types-input/task-integration-task-create.input-type'
+import { TaskIntegrationTaskUpdateInput } from '../../types-input/task-integration-task-update.input-type'
 import { TaskIntegrationTasksInput } from '../../types-input/task-integration-tasks.input-type'
-import { TaskIntegrationMyTasksInput } from '../../types-input/task-integration-tasks-of-current-user.input-type'
+import { TaskIntegrationTasksOfCurrentUserInput } from '../../types-input/task-integration-tasks-of-current-user.input-type'
 import { TaskIntegrationTaskObject } from '../../types-object/task-integration-task.object-type'
 import { TaskIntegrationTasksOutput } from '../../types-output/task-integration-tasks.output-type'
 import { setup } from './global-setup'
@@ -22,15 +22,15 @@ export class GlobalUtils {
 
     constructor(private readonly _setup: Awaited<ReturnType<typeof setup>>) {}
 
-    async gqlCreateTask(
-        dto: TaskIntegrationCreateTaskInput,
+    async gqlTaskCreate(
+        dto: TaskIntegrationTaskCreateInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-            mutation createTask(
-                $createTaskInput: TaskIntegrationCreateTaskInput!
+            mutation taskCreate(
+                $taskCreateInput: TaskIntegrationTaskCreateInput!
             ) {
-                createTask(input: $createTaskInput)
+                taskCreate(input: $taskCreateInput)
             }
         `
 
@@ -38,7 +38,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                createTaskInput: dto,
+                taskCreateInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,
@@ -46,15 +46,15 @@ export class GlobalUtils {
         )
     }
 
-    async gqlUpdateTask(
-        dto: TaskIntegrationUpdateTaskInput,
+    async gqlTaskUpdate(
+        dto: TaskIntegrationTaskUpdateInput,
         accessToken: string,
-    ): Promise<{ updateTask: string }> {
+    ): Promise<{ taskUpdate: string }> {
         const doc = gql`
-            mutation updateTask(
-                $updateTaskInput: TaskIntegrationUpdateTaskInput!
+            mutation taskUpdate(
+                $taskUpdateInput: TaskIntegrationTaskUpdateInput!
             ) {
-                updateTask(input: $updateTaskInput)
+                taskUpdate(input: $taskUpdateInput)
             }
         `
 
@@ -62,7 +62,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                updateTaskInput: dto,
+                taskUpdateInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,
@@ -165,13 +165,15 @@ export class GlobalUtils {
         })
     }
 
-    async gqlMyTasks(
-        dto: TaskIntegrationMyTasksInput | undefined | null,
+    async gqlTasksOfCurrentUser(
+        dto: TaskIntegrationTasksOfCurrentUserInput | undefined | null,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-            query myTasks($myTasksInput: TaskIntegrationMyTasksInput) {
-                myTasks(input: $myTasksInput) {
+            query tasksOfCurrentUser(
+                $tasksOfCurrentUserInput: TaskIntegrationTasksOfCurrentUserInput
+            ) {
+                tasksOfCurrentUser(input: $tasksOfCurrentUserInput) {
                     data {
                         id
                         name
@@ -216,7 +218,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                myTasksInput: dto,
+                tasksOfCurrentUserInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,

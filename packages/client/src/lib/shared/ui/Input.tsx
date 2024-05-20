@@ -1,9 +1,5 @@
 import { InputHTMLAttributes, memo, useEffect, useRef, useState } from 'react'
-import {
-    FieldValues,
-    RegisterOptions,
-    UseFormRegister,
-} from 'react-hook-form'
+import { FieldValues, RegisterOptions, UseFormRegister } from 'react-hook-form'
 import styled from 'styled-components'
 
 type HTMLInputProps = Omit<
