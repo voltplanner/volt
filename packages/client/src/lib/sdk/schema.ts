@@ -6,8 +6,8 @@
 export type Scalars = {
     Float: number
     String: string
-    Boolean: boolean
     ID: string
+    Boolean: boolean
     DateTime: any
     Upload: any
 }
@@ -23,6 +23,95 @@ export interface CursorBasedMetaType {
     cursor: Scalars['String']
     take: Scalars['Float']
     __typename: 'CursorBasedMetaType'
+}
+
+export interface MethodsType {
+    id: Scalars['ID']
+    name: Scalars['String']
+    group: Scalars['String']
+    editable: Scalars['Boolean']
+    description: Scalars['String']
+    allowed: Scalars['Boolean']
+    __typename: 'MethodsType'
+}
+
+export interface RoleType {
+    id: Scalars['ID']
+    name: Scalars['String']
+    editable: Scalars['Boolean']
+    superuser: Scalars['Boolean']
+    methods: MethodsType[]
+    __typename: 'RoleType'
+}
+
+export interface PaginatedRoles {
+    data: RoleType[]
+    meta: PaginatedMetaType
+    __typename: 'PaginatedRoles'
+}
+
+export interface UserType {
+    id: Scalars['ID']
+    firstname: Scalars['String']
+    lastname: Scalars['String']
+    email: Scalars['String']
+    status: AuthUserStatusEnum
+    createdAt: Scalars['DateTime']
+    deletedAt: Scalars['DateTime'] | null
+    __typename: 'UserType'
+}
+
+export type AuthUserStatusEnum = 'WAITING_COMPLETE' | 'ACTIVE' | 'BLOCKED'
+
+export interface PaginatedUsers {
+    data: UserType[]
+    meta: PaginatedMetaType
+    __typename: 'PaginatedUsers'
+}
+
+export interface AuthorizationResponse {
+    refreshToken: Scalars['String']
+    accessToken: Scalars['String']
+    userId: Scalars['ID']
+    expiresAt: Scalars['Float']
+    __typename: 'AuthorizationResponse'
+}
+
+export interface GetNotificationData {
+    id: Scalars['String']
+    topic: Scalars['String']
+    message: Scalars['String']
+    link: Scalars['String']
+    type: NotificationTypeEnum
+    sent: Scalars['Boolean']
+    sentAt: Scalars['DateTime']
+    seen: Scalars['Boolean']
+    __typename: 'GetNotificationData'
+}
+
+export type NotificationTypeEnum = 'EMAIL' | 'WEB' | 'TELEGRAM'
+
+export interface GetNotificationsResponse {
+    data: GetNotificationData[]
+    meta: CursorBasedMetaType
+    __typename: 'GetNotificationsResponse'
+}
+
+export interface GetNotificationPreferences {
+    emailEnabled: Scalars['Boolean']
+    email: Scalars['String'] | null
+    webEnabled: Scalars['Boolean']
+    telegramEnabled: Scalars['Boolean']
+    telegramAccount: Scalars['Float'] | null
+    __typename: 'GetNotificationPreferences'
+}
+
+export interface OnNewNotification {
+    userId: Scalars['String']
+    topic: Scalars['String']
+    message: Scalars['String']
+    link: Scalars['String'] | null
+    __typename: 'OnNewNotification'
 }
 
 export interface ProjectIntegrationProjectObject {
@@ -150,102 +239,63 @@ export interface TaskIntegrationTasksOfCurrentUserOutput {
     __typename: 'TaskIntegrationTasksOfCurrentUserOutput'
 }
 
-export interface MethodsType {
-    id: Scalars['ID']
-    name: Scalars['String']
-    group: Scalars['String']
-    editable: Scalars['Boolean']
-    description: Scalars['String']
-    allowed: Scalars['Boolean']
-    __typename: 'MethodsType'
-}
-
-export interface RoleType {
-    id: Scalars['ID']
-    name: Scalars['String']
-    editable: Scalars['Boolean']
-    superuser: Scalars['Boolean']
-    methods: MethodsType[]
-    __typename: 'RoleType'
-}
-
-export interface PaginatedRoles {
-    data: RoleType[]
-    meta: PaginatedMetaType
-    __typename: 'PaginatedRoles'
-}
-
-export interface UserType {
-    id: Scalars['ID']
+export interface TaskCommentIntegrationUserObject {
+    id: Scalars['String']
     firstname: Scalars['String']
     lastname: Scalars['String']
-    email: Scalars['String']
-    status: AuthUserStatusEnum
-    createdAt: Scalars['DateTime']
-    deletedAt: Scalars['DateTime'] | null
-    __typename: 'UserType'
+    __typename: 'TaskCommentIntegrationUserObject'
 }
 
-export type AuthUserStatusEnum = 'WAITING_COMPLETE' | 'ACTIVE' | 'BLOCKED'
-
-export interface PaginatedUsers {
-    data: UserType[]
-    meta: PaginatedMetaType
-    __typename: 'PaginatedUsers'
-}
-
-export interface AuthorizationResponse {
-    refreshToken: Scalars['String']
-    accessToken: Scalars['String']
-    userId: Scalars['ID']
-    expiresAt: Scalars['Float']
-    __typename: 'AuthorizationResponse'
-}
-
-export interface GetNotificationData {
+export interface TaskCommentIntegrationCommentObject {
     id: Scalars['String']
-    topic: Scalars['String']
-    message: Scalars['String']
-    link: Scalars['String']
-    type: NotificationTypeEnum
-    sent: Scalars['Boolean']
-    sentAt: Scalars['DateTime']
-    seen: Scalars['Boolean']
-    __typename: 'GetNotificationData'
+    text: Scalars['String']
+    taskId: Scalars['String']
+    user: TaskCommentIntegrationUserObject
+    isCanUpdate: Scalars['Boolean']
+    isCanDelete: Scalars['Boolean']
+    createdAt: Scalars['Float']
+    updatedAt: Scalars['Float']
+    __typename: 'TaskCommentIntegrationCommentObject'
 }
 
-export type NotificationTypeEnum = 'EMAIL' | 'WEB' | 'TELEGRAM'
-
-export interface GetNotificationsResponse {
-    data: GetNotificationData[]
-    meta: CursorBasedMetaType
-    __typename: 'GetNotificationsResponse'
+export interface TaskCommentIntegrationCommentsOutput {
+    data: TaskCommentIntegrationCommentObject[]
+    meta: PaginatedMetaType
+    __typename: 'TaskCommentIntegrationCommentsOutput'
 }
 
-export interface GetNotificationPreferences {
-    emailEnabled: Scalars['Boolean']
-    email: Scalars['String'] | null
-    webEnabled: Scalars['Boolean']
-    telegramEnabled: Scalars['Boolean']
-    telegramAccount: Scalars['Float'] | null
-    __typename: 'GetNotificationPreferences'
+export interface TaskEffortIntegrationUserObject {
+    id: Scalars['String']
+    firstname: Scalars['String']
+    lastname: Scalars['String']
+    __typename: 'TaskEffortIntegrationUserObject'
 }
 
-export interface OnNewNotification {
-    userId: Scalars['String']
-    topic: Scalars['String']
-    message: Scalars['String']
-    link: Scalars['String'] | null
-    __typename: 'OnNewNotification'
+export interface TaskEffortIntegrationEffortObject {
+    id: Scalars['String']
+    value: Scalars['Float']
+    description: Scalars['String']
+    taskId: Scalars['String']
+    user: TaskEffortIntegrationUserObject
+    isCanUpdate: Scalars['Boolean']
+    isCanDelete: Scalars['Boolean']
+    createdAt: Scalars['Float']
+    updatedAt: Scalars['Float']
+    __typename: 'TaskEffortIntegrationEffortObject'
+}
+
+export interface TaskEffortIntegrationEffortsOutput {
+    data: TaskEffortIntegrationEffortObject[]
+    meta: PaginatedMetaType
+    __typename: 'TaskEffortIntegrationEffortsOutput'
 }
 
 export interface Query {
-    getUsers: PaginatedUsers
-    getRoles: PaginatedRoles
-    getMyRole: RoleType
-    getUser: UserType
-    getMyNotificationPreferences: GetNotificationPreferences
-    getMyNotifications: GetNotificationsResponse[]
+    task: TaskIntegrationTaskObject
+    tasks: TaskIntegrationTasksOutput
+    tasksOfCurrentUser: TaskIntegrationTasksOfCurrentUserOutput
+    taskComments: TaskCommentIntegrationCommentsOutput
+    taskEfforts: TaskEffortIntegrationEffortsOutput
     project: ProjectIntegrationProjectObject
     projects: ProjectIntegrationProjectsOutput
     projectsOfCurrentUser: ProjectIntegrationProjectsOfCurrentUserOutput
@@ -254,9 +304,12 @@ export interface Query {
     projectTasksTags: ProjectIntegrationTasksTagObject[]
     projectTasksStatuses: ProjectIntegrationTasksStatusObject[]
     projectTasksRelations: ProjectIntegrationTasksRelationObject[]
-    task: TaskIntegrationTaskObject
-    tasks: TaskIntegrationTasksOutput
-    tasksOfCurrentUser: TaskIntegrationTasksOfCurrentUserOutput
+    getUsers: PaginatedUsers
+    getRoles: PaginatedRoles
+    getMyRole: RoleType
+    getUser: UserType
+    getMyNotificationPreferences: GetNotificationPreferences
+    getMyNotifications: GetNotificationsResponse[]
     getFile: Scalars['String']
     __typename: 'Query'
 }
@@ -264,6 +317,16 @@ export interface Query {
 export type OrderEnum = 'ASC' | 'DESC'
 
 export interface Mutation {
+    taskCreate: Scalars['String']
+    taskUpdate: Scalars['String']
+    taskCommentCreate: Scalars['String']
+    taskCommentUpdate: Scalars['String']
+    taskCommentDelete: Scalars['String']
+    taskEffortCreate: Scalars['String']
+    taskEffortUpdate: Scalars['String']
+    taskEffortDelete: Scalars['String']
+    createProject: Scalars['String']
+    updateProject: Scalars['String']
     updateRole: Scalars['Boolean']
     changeUserRole: Scalars['Boolean']
     createRole: Scalars['Boolean']
@@ -278,10 +341,6 @@ export interface Mutation {
     changeMyNotificationPreferences: Scalars['Boolean']
     markAsSeen: Scalars['Boolean']
     markAllAsSeen: Scalars['Boolean']
-    createProject: Scalars['String']
-    updateProject: Scalars['String']
-    taskCreate: Scalars['String']
-    taskUpdate: Scalars['String']
     uploadFile: Scalars['String']
     __typename: 'Mutation'
 }
@@ -302,6 +361,101 @@ export interface PaginatedMetaTypeGenqlSelection {
 export interface CursorBasedMetaTypeGenqlSelection {
     cursor?: boolean | number
     take?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface MethodsTypeGenqlSelection {
+    id?: boolean | number
+    name?: boolean | number
+    group?: boolean | number
+    editable?: boolean | number
+    description?: boolean | number
+    allowed?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface RoleTypeGenqlSelection {
+    id?: boolean | number
+    name?: boolean | number
+    editable?: boolean | number
+    superuser?: boolean | number
+    methods?: MethodsTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface PaginatedRolesGenqlSelection {
+    data?: RoleTypeGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface UserTypeGenqlSelection {
+    id?: boolean | number
+    firstname?: boolean | number
+    lastname?: boolean | number
+    email?: boolean | number
+    status?: boolean | number
+    createdAt?: boolean | number
+    deletedAt?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface PaginatedUsersGenqlSelection {
+    data?: UserTypeGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface AuthorizationResponseGenqlSelection {
+    refreshToken?: boolean | number
+    accessToken?: boolean | number
+    userId?: boolean | number
+    expiresAt?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface GetNotificationDataGenqlSelection {
+    id?: boolean | number
+    topic?: boolean | number
+    message?: boolean | number
+    link?: boolean | number
+    type?: boolean | number
+    sent?: boolean | number
+    sentAt?: boolean | number
+    seen?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface GetNotificationsResponseGenqlSelection {
+    data?: GetNotificationDataGenqlSelection
+    meta?: CursorBasedMetaTypeGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface GetNotificationPreferencesGenqlSelection {
+    emailEnabled?: boolean | number
+    email?: boolean | number
+    webEnabled?: boolean | number
+    telegramEnabled?: boolean | number
+    telegramAccount?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface OnNewNotificationGenqlSelection {
+    userId?: boolean | number
+    topic?: boolean | number
+    message?: boolean | number
+    link?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
@@ -446,113 +600,78 @@ export interface TaskIntegrationTasksOfCurrentUserOutputGenqlSelection {
     __scalar?: boolean | number
 }
 
-export interface MethodsTypeGenqlSelection {
-    id?: boolean | number
-    name?: boolean | number
-    group?: boolean | number
-    editable?: boolean | number
-    description?: boolean | number
-    allowed?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface RoleTypeGenqlSelection {
-    id?: boolean | number
-    name?: boolean | number
-    editable?: boolean | number
-    superuser?: boolean | number
-    methods?: MethodsTypeGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface PaginatedRolesGenqlSelection {
-    data?: RoleTypeGenqlSelection
-    meta?: PaginatedMetaTypeGenqlSelection
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface UserTypeGenqlSelection {
+export interface TaskCommentIntegrationUserObjectGenqlSelection {
     id?: boolean | number
     firstname?: boolean | number
     lastname?: boolean | number
-    email?: boolean | number
-    status?: boolean | number
-    createdAt?: boolean | number
-    deletedAt?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface PaginatedUsersGenqlSelection {
-    data?: UserTypeGenqlSelection
+export interface TaskCommentIntegrationCommentObjectGenqlSelection {
+    id?: boolean | number
+    text?: boolean | number
+    taskId?: boolean | number
+    user?: TaskCommentIntegrationUserObjectGenqlSelection
+    isCanUpdate?: boolean | number
+    isCanDelete?: boolean | number
+    createdAt?: boolean | number
+    updatedAt?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface TaskCommentIntegrationCommentsOutputGenqlSelection {
+    data?: TaskCommentIntegrationCommentObjectGenqlSelection
     meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface AuthorizationResponseGenqlSelection {
-    refreshToken?: boolean | number
-    accessToken?: boolean | number
-    userId?: boolean | number
-    expiresAt?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface GetNotificationDataGenqlSelection {
+export interface TaskEffortIntegrationUserObjectGenqlSelection {
     id?: boolean | number
-    topic?: boolean | number
-    message?: boolean | number
-    link?: boolean | number
-    type?: boolean | number
-    sent?: boolean | number
-    sentAt?: boolean | number
-    seen?: boolean | number
+    firstname?: boolean | number
+    lastname?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface GetNotificationsResponseGenqlSelection {
-    data?: GetNotificationDataGenqlSelection
-    meta?: CursorBasedMetaTypeGenqlSelection
+export interface TaskEffortIntegrationEffortObjectGenqlSelection {
+    id?: boolean | number
+    value?: boolean | number
+    description?: boolean | number
+    taskId?: boolean | number
+    user?: TaskEffortIntegrationUserObjectGenqlSelection
+    isCanUpdate?: boolean | number
+    isCanDelete?: boolean | number
+    createdAt?: boolean | number
+    updatedAt?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
-export interface GetNotificationPreferencesGenqlSelection {
-    emailEnabled?: boolean | number
-    email?: boolean | number
-    webEnabled?: boolean | number
-    telegramEnabled?: boolean | number
-    telegramAccount?: boolean | number
-    __typename?: boolean | number
-    __scalar?: boolean | number
-}
-
-export interface OnNewNotificationGenqlSelection {
-    userId?: boolean | number
-    topic?: boolean | number
-    message?: boolean | number
-    link?: boolean | number
+export interface TaskEffortIntegrationEffortsOutputGenqlSelection {
+    data?: TaskEffortIntegrationEffortObjectGenqlSelection
+    meta?: PaginatedMetaTypeGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }
 
 export interface QueryGenqlSelection {
-    getUsers?: PaginatedUsersGenqlSelection & {
-        __args: { input: GetUsersInput }
+    task?: TaskIntegrationTaskObjectGenqlSelection & {
+        __args: { input: TaskIntegrationTaskInput }
     }
-    getRoles?: PaginatedRolesGenqlSelection & {
-        __args: { input: GetRolesInput }
+    tasks?: TaskIntegrationTasksOutputGenqlSelection & {
+        __args?: { input?: TaskIntegrationTasksInput | null }
     }
-    getMyRole?: RoleTypeGenqlSelection
-    getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
-    getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
-    getMyNotifications?: GetNotificationsResponseGenqlSelection & {
-        __args: { input: GetNotificationsInput }
+    tasksOfCurrentUser?: TaskIntegrationTasksOfCurrentUserOutputGenqlSelection & {
+        __args?: { input?: TaskIntegrationTasksOfCurrentUserInput | null }
+    }
+    taskComments?: TaskCommentIntegrationCommentsOutputGenqlSelection & {
+        __args: { input: TaskCommentIntegrationCommentsInput }
+    }
+    taskEfforts?: TaskEffortIntegrationEffortsOutputGenqlSelection & {
+        __args?: { input?: TaskEffortIntegrationEffortsInput | null }
     }
     project?: ProjectIntegrationProjectObjectGenqlSelection & {
         __args: { input: ProjectIntegrationProjectInput }
@@ -576,100 +695,21 @@ export interface QueryGenqlSelection {
     projectTasksRelations?: ProjectIntegrationTasksRelationObjectGenqlSelection & {
         __args: { input: ProjectIntegrationProjectTasksRelationsInput }
     }
-    task?: TaskIntegrationTaskObjectGenqlSelection & {
-        __args: { input: TaskIntegrationTaskInput }
+    getUsers?: PaginatedUsersGenqlSelection & {
+        __args: { input: GetUsersInput }
     }
-    tasks?: TaskIntegrationTasksOutputGenqlSelection & {
-        __args?: { input?: TaskIntegrationTasksInput | null }
+    getRoles?: PaginatedRolesGenqlSelection & {
+        __args: { input: GetRolesInput }
     }
-    tasksOfCurrentUser?: TaskIntegrationTasksOfCurrentUserOutputGenqlSelection & {
-        __args?: { input?: TaskIntegrationTasksOfCurrentUserInput | null }
+    getMyRole?: RoleTypeGenqlSelection
+    getUser?: UserTypeGenqlSelection & { __args: { input: GetUserInput } }
+    getMyNotificationPreferences?: GetNotificationPreferencesGenqlSelection
+    getMyNotifications?: GetNotificationsResponseGenqlSelection & {
+        __args: { input: GetNotificationsInput }
     }
     getFile?: { __args: { input: GetFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
-}
-
-export interface GetUsersInput {
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
-    orderBy?: OrderByInput | null
-    filter?: GetUsersFilterInput | null
-}
-
-export interface OrderByInput {
-    field: Scalars['String']
-    order: OrderEnum
-}
-
-export interface GetUsersFilterInput {
-    email?: Scalars['String'] | null
-    firstname?: Scalars['String'] | null
-    lastname?: Scalars['String'] | null
-    role?: Scalars['String'] | null
-    status?: AuthUserStatusEnum | null
-}
-
-export interface GetRolesInput {
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
-    filter?: GetRolesFilterInput | null
-}
-
-export interface GetRolesFilterInput {
-    name?: Scalars['String'] | null
-}
-
-export interface GetUserInput {
-    userId: Scalars['ID']
-}
-
-export interface GetNotificationsInput {
-    userId?: Scalars['String'] | null
-    cursor?: Scalars['String'] | null
-    take?: Scalars['Float'] | null
-    type: NotificationTypeEnum
-    seen?: Scalars['Boolean'] | null
-}
-
-export interface ProjectIntegrationProjectInput {
-    id: Scalars['String']
-}
-
-export interface ProjectIntegrationProjectsInput {
-    curPage?: Scalars['Float'] | null
-    perPage?: Scalars['Float'] | null
-    filterBy?: ProjectIntegrationProjectsFilterByInput | null
-}
-
-export interface ProjectIntegrationProjectsFilterByInput {
-    name?: Scalars['String'][] | null
-    userId?: Scalars['String'][] | null
-    fulltext?: Scalars['String'][] | null
-    createdAtFrom?: Scalars['Float'] | null
-    createdAtTo?: Scalars['Float'] | null
-}
-
-export interface ProjectIntegrationProjectUsersInput {
-    projectId: Scalars['String']
-    filterByName?: Scalars['String'] | null
-    orderBy?: OrderByInput | null
-}
-
-export interface ProjectIntegrationProjectUsersRolesInput {
-    projectId: Scalars['String']
-}
-
-export interface ProjectIntegrationProjectTasksTagsInput {
-    projectId: Scalars['String']
-}
-
-export interface ProjectIntegrationProjectTasksStatusesInput {
-    projectId: Scalars['String']
-}
-
-export interface ProjectIntegrationProjectTasksRelationsInput {
-    projectId: Scalars['String']
 }
 
 export interface TaskIntegrationTaskInput {
@@ -702,11 +742,127 @@ export interface TaskIntegrationTasksOfCurrentUserInput {
     perPage?: Scalars['Float'] | null
 }
 
+export interface TaskCommentIntegrationCommentsInput {
+    taskId: Scalars['String']
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+}
+
+export interface TaskEffortIntegrationEffortsInput {
+    taskId?: Scalars['String'] | null
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+}
+
+export interface ProjectIntegrationProjectInput {
+    id: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectsInput {
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+    filterBy?: ProjectIntegrationProjectsFilterByInput | null
+}
+
+export interface ProjectIntegrationProjectsFilterByInput {
+    name?: Scalars['String'][] | null
+    userId?: Scalars['String'][] | null
+    fulltext?: Scalars['String'][] | null
+    createdAtFrom?: Scalars['Float'] | null
+    createdAtTo?: Scalars['Float'] | null
+}
+
+export interface ProjectIntegrationProjectUsersInput {
+    projectId: Scalars['String']
+    filterByName?: Scalars['String'] | null
+    orderBy?: OrderByInput | null
+}
+
+export interface OrderByInput {
+    field: Scalars['String']
+    order: OrderEnum
+}
+
+export interface ProjectIntegrationProjectUsersRolesInput {
+    projectId: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectTasksTagsInput {
+    projectId: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectTasksStatusesInput {
+    projectId: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectTasksRelationsInput {
+    projectId: Scalars['String']
+}
+
+export interface GetUsersInput {
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+    orderBy?: OrderByInput | null
+    filter?: GetUsersFilterInput | null
+}
+
+export interface GetUsersFilterInput {
+    email?: Scalars['String'] | null
+    firstname?: Scalars['String'] | null
+    lastname?: Scalars['String'] | null
+    role?: Scalars['String'] | null
+    status?: AuthUserStatusEnum | null
+}
+
+export interface GetRolesInput {
+    curPage?: Scalars['Float'] | null
+    perPage?: Scalars['Float'] | null
+    filter?: GetRolesFilterInput | null
+}
+
+export interface GetRolesFilterInput {
+    name?: Scalars['String'] | null
+}
+
+export interface GetUserInput {
+    userId: Scalars['ID']
+}
+
+export interface GetNotificationsInput {
+    userId?: Scalars['String'] | null
+    cursor?: Scalars['String'] | null
+    take?: Scalars['Float'] | null
+    type: NotificationTypeEnum
+    seen?: Scalars['Boolean'] | null
+}
+
 export interface GetFileInput {
     id: Scalars['String']
 }
 
 export interface MutationGenqlSelection {
+    taskCreate?: { __args: { input: TaskIntegrationTaskCreateInput } }
+    taskUpdate?: { __args: { input: TaskIntegrationTaskUpdateInput } }
+    taskCommentCreate?: {
+        __args: { input: TaskCommentIntegrationCommentCreateInput }
+    }
+    taskCommentUpdate?: {
+        __args: { input: TaskCommentIntegrationCommentUpdateInput }
+    }
+    taskCommentDelete?: {
+        __args: { input: TaskCommentIntegrationCommentDeleteInput }
+    }
+    taskEffortCreate?: {
+        __args: { input: TaskEffortIntegrationEffortCreateInput }
+    }
+    taskEffortUpdate?: {
+        __args: { input: TaskEffortIntegrationEffortUpdateInput }
+    }
+    taskEffortDelete?: {
+        __args: { input: TaskEffortIntegrationEffortDeleteInput }
+    }
+    createProject?: { __args: { input: ProjectIntegrationCreateProjectInput } }
+    updateProject?: { __args: { input: ProjectIntegrationProjectUpdateInput } }
     updateRole?: { __args: { input: UpdateRoleInput } }
     changeUserRole?: { __args: { input: ChangeUserRoleInput } }
     createRole?: { __args: { input: CreateRoleInput } }
@@ -729,13 +885,90 @@ export interface MutationGenqlSelection {
     }
     markAsSeen?: { __args: { input: MarkAsSeenInput } }
     markAllAsSeen?: { __args: { input: MarkAllAsSeenInput } }
-    createProject?: { __args: { input: ProjectIntegrationCreateProjectInput } }
-    updateProject?: { __args: { input: ProjectIntegrationProjectUpdateInput } }
-    taskCreate?: { __args: { input: TaskIntegrationTaskCreateInput } }
-    taskUpdate?: { __args: { input: TaskIntegrationTaskUpdateInput } }
     uploadFile?: { __args: { input: UploadFileInput } }
     __typename?: boolean | number
     __scalar?: boolean | number
+}
+
+export interface TaskIntegrationTaskCreateInput {
+    projectId: Scalars['String']
+    name: Scalars['String']
+    statusId: Scalars['String']
+    description?: Scalars['String'] | null
+    estimatedDateStart?: Scalars['Float'] | null
+    estimatedDateEnd?: Scalars['Float'] | null
+    estimatedDuration?: Scalars['Float'] | null
+    assignedToId?: Scalars['String'] | null
+    parentId?: Scalars['String'] | null
+    tagIds?: Scalars['String'][] | null
+}
+
+export interface TaskIntegrationTaskUpdateInput {
+    id: Scalars['String']
+    version: Scalars['Float']
+    name?: Scalars['String'] | null
+    description?: Scalars['String'] | null
+    estimatedDateEnd?: Scalars['Float'] | null
+    estimatedDateStart?: Scalars['Float'] | null
+    estimatedDuration?: Scalars['Float'] | null
+    parentId?: Scalars['String'] | null
+    statusId?: Scalars['String'] | null
+    assignedToId?: Scalars['String'] | null
+    tagIds?: Scalars['String'][] | null
+}
+
+export interface TaskCommentIntegrationCommentCreateInput {
+    taskId: Scalars['String']
+    text: Scalars['String']
+}
+
+export interface TaskCommentIntegrationCommentUpdateInput {
+    id: Scalars['String']
+    text: Scalars['String']
+}
+
+export interface TaskCommentIntegrationCommentDeleteInput {
+    id: Scalars['String']
+}
+
+export interface TaskEffortIntegrationEffortCreateInput {
+    taskId: Scalars['String']
+    value: Scalars['Float']
+    description: Scalars['String']
+}
+
+export interface TaskEffortIntegrationEffortUpdateInput {
+    id: Scalars['String']
+    value: Scalars['Float']
+    description: Scalars['String']
+}
+
+export interface TaskEffortIntegrationEffortDeleteInput {
+    id: Scalars['String']
+}
+
+export interface ProjectIntegrationCreateProjectInput {
+    name: Scalars['String']
+    /** Budget of the project in hours */
+    budget: Scalars['Float']
+    /** Deadline of the project in timestampMs */
+    deadline: Scalars['Float']
+    description: Scalars['String']
+    members?: ProjectIntegrationCreateProjectMemberInput[] | null
+}
+
+export interface ProjectIntegrationCreateProjectMemberInput {
+    userId: Scalars['String']
+    roleCode: Scalars['String']
+}
+
+export interface ProjectIntegrationProjectUpdateInput {
+    id: Scalars['String']
+    version: Scalars['Float']
+    name?: Scalars['String'] | null
+    description?: Scalars['String'] | null
+    budget?: Scalars['Float'] | null
+    deadline?: Scalars['Float'] | null
 }
 
 export interface UpdateRoleInput {
@@ -820,57 +1053,6 @@ export interface MarkAllAsSeenInput {
     type: NotificationTypeEnum
 }
 
-export interface ProjectIntegrationCreateProjectInput {
-    name: Scalars['String']
-    /** Budget of the project in hours */
-    budget: Scalars['Float']
-    /** Deadline of the project in timestampMs */
-    deadline: Scalars['Float']
-    description: Scalars['String']
-    members?: ProjectIntegrationCreateProjectMemberInput[] | null
-}
-
-export interface ProjectIntegrationCreateProjectMemberInput {
-    userId: Scalars['String']
-    roleCode: Scalars['String']
-}
-
-export interface ProjectIntegrationProjectUpdateInput {
-    id: Scalars['String']
-    version: Scalars['Float']
-    name?: Scalars['String'] | null
-    description?: Scalars['String'] | null
-    budget?: Scalars['Float'] | null
-    deadline?: Scalars['Float'] | null
-}
-
-export interface TaskIntegrationTaskCreateInput {
-    projectId: Scalars['String']
-    name: Scalars['String']
-    statusId: Scalars['String']
-    description?: Scalars['String'] | null
-    estimatedDateStart?: Scalars['Float'] | null
-    estimatedDateEnd?: Scalars['Float'] | null
-    estimatedDuration?: Scalars['Float'] | null
-    assignedToId?: Scalars['String'] | null
-    parentId?: Scalars['String'] | null
-    tagIds?: Scalars['String'][] | null
-}
-
-export interface TaskIntegrationTaskUpdateInput {
-    id: Scalars['String']
-    version: Scalars['Float']
-    name?: Scalars['String'] | null
-    description?: Scalars['String'] | null
-    estimatedDateEnd?: Scalars['Float'] | null
-    estimatedDateStart?: Scalars['Float'] | null
-    estimatedDuration?: Scalars['Float'] | null
-    parentId?: Scalars['String'] | null
-    statusId?: Scalars['String'] | null
-    assignedToId?: Scalars['String'] | null
-    tagIds?: Scalars['String'][] | null
-}
-
 export interface UploadFileInput {
     file: Scalars['Upload']
 }
@@ -897,6 +1079,102 @@ export const isCursorBasedMetaType = (
     if (!obj?.__typename)
         throw new Error('__typename is missing in "isCursorBasedMetaType"')
     return CursorBasedMetaType_possibleTypes.includes(obj.__typename)
+}
+
+const MethodsType_possibleTypes: string[] = ['MethodsType']
+export const isMethodsType = (
+    obj?: { __typename?: any } | null,
+): obj is MethodsType => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isMethodsType"')
+    return MethodsType_possibleTypes.includes(obj.__typename)
+}
+
+const RoleType_possibleTypes: string[] = ['RoleType']
+export const isRoleType = (
+    obj?: { __typename?: any } | null,
+): obj is RoleType => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isRoleType"')
+    return RoleType_possibleTypes.includes(obj.__typename)
+}
+
+const PaginatedRoles_possibleTypes: string[] = ['PaginatedRoles']
+export const isPaginatedRoles = (
+    obj?: { __typename?: any } | null,
+): obj is PaginatedRoles => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isPaginatedRoles"')
+    return PaginatedRoles_possibleTypes.includes(obj.__typename)
+}
+
+const UserType_possibleTypes: string[] = ['UserType']
+export const isUserType = (
+    obj?: { __typename?: any } | null,
+): obj is UserType => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isUserType"')
+    return UserType_possibleTypes.includes(obj.__typename)
+}
+
+const PaginatedUsers_possibleTypes: string[] = ['PaginatedUsers']
+export const isPaginatedUsers = (
+    obj?: { __typename?: any } | null,
+): obj is PaginatedUsers => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isPaginatedUsers"')
+    return PaginatedUsers_possibleTypes.includes(obj.__typename)
+}
+
+const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
+export const isAuthorizationResponse = (
+    obj?: { __typename?: any } | null,
+): obj is AuthorizationResponse => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isAuthorizationResponse"')
+    return AuthorizationResponse_possibleTypes.includes(obj.__typename)
+}
+
+const GetNotificationData_possibleTypes: string[] = ['GetNotificationData']
+export const isGetNotificationData = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationData => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isGetNotificationData"')
+    return GetNotificationData_possibleTypes.includes(obj.__typename)
+}
+
+const GetNotificationsResponse_possibleTypes: string[] = [
+    'GetNotificationsResponse',
+]
+export const isGetNotificationsResponse = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationsResponse => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isGetNotificationsResponse"')
+    return GetNotificationsResponse_possibleTypes.includes(obj.__typename)
+}
+
+const GetNotificationPreferences_possibleTypes: string[] = [
+    'GetNotificationPreferences',
+]
+export const isGetNotificationPreferences = (
+    obj?: { __typename?: any } | null,
+): obj is GetNotificationPreferences => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isGetNotificationPreferences"',
+        )
+    return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
+}
+
+const OnNewNotification_possibleTypes: string[] = ['OnNewNotification']
+export const isOnNewNotification = (
+    obj?: { __typename?: any } | null,
+): obj is OnNewNotification => {
+    if (!obj?.__typename)
+        throw new Error('__typename is missing in "isOnNewNotification"')
+    return OnNewNotification_possibleTypes.includes(obj.__typename)
 }
 
 const ProjectIntegrationProjectObject_possibleTypes: string[] = [
@@ -1114,100 +1392,94 @@ export const isTaskIntegrationTasksOfCurrentUserOutput = (
     )
 }
 
-const MethodsType_possibleTypes: string[] = ['MethodsType']
-export const isMethodsType = (
-    obj?: { __typename?: any } | null,
-): obj is MethodsType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isMethodsType"')
-    return MethodsType_possibleTypes.includes(obj.__typename)
-}
-
-const RoleType_possibleTypes: string[] = ['RoleType']
-export const isRoleType = (
-    obj?: { __typename?: any } | null,
-): obj is RoleType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isRoleType"')
-    return RoleType_possibleTypes.includes(obj.__typename)
-}
-
-const PaginatedRoles_possibleTypes: string[] = ['PaginatedRoles']
-export const isPaginatedRoles = (
-    obj?: { __typename?: any } | null,
-): obj is PaginatedRoles => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isPaginatedRoles"')
-    return PaginatedRoles_possibleTypes.includes(obj.__typename)
-}
-
-const UserType_possibleTypes: string[] = ['UserType']
-export const isUserType = (
-    obj?: { __typename?: any } | null,
-): obj is UserType => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isUserType"')
-    return UserType_possibleTypes.includes(obj.__typename)
-}
-
-const PaginatedUsers_possibleTypes: string[] = ['PaginatedUsers']
-export const isPaginatedUsers = (
-    obj?: { __typename?: any } | null,
-): obj is PaginatedUsers => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isPaginatedUsers"')
-    return PaginatedUsers_possibleTypes.includes(obj.__typename)
-}
-
-const AuthorizationResponse_possibleTypes: string[] = ['AuthorizationResponse']
-export const isAuthorizationResponse = (
-    obj?: { __typename?: any } | null,
-): obj is AuthorizationResponse => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isAuthorizationResponse"')
-    return AuthorizationResponse_possibleTypes.includes(obj.__typename)
-}
-
-const GetNotificationData_possibleTypes: string[] = ['GetNotificationData']
-export const isGetNotificationData = (
-    obj?: { __typename?: any } | null,
-): obj is GetNotificationData => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isGetNotificationData"')
-    return GetNotificationData_possibleTypes.includes(obj.__typename)
-}
-
-const GetNotificationsResponse_possibleTypes: string[] = [
-    'GetNotificationsResponse',
+const TaskCommentIntegrationUserObject_possibleTypes: string[] = [
+    'TaskCommentIntegrationUserObject',
 ]
-export const isGetNotificationsResponse = (
+export const isTaskCommentIntegrationUserObject = (
     obj?: { __typename?: any } | null,
-): obj is GetNotificationsResponse => {
-    if (!obj?.__typename)
-        throw new Error('__typename is missing in "isGetNotificationsResponse"')
-    return GetNotificationsResponse_possibleTypes.includes(obj.__typename)
-}
-
-const GetNotificationPreferences_possibleTypes: string[] = [
-    'GetNotificationPreferences',
-]
-export const isGetNotificationPreferences = (
-    obj?: { __typename?: any } | null,
-): obj is GetNotificationPreferences => {
+): obj is TaskCommentIntegrationUserObject => {
     if (!obj?.__typename)
         throw new Error(
-            '__typename is missing in "isGetNotificationPreferences"',
+            '__typename is missing in "isTaskCommentIntegrationUserObject"',
         )
-    return GetNotificationPreferences_possibleTypes.includes(obj.__typename)
+    return TaskCommentIntegrationUserObject_possibleTypes.includes(
+        obj.__typename,
+    )
 }
 
-const OnNewNotification_possibleTypes: string[] = ['OnNewNotification']
-export const isOnNewNotification = (
+const TaskCommentIntegrationCommentObject_possibleTypes: string[] = [
+    'TaskCommentIntegrationCommentObject',
+]
+export const isTaskCommentIntegrationCommentObject = (
     obj?: { __typename?: any } | null,
-): obj is OnNewNotification => {
+): obj is TaskCommentIntegrationCommentObject => {
     if (!obj?.__typename)
-        throw new Error('__typename is missing in "isOnNewNotification"')
-    return OnNewNotification_possibleTypes.includes(obj.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskCommentIntegrationCommentObject"',
+        )
+    return TaskCommentIntegrationCommentObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const TaskCommentIntegrationCommentsOutput_possibleTypes: string[] = [
+    'TaskCommentIntegrationCommentsOutput',
+]
+export const isTaskCommentIntegrationCommentsOutput = (
+    obj?: { __typename?: any } | null,
+): obj is TaskCommentIntegrationCommentsOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskCommentIntegrationCommentsOutput"',
+        )
+    return TaskCommentIntegrationCommentsOutput_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const TaskEffortIntegrationUserObject_possibleTypes: string[] = [
+    'TaskEffortIntegrationUserObject',
+]
+export const isTaskEffortIntegrationUserObject = (
+    obj?: { __typename?: any } | null,
+): obj is TaskEffortIntegrationUserObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskEffortIntegrationUserObject"',
+        )
+    return TaskEffortIntegrationUserObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const TaskEffortIntegrationEffortObject_possibleTypes: string[] = [
+    'TaskEffortIntegrationEffortObject',
+]
+export const isTaskEffortIntegrationEffortObject = (
+    obj?: { __typename?: any } | null,
+): obj is TaskEffortIntegrationEffortObject => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskEffortIntegrationEffortObject"',
+        )
+    return TaskEffortIntegrationEffortObject_possibleTypes.includes(
+        obj.__typename,
+    )
+}
+
+const TaskEffortIntegrationEffortsOutput_possibleTypes: string[] = [
+    'TaskEffortIntegrationEffortsOutput',
+]
+export const isTaskEffortIntegrationEffortsOutput = (
+    obj?: { __typename?: any } | null,
+): obj is TaskEffortIntegrationEffortsOutput => {
+    if (!obj?.__typename)
+        throw new Error(
+            '__typename is missing in "isTaskEffortIntegrationEffortsOutput"',
+        )
+    return TaskEffortIntegrationEffortsOutput_possibleTypes.includes(
+        obj.__typename,
+    )
 }
 
 const Query_possibleTypes: string[] = ['Query']

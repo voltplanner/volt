@@ -34,12 +34,14 @@ export const RightbarStyled = styled.div`
 export const ToolbarStyled = styled.div`
     display: flex;
     width: 100%;
-    height: fit-content;
+    /* height: fit-content; */
+    height: 50px;
     background-color: darkorchid;
 `
 export const HeaderStyled = styled.div`
     display: flex;
     width: 100%;
-    height: fit-content;
+    /* height: fit-content; */
+    height: 50px;
     background-color: tomato;
 `
