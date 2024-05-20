@@ -1,11 +1,6 @@
 import { ApiRefreshToken } from 'shared/api/refresh'
 import { Suspense, memo, useEffect, useMemo, useState } from 'react'
-import {
-    Route,
-    Routes,
-    useNavigate,
-    useLocation,
-} from 'react-router-dom'
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom'
 import { routeConfig } from 'shared'
 import styled from 'styled-components'
 import { useSessionStore } from 'entities'
@@ -46,12 +41,18 @@ const AppRouter = () => {
         const expirationTime = Number(localStorage.getItem('expiresAt'))
         const currentTimeInSeconds = Math.floor(Date.now() / 1000)
         const token = localStorage.getItem('accessToken')
-        if(token && (location.pathname === '/signin' || location.pathname === '/signup')){
+        if (
+            token &&
+            (location.pathname === '/signin' || location.pathname === '/signup')
+        ) {
             navigate('/')
         }
         if (!token) {
             setIsAuth(false)
-            if (location.pathname !== '/signin' && location.pathname !== '/signup') {
+            if (
+                location.pathname !== '/signin' &&
+                location.pathname !== '/signup'
+            ) {
                 navigate('/signin')
             }
         } else if (expirationTime <= currentTimeInSeconds) {

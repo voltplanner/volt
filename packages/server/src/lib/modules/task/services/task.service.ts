@@ -6,7 +6,7 @@ import {
     PrismaServiceWithExtentionsType,
     PrismaTransactionClientType,
 } from '../../../shared/prisma'
-import { UpdateTaskConflictError } from '../errors/task-update-conflict.error'
+import { TaskUpdateConflictError } from '../errors/task-update-conflict.error'
 
 @Injectable()
 export class TaskService {
@@ -93,7 +93,7 @@ export class TaskService {
         } catch (e) {
             const conflictingProps = await this._findConflictingProps(dto)
 
-            throw new UpdateTaskConflictError({ id: dto.id, conflictingProps })
+            throw new TaskUpdateConflictError({ id: dto.id, conflictingProps })
         }
     }
 

@@ -29,7 +29,6 @@
     },
     "serve": {
       "executor": "@nx/js:node",
-      "dependsOn": ["prisma:migrate:deploy"],
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "server:build"

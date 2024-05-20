@@ -1,6 +1,6 @@
 import { DefaultError } from '../../../shared/errors/default.error'
 
-export class UpdateTaskConflictError extends DefaultError {
+export class TaskUpdateConflictError extends DefaultError {
     code = 'TASK_001'
     name = 'TASK_UPDATE_CONFLICT_ERROR'
 

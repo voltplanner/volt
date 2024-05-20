@@ -1,4 +1,4 @@
-import { TaskIntegrationCreateTaskInput } from '../../task/types-input/task-integration-task-create.input-type'
+import { TaskIntegrationTaskCreateInput } from '../../task/types-input/task-integration-task-create.input-type'
 import { setup as setupTest } from './support/global-setup'
 import { teardown } from './support/global-teardown'
 import { GlobalUtils } from './support/global-utils'
@@ -21,7 +21,7 @@ describe('Task Effort', () => {
     describe('GQL API', () => {
         let projectId = ''
 
-        let taskPayload_1: TaskIntegrationCreateTaskInput = {} as any
+        let taskPayload_1: TaskIntegrationTaskCreateInput = {} as any
         let taskId_1 = ''
 
         afterEach(async () => {
@@ -85,19 +85,19 @@ describe('Task Effort', () => {
                 assignedToId: adminUser.id,
             }
 
-            const { createTask } = await utils.gqlCreateTask(
+            const { taskCreate } = await utils.gqlTaskCreate(
                 taskPayload_1,
                 adminAccessToken,
             )
 
-            taskId_1 = createTask
+            taskId_1 = taskCreate
         })
 
         it('Must create task effort', async () => {
             const { adminUser, adminAccessToken } =
                 await utils.gqlGetAdminUser()
 
-            const { createTaskEffort } = await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate } = await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -108,10 +108,10 @@ describe('Task Effort', () => {
             )
 
             const taskEffort = await setup.prisma.taskEffort.findUniqueOrThrow({
-                where: { id: createTaskEffort },
+                where: { id: taskEffortCreate },
             })
 
-            expect(taskEffort.id).toBe(createTaskEffort)
+            expect(taskEffort.id).toBe(taskEffortCreate)
             expect(taskEffort.description).toBe(
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
             )
@@ -122,7 +122,7 @@ describe('Task Effort', () => {
         it('Must update task effort', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { createTaskEffort } = await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate } = await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -132,9 +132,9 @@ describe('Task Effort', () => {
                 adminAccessToken,
             )
 
-            const { updateTaskEffort } = await utils.gqlUpdateTaskEffort(
+            const { taskEffortUpdate } = await utils.gqlTaskEffortUpdate(
                 {
-                    id: createTaskEffort,
+                    id: taskEffortCreate,
                     description:
                         'Perspiciatis tempora velit ipsum dolor sit amet, iste natus error',
                     value: 2,
@@ -143,10 +143,10 @@ describe('Task Effort', () => {
             )
 
             const taskEffort = await setup.prisma.taskEffort.findUniqueOrThrow({
-                where: { id: updateTaskEffort },
+                where: { id: taskEffortUpdate },
             })
 
-            expect(taskEffort.id).toBe(updateTaskEffort)
+            expect(taskEffort.id).toBe(taskEffortUpdate)
             expect(taskEffort.description).toBe(
                 'Perspiciatis tempora velit ipsum dolor sit amet, iste natus error',
             )
@@ -156,7 +156,7 @@ describe('Task Effort', () => {
         it('Must delete task effort', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { createTaskEffort } = await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate } = await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -166,15 +166,15 @@ describe('Task Effort', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlDeleteTaskEffort(
+            await utils.gqlTaskEffortDelete(
                 {
-                    id: createTaskEffort,
+                    id: taskEffortCreate,
                 },
                 adminAccessToken,
             )
 
             const taskEffort = await setup.prisma.taskEffort.findUnique({
-                where: { id: createTaskEffort },
+                where: { id: taskEffortCreate },
             })
 
             expect(taskEffort.isDeleted).toBe(true)
@@ -183,7 +183,7 @@ describe('Task Effort', () => {
         it('Must return task efforts ms', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            await utils.gqlCreateTaskEffort(
+            await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -193,7 +193,7 @@ describe('Task Effort', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlCreateTaskEffort(
+            await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -214,8 +214,8 @@ describe('Task Effort', () => {
             const { adminUser, adminAccessToken } =
                 await utils.gqlGetAdminUser()
 
-            const { createTaskEffort: createTaskEffort_1 } =
-                await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate: taskEffortCreate_1 } =
+                await utils.gqlTaskEffortCreate(
                     {
                         taskId: taskId_1,
                         description:
@@ -225,8 +225,8 @@ describe('Task Effort', () => {
                     adminAccessToken,
                 )
 
-            const { createTaskEffort: createTaskEffort_2 } =
-                await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate: taskEffortCreate_2 } =
+                await utils.gqlTaskEffortCreate(
                     {
                         taskId: taskId_1,
                         description:
@@ -247,8 +247,8 @@ describe('Task Effort', () => {
             expect(taskEfforts.data).toBeDefined()
             expect(taskEfforts.meta).toBeDefined()
             expect(taskEfforts.data.map((i) => i.id)).toEqual([
-                createTaskEffort_2,
-                createTaskEffort_1,
+                taskEffortCreate_2,
+                taskEffortCreate_1,
             ])
 
             for (const i of taskEfforts.data) {
@@ -270,8 +270,8 @@ describe('Task Effort', () => {
         it('Must return task efforts paginated', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { createTaskEffort: createTaskEffort_1 } =
-                await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate: taskEffortCreate_1 } =
+                await utils.gqlTaskEffortCreate(
                     {
                         taskId: taskId_1,
                         description:
@@ -280,7 +280,7 @@ describe('Task Effort', () => {
                     },
                     adminAccessToken,
                 )
-            await utils.gqlCreateTaskEffort(
+            await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -289,7 +289,7 @@ describe('Task Effort', () => {
                 },
                 adminAccessToken,
             )
-            await utils.gqlCreateTaskEffort(
+            await utils.gqlTaskEffortCreate(
                 {
                     taskId: taskId_1,
                     description:
@@ -313,15 +313,15 @@ describe('Task Effort', () => {
             expect(taskEfforts.meta.curPage).toBe(2)
             expect(taskEfforts.meta.perPage).toBe(2)
             expect(taskEfforts.data.map((i) => i.id)).toEqual([
-                createTaskEffort_1,
+                taskEffortCreate_1,
             ])
         })
 
         it('Must not return deleted task efforts', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { createTaskEffort: createTaskEffort_1 } =
-                await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate: taskEffortCreate_1 } =
+                await utils.gqlTaskEffortCreate(
                     {
                         taskId: taskId_1,
                         description:
@@ -331,8 +331,8 @@ describe('Task Effort', () => {
                     adminAccessToken,
                 )
 
-            const { createTaskEffort: createTaskEffort_2 } =
-                await utils.gqlCreateTaskEffort(
+            const { taskEffortCreate: taskEffortCreate_2 } =
+                await utils.gqlTaskEffortCreate(
                     {
                         taskId: taskId_1,
                         description:
@@ -342,9 +342,9 @@ describe('Task Effort', () => {
                     adminAccessToken,
                 )
 
-            await utils.gqlDeleteTaskEffort(
+            await utils.gqlTaskEffortDelete(
                 {
-                    id: createTaskEffort_1,
+                    id: taskEffortCreate_1,
                 },
                 adminAccessToken,
             )
@@ -357,7 +357,7 @@ describe('Task Effort', () => {
             )
 
             expect(taskEfforts.data.map((i) => i.id)).toEqual([
-                createTaskEffort_2,
+                taskEffortCreate_2,
             ])
         })
     })

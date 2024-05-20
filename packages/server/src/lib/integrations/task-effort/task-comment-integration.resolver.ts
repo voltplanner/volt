@@ -29,7 +29,7 @@ export class TaskEffortIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async createTaskEffort(
+    async taskEffortCreate(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskEffortIntegrationEffortCreateInput,
     ): Promise<string> {
@@ -50,7 +50,7 @@ export class TaskEffortIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async updateTaskEffort(
+    async taskEffortUpdate(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskEffortIntegrationEffortUpdateInput,
     ) {
@@ -71,7 +71,7 @@ export class TaskEffortIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async deleteTaskEffort(
+    async taskEffortDelete(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskEffortIntegrationEffortDeleteInput,
     ) {

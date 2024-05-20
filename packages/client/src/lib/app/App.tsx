@@ -7,10 +7,11 @@ import { useEffect } from 'react'
 export function App() {
     const { checkAuth, getLocalSession } = useSessionStore()
     useEffect(() => {
+        getLocalSession()
         const intervalId = setInterval(() => {
             getLocalSession()
         }, 3000)
-        return () => clearInterval(intervalId) 
+        return () => clearInterval(intervalId)
     }, [])
     return (
         <WrapperStyled>

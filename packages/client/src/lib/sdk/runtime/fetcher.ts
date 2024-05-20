@@ -30,10 +30,8 @@ export const createFetcher = ({
     if (!url && !fetcher) {
         throw new Error('url or fetcher is required')
     }
-
-    fetcher =
-        fetcher ||
-        (async (body) => {
+    if (!fetcher) {
+        fetcher = async (body) => {
             let headersObject =
                 typeof headers == 'function' ? await headers() : headers
             headersObject = headersObject || {}
@@ -57,7 +55,8 @@ export const createFetcher = ({
             }
             const json = await res.json()
             return json
-        })
+        }
+    }
 
     if (!batch) {
         return async (body) => {
