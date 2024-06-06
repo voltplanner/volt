@@ -29,7 +29,7 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentCreate(
+    async createTaskComment(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskCommentIntegrationCommentCreateInput,
     ): Promise<string> {
@@ -49,7 +49,7 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentUpdate(
+    async updateTaskComment(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskCommentIntegrationCommentUpdateInput,
     ) {
@@ -69,7 +69,7 @@ export class TaskCommentIntegrationResolver {
 
     @UseGuards(ACLGuard)
     @Mutation(() => String)
-    async taskCommentDelete(
+    async deleteTaskComment(
         @CurrentUser() { userId }: CurrentUserPayload,
         @Args('input') input: TaskCommentIntegrationCommentDeleteInput,
     ) {

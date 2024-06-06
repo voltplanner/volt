@@ -5,13 +5,13 @@ import { parseMetaArgs } from '../../utils'
 import { Prisma, Task, TaskStatus, TaskTag, TaskView } from '..'
 import { PrismaService } from '../prisma.service'
 import {
-    TaskCreateRepositoryDto,
-    TaskDeleteRepositoryDto,
+    CreateTaskRepositoryDto,
+    DeleteTaskRepositoryDto,
     TaskFindManyRepositoryDto,
     TaskFindOneRepositoryDto,
     TaskFindSubtasksRepositoryDto,
     TaskGetByIdRepositoryDto,
-    TaskUpdateRepositoryDto,
+    UpdateTaskRepositoryDto,
 } from '../repositories-dto/task.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 import { mutateFindManyDelegateWithFilterNumber } from '../utils/prisma-mutate-find-many-delegate-with-filter-number'
@@ -20,7 +20,7 @@ import { mutateFindManyDelegateWithFilterUuid } from '../utils/prisma-mutate-fin
 
 export const taskModelExtentions = {
     async extCreate(
-        dto: TaskCreateRepositoryDto,
+        dto: CreateTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -139,7 +139,7 @@ export const taskModelExtentions = {
     // Nested Set Notes:
     // Method moves the node and all its children to the new parent if parentId is specified
     async extUpdate(
-        dto: TaskUpdateRepositoryDto,
+        dto: UpdateTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -267,7 +267,7 @@ export const taskModelExtentions = {
     // Nested Set Notes:
     // Method deletes node, but retains children. If deleted node had parent, then all closest children of the deleted node will become its children.
     async extDelete(
-        dto: TaskDeleteRepositoryDto,
+        dto: DeleteTaskRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {

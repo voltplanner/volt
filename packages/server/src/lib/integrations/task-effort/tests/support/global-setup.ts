@@ -21,7 +21,7 @@ import {
 } from '../../../../../../../../packages/server/src/lib/shared/prisma'
 import { ProjectIntegrationResolver } from '../../../project/project-integration.resolver'
 import { TaskIntegrationResolver } from '../../../task/task-integration.resolver'
-import { TaskEffortIntegrationResolver } from '../../task-comment-integration.resolver'
+import { TaskEffortIntegrationResolver } from '../../task-effort-integration.resolver'
 
 dotenv.config()
 

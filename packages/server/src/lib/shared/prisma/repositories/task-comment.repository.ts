@@ -5,16 +5,16 @@ import { parseMetaArgs } from '../../utils'
 import { Prisma } from '..'
 import { PrismaService } from '../prisma.service'
 import {
-    TaskCommentCreateRepositoryDto,
-    TaskCommentDeleteRepositoryDto,
+    CreateTaskCommentRepositoryDto,
+    DeleteTaskCommentRepositoryDto,
     TaskCommentFindManyRepositoryDto,
-    TaskCommentUpdateRepositoryDto,
+    UpdateTaskCommentRepositoryDto,
 } from '../repositories-dto/task-comment.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskCommentModelExtentions = {
     async extCreate(
-        dto: TaskCommentCreateRepositoryDto,
+        dto: CreateTaskCommentRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -46,7 +46,7 @@ export const taskCommentModelExtentions = {
     },
 
     async extUpdate(
-        dto: TaskCommentUpdateRepositoryDto,
+        dto: UpdateTaskCommentRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -77,7 +77,7 @@ export const taskCommentModelExtentions = {
     },
 
     async extDelete(
-        dto: TaskCommentDeleteRepositoryDto,
+        dto: DeleteTaskCommentRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {

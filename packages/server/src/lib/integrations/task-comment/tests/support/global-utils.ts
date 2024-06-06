@@ -3,7 +3,7 @@ import request, { gql } from 'graphql-request'
 import { GetUsersInput } from '../../../../../../../../packages/server/src/lib/modules/auth/interfaces/auth.graphql'
 import { ProjectIntegrationCreateProjectInput } from '../../../project/types-input/project-integration-project-create.input-type'
 import { ProjectIntegrationProjectTasksStatusesInput } from '../../../project/types-input/project-integration-project-tasks-statuses.input-type'
-import { TaskIntegrationTaskCreateInput } from '../../../task/types-input/task-integration-task-create.input-type'
+import { TaskIntegrationCreateTaskInput } from '../../../task/types-input/task-integration-task-create.input-type'
 import { TaskCommentIntegrationCommentCreateInput } from '../../types-input/task-comment-integration-comment-create.input-type'
 import { TaskCommentIntegrationCommentDeleteInput } from '../../types-input/task-comment-integration-comment-delete.input-type'
 import { TaskCommentIntegrationCommentUpdateInput } from '../../types-input/task-comment-integration-comment-update.input-type'
@@ -18,15 +18,15 @@ export class GlobalUtils {
 
     constructor(private readonly _setup: Awaited<ReturnType<typeof setup>>) {}
 
-    async gqlTaskCommentCreate(
+    async gqlCreateTaskComment(
         dto: TaskCommentIntegrationCommentCreateInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-            mutation taskCommentCreate(
-                $taskCommentCreateInput: TaskCommentIntegrationCommentCreateInput!
+            mutation createTaskComment(
+                $createTaskCommentInput: TaskCommentIntegrationCommentCreateInput!
             ) {
-                taskCommentCreate(input: $taskCommentCreateInput)
+                createTaskComment(input: $createTaskCommentInput)
             }
         `
 
@@ -34,7 +34,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                taskCommentCreateInput: dto,
+                createTaskCommentInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,
@@ -42,15 +42,15 @@ export class GlobalUtils {
         )
     }
 
-    async gqlTaskCommentUpdate(
+    async gqlUpdateTaskComment(
         dto: TaskCommentIntegrationCommentUpdateInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-            mutation taskCommentUpdate(
-                $taskCommentUpdateInput: TaskCommentIntegrationCommentUpdateInput!
+            mutation updateTaskComment(
+                $updateTaskCommentInput: TaskCommentIntegrationCommentUpdateInput!
             ) {
-                taskCommentUpdate(input: $taskCommentUpdateInput)
+                updateTaskComment(input: $updateTaskCommentInput)
             }
         `
 
@@ -58,7 +58,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                taskCommentUpdateInput: dto,
+                updateTaskCommentInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,
@@ -66,15 +66,15 @@ export class GlobalUtils {
         )
     }
 
-    async gqlTaskCommentDelete(
+    async gqlDeleteTaskComment(
         dto: TaskCommentIntegrationCommentDeleteInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-            mutation taskCommentDelete(
-                $taskCommentDeleteInput: TaskCommentIntegrationCommentDeleteInput!
+            mutation deleteTaskComment(
+                $deleteTaskCommentInput: TaskCommentIntegrationCommentDeleteInput!
             ) {
-                taskCommentDelete(input: $taskCommentDeleteInput)
+                deleteTaskComment(input: $deleteTaskCommentInput)
             }
         `
 
@@ -82,7 +82,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                taskCommentDeleteInput: dto,
+                deleteTaskCommentInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,
@@ -134,15 +134,15 @@ export class GlobalUtils {
         )
     }
 
-    async gqlTaskCreate(
-        dto: TaskIntegrationTaskCreateInput,
+    async gqlCreateTask(
+        dto: TaskIntegrationCreateTaskInput,
         accessToken: string,
     ): Promise<Record<string, any>> {
         const doc = gql`
-            mutation taskCreate(
-                $taskCreateInput: TaskIntegrationTaskCreateInput!
+            mutation createTask(
+                $createTaskInput: TaskIntegrationCreateTaskInput!
             ) {
-                taskCreate(input: $taskCreateInput)
+                createTask(input: $createTaskInput)
             }
         `
 
@@ -150,7 +150,7 @@ export class GlobalUtils {
             this.gqlApiUrl,
             doc,
             {
-                taskCreateInput: dto,
+                createTaskInput: dto,
             },
             {
                 Authorization: `Bearer ${accessToken}`,

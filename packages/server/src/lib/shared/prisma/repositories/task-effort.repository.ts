@@ -5,16 +5,16 @@ import { parseMetaArgs } from '../../utils'
 import { Prisma } from '..'
 import { PrismaService } from '../prisma.service'
 import {
-    TaskEffortCreateRepositoryDto,
-    TaskEffortDeleteRepositoryDto,
+    CreateTaskEffortRepositoryDto,
+    DeleteTaskEffortRepositoryDto,
     TaskEffortFindManyRepositoryDto,
-    TaskEffortUpdateRepositoryDto,
+    UpdateTaskEffortRepositoryDto,
 } from '../repositories-dto/task-effort.repository-dto'
 import { PrismaTransactionClientType } from '../types/prisma-transaction-client.type'
 
 export const taskEffortModelExtentions = {
     async extCreate(
-        dto: TaskEffortCreateRepositoryDto,
+        dto: CreateTaskEffortRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -47,7 +47,7 @@ export const taskEffortModelExtentions = {
     },
 
     async extUpdate(
-        dto: TaskEffortUpdateRepositoryDto,
+        dto: UpdateTaskEffortRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {
@@ -79,7 +79,7 @@ export const taskEffortModelExtentions = {
     },
 
     async extDelete(
-        dto: TaskEffortDeleteRepositoryDto,
+        dto: DeleteTaskEffortRepositoryDto,
         prisma?: any,
     ): Promise<string> {
         try {

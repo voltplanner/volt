@@ -1,18 +1,18 @@
 import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 
-export type TaskCommentCreateRepositoryDto = {
+export type CreateTaskCommentRepositoryDto = {
     text: string
     taskId: string
     userId: string
 }
 
-export type TaskCommentUpdateRepositoryDto = {
+export type UpdateTaskCommentRepositoryDto = {
     id: string
     text: string
     userId?: string
 }
 
-export type TaskCommentDeleteRepositoryDto = {
+export type DeleteTaskCommentRepositoryDto = {
     id: string
     userId?: string
 }
