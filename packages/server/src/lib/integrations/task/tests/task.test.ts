@@ -1,4 +1,4 @@
-import { TaskIntegrationTaskCreateInput } from '../types-input/task-integration-task-create.input-type'
+import { TaskIntegrationCreateTaskInput } from '../types-input/task-integration-task-create.input-type'
 import { setup as setupTest } from './support/global-setup'
 import { teardown } from './support/global-teardown'
 import { GlobalUtils } from './support/global-utils'
@@ -63,7 +63,7 @@ describe('Task', () => {
                 await utils.gqlProjectTasksStatuses({
                     projectId: createProject,
                 })
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: createProject,
                     name: 'Test Task 1',
@@ -80,7 +80,7 @@ describe('Task', () => {
                 adminAccessToken,
             )
 
-            expect(typeof taskCreate).toBe('string')
+            expect(typeof createTask).toBe('string')
         })
 
         it('Must return task', async () => {
@@ -125,15 +125,15 @@ describe('Task', () => {
                 statusId: taskPayloadStatus.id,
             }
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 taskPayload,
                 adminAccessToken,
             )
-            const { task } = await utils.gqlTask({ id: taskCreate })
+            const { task } = await utils.gqlTask({ id: createTask })
 
             expect(typeof task.createdAt).toBe('number')
 
-            expect(task.id).toBe(taskCreate)
+            expect(task.id).toBe(createTask)
             expect(task.number).toBe(1)
             expect(task.version).toBe(0)
             expect(task.name).toBe(taskPayload.name)
@@ -213,7 +213,7 @@ describe('Task', () => {
             const projectTasksStatuses_1 = projectTasksStatuses[0]
             const projectTasksStatuses_2 = projectTasksStatuses[1]
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: projectId,
                     name: 'Test Task 1',
@@ -229,10 +229,10 @@ describe('Task', () => {
             )
 
             const { task: createdTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
-            await utils.gqlTaskUpdate(
+            await utils.gqlUpdateTask(
                 {
                     id: createdTask.id,
                     version: createdTask.version,
@@ -248,10 +248,10 @@ describe('Task', () => {
             )
 
             const { task: updatedTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
-            expect(updatedTask.id).toBe(taskCreate)
+            expect(updatedTask.id).toBe(createTask)
             expect(updatedTask.createdAt).toBe(createdTask.createdAt)
 
             expect(updatedTask.name).toBe('Test Task 2')
@@ -275,7 +275,7 @@ describe('Task', () => {
         it('Must update task name', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: projectId,
                     name: 'Test Task 1',
@@ -285,9 +285,9 @@ describe('Task', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlTaskUpdate(
+            await utils.gqlUpdateTask(
                 {
-                    id: taskCreate,
+                    id: createTask,
                     version: 0,
                     name: 'Test Task 2',
                 },
@@ -295,7 +295,7 @@ describe('Task', () => {
             )
 
             const { task: updatedTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
             expect(updatedTask.name).toBe('Test Task 2')
@@ -304,7 +304,7 @@ describe('Task', () => {
         it('Must update task description', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: projectId,
                     name: 'Test Task 1',
@@ -314,9 +314,9 @@ describe('Task', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlTaskUpdate(
+            await utils.gqlUpdateTask(
                 {
-                    id: taskCreate,
+                    id: createTask,
                     version: 0,
                     description: 'Test Description 2',
                 },
@@ -324,7 +324,7 @@ describe('Task', () => {
             )
 
             const { task: updatedTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
             expect(updatedTask.description).toBe('Test Description 2')
@@ -333,7 +333,7 @@ describe('Task', () => {
         it('Must update task status', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: projectId,
                     name: 'Test Task 1',
@@ -343,9 +343,9 @@ describe('Task', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlTaskUpdate(
+            await utils.gqlUpdateTask(
                 {
-                    id: taskCreate,
+                    id: createTask,
                     version: 0,
                     statusId: projectTasksStatuses[1].id,
                 },
@@ -353,7 +353,7 @@ describe('Task', () => {
             )
 
             const { task: updatedTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
             expect(updatedTask.status.id).toBe(projectTasksStatuses[1].id)
@@ -369,7 +369,7 @@ describe('Task', () => {
                 .filter((i) => ['BUG', 'STORY'].includes(i.code))
                 .map((i: any) => i.id)
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: projectId,
                     name: 'Test Task 1',
@@ -380,9 +380,9 @@ describe('Task', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlTaskUpdate(
+            await utils.gqlUpdateTask(
                 {
-                    id: taskCreate,
+                    id: createTask,
                     version: 0,
                     tagIds: tagIdsOnUpdate,
                 },
@@ -390,7 +390,7 @@ describe('Task', () => {
             )
 
             const { task: updatedTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
             expect(updatedTask.tags.map((i) => i.id)).toEqual(tagIdsOnUpdate)
@@ -401,9 +401,9 @@ describe('Task', () => {
         let projectId = ''
         let adminUserId = ''
 
-        let taskPayload_1: TaskIntegrationTaskCreateInput = {} as any
-        let taskPayload_2: TaskIntegrationTaskCreateInput = {} as any
-        let taskPayload_3: TaskIntegrationTaskCreateInput = {} as any
+        let taskPayload_1: TaskIntegrationCreateTaskInput = {} as any
+        let taskPayload_2: TaskIntegrationCreateTaskInput = {} as any
+        let taskPayload_3: TaskIntegrationCreateTaskInput = {} as any
         let createdAtBefore_2: Date
         let createdAtAfter_2: Date
 
@@ -505,19 +505,19 @@ describe('Task', () => {
                     .map((i: any) => i.id),
             }
 
-            await utils.gqlTaskCreate(taskPayload_1, adminAccessToken)
+            await utils.gqlCreateTask(taskPayload_1, adminAccessToken)
 
             await new Promise((r) => setTimeout(r, 500))
             createdAtBefore_2 = new Date()
             await new Promise((r) => setTimeout(r, 500))
 
-            await utils.gqlTaskCreate(taskPayload_2, adminAccessToken)
+            await utils.gqlCreateTask(taskPayload_2, adminAccessToken)
 
             await new Promise((r) => setTimeout(r, 500))
             createdAtAfter_2 = new Date()
             await new Promise((r) => setTimeout(r, 500))
 
-            await utils.gqlTaskCreate(taskPayload_3, adminAccessToken)
+            await utils.gqlCreateTask(taskPayload_3, adminAccessToken)
         })
 
         it('Must return tasks', async () => {
@@ -531,15 +531,12 @@ describe('Task', () => {
 
         it('Must return tasks of current user', async () => {
             const accessToken = await utils.adminGetAccessToken()
-            const { tasksOfCurrentUser } = await utils.gqlTasksOfCurrentUser(
-                undefined,
-                accessToken,
-            )
+            const { myTasks } = await utils.gqlMyTasks(undefined, accessToken)
 
-            expect(tasksOfCurrentUser).toBeDefined()
-            expect(tasksOfCurrentUser.data).toBeDefined()
-            expect(tasksOfCurrentUser.meta).toBeDefined()
-            expect(tasksOfCurrentUser.data).toHaveLength(2)
+            expect(myTasks).toBeDefined()
+            expect(myTasks.data).toBeDefined()
+            expect(myTasks.meta).toBeDefined()
+            expect(myTasks.data).toHaveLength(2)
         })
 
         it('Must return filtered tasks by name', async () => {
@@ -765,7 +762,7 @@ describe('Task', () => {
             const projectTasksStatuses_2 = projectTasksStatuses[1]
             const projectTasksStatuses_3 = projectTasksStatuses[2]
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 {
                     projectId: createProject,
                     name: 'Test Task 1',
@@ -781,10 +778,10 @@ describe('Task', () => {
             )
 
             const { task: createdTask } = await utils.gqlTask({
-                id: taskCreate,
+                id: createTask,
             })
 
-            await utils.gqlTaskUpdate(
+            await utils.gqlUpdateTask(
                 {
                     id: createdTask.id,
                     version: createdTask.version,
@@ -803,7 +800,7 @@ describe('Task', () => {
 
             // Try to update task with same version
             try {
-                await utils.gqlTaskUpdate(
+                await utils.gqlUpdateTask(
                     {
                         id: createdTask.id,
                         version: createdTask.version,

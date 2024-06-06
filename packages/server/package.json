@@ -26,8 +26,8 @@
     "grammy": "^1.21.1",
     "graphql": "^16.8.1",
     "graphql-subscriptions": "^2.0.0",
-    "graphql-ws": "^5.15.0",
     "graphql-upload": "^13.0.0",
+    "graphql-ws": "^5.15.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "nodemailer": "^6.9.8",
@@ -44,6 +44,12 @@
     "@types/lodash": "^4.14.202",
     "@types/multer": "^1.4.11",
     "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38"
+    "@types/passport-local": "^1.0.38",
+    "cross-fetch": "^3.1.8",
+    "dotenv": "^16.4.5",
+    "execa": "^8.0.1",
+    "graphql-request": "^6.1.0",
+    "pg": "^8.11.5",
+    "testcontainers": "^10.9.0"
   }
 }

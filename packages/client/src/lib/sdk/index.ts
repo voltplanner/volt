@@ -1,20 +1,20 @@
 // @ts-nocheck
 import type {
-    QueryGenqlSelection,
-    Query,
-    MutationGenqlSelection,
-    Mutation,
-    SubscriptionGenqlSelection,
-    Subscription,
+  QueryGenqlSelection,
+  Query,
+  MutationGenqlSelection,
+  Mutation,
+  SubscriptionGenqlSelection,
+  Subscription,
 } from './schema'
 import {
-    linkTypeMap,
-    createClient as createClientOriginal,
-    generateGraphqlOperation,
-    type FieldsSelection,
-    type GraphqlOperation,
-    type ClientOptions,
-    GenqlError,
+  linkTypeMap,
+  createClient as createClientOriginal,
+  generateGraphqlOperation,
+  type FieldsSelection,
+  type GraphqlOperation,
+  type ClientOptions,
+  GenqlError,
 } from './runtime'
 export type { FieldsSelection } from './runtime'
 export { GenqlError }
@@ -24,60 +24,56 @@ export * from './schema'
 const typeMap = linkTypeMap(types as any)
 
 export interface Client {
-    query<R extends QueryGenqlSelection>(
-        request: R & { __name?: string },
-    ): Promise<FieldsSelection<Query, R>>
+  query<R extends QueryGenqlSelection>(
+    request: R & { __name?: string },
+  ): Promise<FieldsSelection<Query, R>>
 
-    mutation<R extends MutationGenqlSelection>(
-        request: R & { __name?: string },
-    ): Promise<FieldsSelection<Mutation, R>>
+  mutation<R extends MutationGenqlSelection>(
+    request: R & { __name?: string },
+  ): Promise<FieldsSelection<Mutation, R>>
 }
 
 export const createClient = function (options?: ClientOptions): Client {
-    return createClientOriginal({
-        url: undefined,
+  return createClientOriginal({
+    url: undefined,
 
-        ...options,
-        queryRoot: typeMap.Query!,
-        mutationRoot: typeMap.Mutation!,
-        subscriptionRoot: typeMap.Subscription!,
-    }) as any
+    ...options,
+    queryRoot: typeMap.Query!,
+    mutationRoot: typeMap.Mutation!,
+    subscriptionRoot: typeMap.Subscription!,
+  }) as any
 }
 
 export const everything = {
-    __scalar: true,
+  __scalar: true,
 }
 
 export type QueryResult<fields extends QueryGenqlSelection> = FieldsSelection<
-    Query,
-    fields
+  Query,
+  fields
 >
 export const generateQueryOp: (
-    fields: QueryGenqlSelection & { __name?: string },
+  fields: QueryGenqlSelection & { __name?: string },
 ) => GraphqlOperation = function (fields) {
-    return generateGraphqlOperation('query', typeMap.Query!, fields as any)
+  return generateGraphqlOperation('query', typeMap.Query!, fields as any)
 }
 
 export type MutationResult<fields extends MutationGenqlSelection> =
-    FieldsSelection<Mutation, fields>
+  FieldsSelection<Mutation, fields>
 export const generateMutationOp: (
-    fields: MutationGenqlSelection & { __name?: string },
+  fields: MutationGenqlSelection & { __name?: string },
 ) => GraphqlOperation = function (fields) {
-    return generateGraphqlOperation(
-        'mutation',
-        typeMap.Mutation!,
-        fields as any,
-    )
+  return generateGraphqlOperation('mutation', typeMap.Mutation!, fields as any)
 }
 
 export type SubscriptionResult<fields extends SubscriptionGenqlSelection> =
-    FieldsSelection<Subscription, fields>
+  FieldsSelection<Subscription, fields>
 export const generateSubscriptionOp: (
-    fields: SubscriptionGenqlSelection & { __name?: string },
+  fields: SubscriptionGenqlSelection & { __name?: string },
 ) => GraphqlOperation = function (fields) {
-    return generateGraphqlOperation(
-        'subscription',
-        typeMap.Subscription!,
-        fields as any,
-    )
+  return generateGraphqlOperation(
+    'subscription',
+    typeMap.Subscription!,
+    fields as any,
+  )
 }

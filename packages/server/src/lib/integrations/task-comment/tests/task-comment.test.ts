@@ -1,4 +1,4 @@
-import { TaskIntegrationTaskCreateInput } from '../../task/types-input/task-integration-task-create.input-type'
+import { TaskIntegrationCreateTaskInput } from '../../task/types-input/task-integration-task-create.input-type'
 import { setup as setupTest } from './support/global-setup'
 import { teardown } from './support/global-teardown'
 import { GlobalUtils } from './support/global-utils'
@@ -21,7 +21,7 @@ describe('Task Comment', () => {
     describe('GQL API', () => {
         let projectId = ''
 
-        let taskPayload_1: TaskIntegrationTaskCreateInput = {} as any
+        let taskPayload_1: TaskIntegrationCreateTaskInput = {} as any
         let taskId_1 = ''
 
         afterEach(async () => {
@@ -85,19 +85,19 @@ describe('Task Comment', () => {
                 assignedToId: adminUser.id,
             }
 
-            const { taskCreate } = await utils.gqlTaskCreate(
+            const { createTask } = await utils.gqlCreateTask(
                 taskPayload_1,
                 adminAccessToken,
             )
 
-            taskId_1 = taskCreate
+            taskId_1 = createTask
         })
 
         it('Must create task comment', async () => {
             const { adminUser, adminAccessToken } =
                 await utils.gqlGetAdminUser()
 
-            const { taskCommentCreate } = await utils.gqlTaskCommentCreate(
+            const { createTaskComment } = await utils.gqlCreateTaskComment(
                 {
                     taskId: taskId_1,
                     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
@@ -107,10 +107,10 @@ describe('Task Comment', () => {
 
             const taskComment =
                 await setup.prisma.taskComment.findUniqueOrThrow({
-                    where: { id: taskCommentCreate },
+                    where: { id: createTaskComment },
                 })
 
-            expect(taskComment.id).toBe(taskCommentCreate)
+            expect(taskComment.id).toBe(createTaskComment)
             expect(taskComment.text).toBe(
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
             )
@@ -120,7 +120,7 @@ describe('Task Comment', () => {
         it('Must update task comment', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCommentCreate } = await utils.gqlTaskCommentCreate(
+            const { createTaskComment } = await utils.gqlCreateTaskComment(
                 {
                     taskId: taskId_1,
                     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
@@ -128,9 +128,9 @@ describe('Task Comment', () => {
                 adminAccessToken,
             )
 
-            const { taskCommentUpdate } = await utils.gqlTaskCommentUpdate(
+            const { updateTaskComment } = await utils.gqlUpdateTaskComment(
                 {
-                    id: taskCommentCreate,
+                    id: createTaskComment,
                     text: 'Perspiciatis tempora velit ipsum dolor sit amet, iste natus error',
                 },
                 adminAccessToken,
@@ -138,10 +138,10 @@ describe('Task Comment', () => {
 
             const taskComment =
                 await setup.prisma.taskComment.findUniqueOrThrow({
-                    where: { id: taskCommentUpdate },
+                    where: { id: updateTaskComment },
                 })
 
-            expect(taskComment.id).toBe(taskCommentUpdate)
+            expect(taskComment.id).toBe(updateTaskComment)
             expect(taskComment.text).toBe(
                 'Perspiciatis tempora velit ipsum dolor sit amet, iste natus error',
             )
@@ -150,7 +150,7 @@ describe('Task Comment', () => {
         it('Must delete task comment', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCommentCreate } = await utils.gqlTaskCommentCreate(
+            const { createTaskComment } = await utils.gqlCreateTaskComment(
                 {
                     taskId: taskId_1,
                     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
@@ -158,15 +158,15 @@ describe('Task Comment', () => {
                 adminAccessToken,
             )
 
-            await utils.gqlTaskCommentDelete(
+            await utils.gqlDeleteTaskComment(
                 {
-                    id: taskCommentCreate,
+                    id: createTaskComment,
                 },
                 adminAccessToken,
             )
 
             const taskComment = await setup.prisma.taskComment.findUnique({
-                where: { id: taskCommentCreate },
+                where: { id: createTaskComment },
             })
 
             expect(taskComment.isDeleted).toBe(true)
@@ -176,8 +176,8 @@ describe('Task Comment', () => {
             const { adminUser, adminAccessToken } =
                 await utils.gqlGetAdminUser()
 
-            const { taskCommentCreate: taskCommentCreate_1 } =
-                await utils.gqlTaskCommentCreate(
+            const { createTaskComment: createTaskComment_1 } =
+                await utils.gqlCreateTaskComment(
                     {
                         taskId: taskId_1,
                         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
@@ -185,8 +185,8 @@ describe('Task Comment', () => {
                     adminAccessToken,
                 )
 
-            const { taskCommentCreate: taskCommentCreate_2 } =
-                await utils.gqlTaskCommentCreate(
+            const { createTaskComment: createTaskComment_2 } =
+                await utils.gqlCreateTaskComment(
                     {
                         taskId: taskId_1,
                         text: 'Perspiciatis tempora velit ipsum dolor sit amet, iste natus error',
@@ -205,8 +205,8 @@ describe('Task Comment', () => {
             expect(taskComments.data).toBeDefined()
             expect(taskComments.meta).toBeDefined()
             expect(taskComments.data.map((i) => i.id)).toEqual([
-                taskCommentCreate_2,
-                taskCommentCreate_1,
+                createTaskComment_2,
+                createTaskComment_1,
             ])
 
             for (const i of taskComments.data) {
@@ -227,22 +227,22 @@ describe('Task Comment', () => {
         it('Must return task comments paginated', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCommentCreate: taskCommentCreate_1 } =
-                await utils.gqlTaskCommentCreate(
+            const { createTaskComment: createTaskComment_1 } =
+                await utils.gqlCreateTaskComment(
                     {
                         taskId: taskId_1,
                         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
                     },
                     adminAccessToken,
                 )
-            await utils.gqlTaskCommentCreate(
+            await utils.gqlCreateTaskComment(
                 {
                     taskId: taskId_1,
                     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
                 },
                 adminAccessToken,
             )
-            await utils.gqlTaskCommentCreate(
+            await utils.gqlCreateTaskComment(
                 {
                     taskId: taskId_1,
                     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
@@ -264,15 +264,15 @@ describe('Task Comment', () => {
             expect(taskComments.meta.curPage).toBe(2)
             expect(taskComments.meta.perPage).toBe(2)
             expect(taskComments.data.map((i) => i.id)).toEqual([
-                taskCommentCreate_1,
+                createTaskComment_1,
             ])
         })
 
         it('Must not return deleted task comments', async () => {
             const { adminAccessToken } = await utils.gqlGetAdminUser()
 
-            const { taskCommentCreate: taskCommentCreate_1 } =
-                await utils.gqlTaskCommentCreate(
+            const { createTaskComment: createTaskComment_1 } =
+                await utils.gqlCreateTaskComment(
                     {
                         taskId: taskId_1,
                         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
@@ -280,8 +280,8 @@ describe('Task Comment', () => {
                     adminAccessToken,
                 )
 
-            const { taskCommentCreate: taskCommentCreate_2 } =
-                await utils.gqlTaskCommentCreate(
+            const { createTaskComment: createTaskComment_2 } =
+                await utils.gqlCreateTaskComment(
                     {
                         taskId: taskId_1,
                         text: 'Perspiciatis tempora velit ipsum dolor sit amet, iste natus error',
@@ -289,9 +289,9 @@ describe('Task Comment', () => {
                     adminAccessToken,
                 )
 
-            await utils.gqlTaskCommentDelete(
+            await utils.gqlDeleteTaskComment(
                 {
-                    id: taskCommentCreate_1,
+                    id: createTaskComment_1,
                 },
                 adminAccessToken,
             )
@@ -304,7 +304,7 @@ describe('Task Comment', () => {
             )
 
             expect(taskComments.data.map((i) => i.id)).toEqual([
-                taskCommentCreate_2,
+                createTaskComment_2,
             ])
         })
     })
