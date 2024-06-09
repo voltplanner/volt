@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { RoleStore } from './types'
 
-export const useRoleStore = create<RoleStore>()(
+export const roleStore = create<RoleStore>()(
     devtools((set, get) => ({
         role: {
             id: '',

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useRoles } from '../api/useRoles'
-import { useRoleStore } from '../model/useRoleStore'
+import { roleStore } from '../model/roleStore'
 import { GroupPermissions } from 'entities'
 import { Button } from 'shared'
 import { useChangePermissions } from '../api/useChangePermissions'
@@ -17,7 +17,7 @@ export const EditRole = ({ name = '' }: EditRoleProps) => {
         setRole,
         separateMethods,
         toggleMethod,
-    } = useRoleStore()
+    } = roleStore()
     const { changePermissions } = useChangePermissions({
         roleId: role?.id,
         permissions: methodsChanged?.map((method) => ({
