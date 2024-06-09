@@ -17,7 +17,7 @@ interface FormState {
     setData: (value: Partial<TData>) => void
     resetStore: () => void
 }
-export const useFormStore = create<FormState>()(
+export const formStore = create<FormState>()(
     devtools((set, get) => ({
         data: {
             surname: '',

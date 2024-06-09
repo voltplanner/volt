@@ -16,7 +16,7 @@ interface SessionStore {
     logout: () => void
     checkAuth: () => boolean
 }
-export const useSessionStore = create<SessionStore>()(
+export const sessionStore = create<SessionStore>()(
     devtools((set, get) => ({
         code: '',
         session: {

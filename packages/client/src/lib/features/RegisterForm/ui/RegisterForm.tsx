@@ -1,4 +1,4 @@
-import { useFormStore } from '../model/useFormStore'
+import { formStore } from '../model/formStore'
 import { AboutStep } from './AboutStep'
 import { PasswordStep } from './PasswordStep'
 

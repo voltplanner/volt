@@ -3,13 +3,13 @@ import { Suspense, memo, useEffect, useMemo, useState } from 'react'
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom'
 import { routeConfig } from 'shared'
 import styled from 'styled-components'
-import { useSessionStore } from 'entities'
+import { sessionStore } from 'entities'
 
 const AppRouter = () => {
     const [isAuth, setIsAuth] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
-    const { session, getLocalSession, login, logout } = useSessionStore()
+    const { session, getLocalSession, login, logout } = sessionStore()
     const { refreshToken } = ApiRefreshToken({
         refreshToken: session.refreshToken,
     })

@@ -9,7 +9,7 @@ interface FormState {
     setPassword: (password: string) => void
     resetStore: () => void
 }
-export const useFormStore = create<FormState>()(
+export const formStore = create<FormState>()(
     devtools((set, get) => ({
         email: '',
         password: '',

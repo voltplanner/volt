@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { BackIcon, Button, ReactIcon } from 'shared'
 import styled from 'styled-components'
 import { ApiSignIn } from './api/api'
-import { useFormStore } from './model/useFormStore'
+import { formStore } from './model/formStore'
 import { InternalLoginForm } from './ui/InternalLoginForm'
 import { ExternalLoginForm } from './ui/ExternalLoginForm'
-import { useSessionStore } from 'entities'
+import { sessionStore } from 'entities'
 import { useNavigate } from 'react-router-dom'
 
 type LoginFormProps = {
@@ -15,8 +15,8 @@ type LoginFormProps = {
 export const LoginForm = (props: LoginFormProps) => {
     const { title } = props
     const { setEmail, setPassword, resetStore, email, password } =
-        useFormStore()
-    const { login } = useSessionStore()
+        formStore()
+    const { login } = sessionStore()
     const [isInternal, setIsInternal] = useState(false)
     const navigate = useNavigate()
     const { signIn } = ApiSignIn({

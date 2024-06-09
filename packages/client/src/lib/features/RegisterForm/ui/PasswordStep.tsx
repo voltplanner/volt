@@ -3,7 +3,7 @@ import { Button, Input } from 'shared'
 import { FormStyled } from './styles'
 import { useCompleteSignIn } from '../api/useCompleteSignIn'
 import { RegisterData } from './RegisterForm'
-import { useSessionStore } from 'entities'
+import { sessionStore } from 'entities'
 import { useNavigate } from 'react-router-dom'
 
 type FormData = {
@@ -24,7 +24,7 @@ export const PasswordStep = ({ code, userId, email }: RegisterData) => {
         },
     })
     const navigate = useNavigate()
-    const { login } = useSessionStore()
+    const { login } = sessionStore()
     const password = watch('password')
     // const { data, setStep } = useFormStore()
     const onSubmit: SubmitHandler<FormData> = async (data) => {

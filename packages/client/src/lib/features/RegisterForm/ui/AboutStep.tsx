@@ -1,7 +1,7 @@
 import { SubmitHandler, UseFormHandleSubmit, useForm } from 'react-hook-form'
 import { Button, Input } from 'shared'
 import { FormStyled } from './styles'
-import { useFormStore } from '../model/useFormStore'
+import { formStore } from '../model/formStore'
 import { useEffect } from 'react'
 type FormData = {
     surname: string
@@ -22,7 +22,7 @@ export const AboutStep = () => {
             nickname: '',
         },
     })
-    const { setData, data, setStep } = useFormStore()
+    const { setData, data, setStep } = formStore()
     const onSubmit: SubmitHandler<FormData> = (data) => {
         setData(data)
         setStep(2)

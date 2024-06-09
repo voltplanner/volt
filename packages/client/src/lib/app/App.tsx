@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 import AppRouter from './routes/AppRouter'
 import { Layout } from './Layout'
-import { useSessionStore } from 'entities'
+import { sessionStore } from 'entities'
 import { useEffect } from 'react'
 
 export function App() {
-    const { checkAuth, getLocalSession } = useSessionStore()
+    const { checkAuth, getLocalSession } = sessionStore()
     useEffect(() => {
         getLocalSession()
         const intervalId = setInterval(() => {

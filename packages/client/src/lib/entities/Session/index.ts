@@ -1,1 +1,1 @@
-export { useSessionStore } from './model/useSessionStore'
+export { sessionStore } from './model/sessionStore'

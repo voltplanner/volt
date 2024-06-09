@@ -1,23 +1,22 @@
-import { Input } from 'shared'
+import { Button, Modal} from 'shared'
 import { useCreateProject } from '../api/useCreateProject'
 import { useState } from 'react'
+import { CreateModal } from './CreateModal/CreateModal'
 
 export const CreateProject = () => {
-    const [state, setState] = useState({
-        budget: 0,
-        deadline: 0,
-        description: '',
-        name: '',
-        members: [],
-    })
-    const { createProject } = useCreateProject({
-        ...state,
-    })
+    const [isOpen, setIsOpen] = useState(false)
+    const onClickModal = () => {
+        setIsOpen((prev) => !prev)
+    }
     return (
-        <div>
-            <Input />
-            <textarea />
-            <Input type="date" />
-        </div>
+        <>
+            <Button onClick={onClickModal}>+ Create project</Button>
+            <Modal
+                children={<CreateModal />}
+                onClose={() => setIsOpen(false)}
+                isOpen={isOpen}
+            />
+            
+        </>
     )
 }
