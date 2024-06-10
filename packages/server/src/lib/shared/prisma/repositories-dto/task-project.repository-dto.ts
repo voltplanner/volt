@@ -2,6 +2,7 @@ import { OrderEnum } from '../../../shared/interfaces/shared.interfaces'
 
 export type TaskProjectCreateRepositoryDto = {
     name: string
+    key: string
     budget?: number
     deadline?: Date
     description?: string
@@ -10,6 +11,7 @@ export type TaskProjectCreateRepositoryDto = {
 export type TaskProjectUpdateRepositoryDto = {
     id: string
     version: number
+    key?: string
     name?: string
     budget?: number | null
     deadline?: Date | null

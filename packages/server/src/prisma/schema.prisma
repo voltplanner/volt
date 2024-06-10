@@ -185,6 +185,7 @@ model TaskUserRole {
 model TaskProject {
     id          String    @id @default(uuid()) @db.Uuid
     name        String    @db.VarChar(512)
+    key         String    @db.VarChar(6)
     description String?
     deadline    DateTime? @db.Timestamp(6)
     budget      Int?      @db.Integer

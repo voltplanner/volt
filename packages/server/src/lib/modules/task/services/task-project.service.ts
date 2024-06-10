@@ -21,19 +21,21 @@ export class TaskProjectService {
     async create(
         dto: {
             readonly name: string
+            readonly key: string
             readonly budget?: number
             readonly deadline?: Date
             readonly description?: string
         },
         prisma?: PrismaTransactionClientType,
     ) {
-        const { name, budget, deadline, description } = dto
+        const { name, budget, deadline, description, key } = dto
 
         const client = prisma || this.prisma
 
         const projectId = await client.taskProject.extCreate(
             {
                 name,
+                key,
                 budget,
                 deadline,
                 description,
@@ -54,6 +56,7 @@ export class TaskProjectService {
             readonly id: string
             readonly version: number
             readonly name?: string
+            readonly key?: string
             readonly budget?: number | null
             readonly deadline?: number | null
             readonly description?: string | null

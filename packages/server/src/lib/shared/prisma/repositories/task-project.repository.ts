@@ -25,11 +25,12 @@ export const taskProjectModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { name, budget, deadline, description } = dto
+            const { name, budget, deadline, description, key } = dto
 
             const { id } = await client.taskProject.create({
                 data: {
                     name,
+                    key,
                     budget,
                     deadline,
                     version: 0,
@@ -59,12 +60,14 @@ export const taskProjectModelExtentions = {
             const client: PrismaTransactionClientType =
                 prisma || PrismaService.instance
 
-            const { id, version, name, budget, deadline, description } = dto
+            const { id, version, name, budget, deadline, description, key } =
+                dto
 
             const { id: updatedId } = await client.taskProject.update({
                 where: { id, version },
                 data: {
                     name,
+                    key,
                     budget,
                     deadline,
                     description,

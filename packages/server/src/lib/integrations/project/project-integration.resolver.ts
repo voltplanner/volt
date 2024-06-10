@@ -47,7 +47,7 @@ export class ProjectIntegrationResolver {
     async createProject(
         @Args('input') input: ProjectIntegrationCreateProjectInput,
     ): Promise<string> {
-        const { name, budget, deadline, description } = input
+        const { name, budget, deadline, description, key } = input
 
         const members: ProjectIntegrationCreateProjectMemberInput[] =
             input.members ?? []
@@ -57,6 +57,7 @@ export class ProjectIntegrationResolver {
             const projectId = await this._taskProjectService.create(
                 {
                     name,
+                    key,
                     budget,
                     description,
                     deadline: new Date(deadline),

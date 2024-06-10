@@ -12,6 +12,9 @@ export class ProjectIntegrationProjectUpdateInput {
     readonly name?: string | null
 
     @Field(() => String, { nullable: true })
+    readonly key?: string | null
+
+    @Field(() => String, { nullable: true })
     readonly description?: string | null
 
     @Field(() => Number, { nullable: true })

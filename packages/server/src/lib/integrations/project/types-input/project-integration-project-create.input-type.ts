@@ -11,6 +11,9 @@ export class ProjectIntegrationCreateProjectInput {
     })
     readonly budget?: number
 
+    @Field(() => String)
+    readonly key: string
+
     @Field(() => Number, {
         description: 'Deadline of the project in timestampMs',
         nullable: true,
